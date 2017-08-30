@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d0566bc08399084bb947700a08aa165, type: 3}
+  m_Name: GenericHips
+  m_EditorClassIdentifier: 
+  bodyPartID: 0
+  bodyPartName: 48697073
+  bodyPartLayers: []
+  subBodyParts:
+  - {fileID: 11400000, guid: d569341c77f9a1646b1af07e3856c54e, type: 2}
+  physicalIntegrity: 0
+  partType: 0
+  armor: 0
+  collider: {fileID: 0}
