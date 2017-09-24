@@ -133,45 +133,45 @@ public class SimpleChunk : MonoBehaviour
 
 
 
-    public virtual MeshData SimpleChunkData
-     (SimpleChunk simpleChunk, int x, int y, int z, MeshData meshData)
-    {
+    //public virtual MeshData SimpleChunkData
+    // (SimpleChunk simpleChunk, int x, int y, int z, MeshData meshData)
+    //{
 
-        meshData.useRenderDataForCol = true;
+    //    meshData.useRenderDataForCol = true;
 
-        if (!simpleChunk.GetSimpleChunk(x, y + 1, z).IsSolid(Direction.down))
-        {
-            meshData = FaceDataUp(simpleChunk, x, y, z, meshData);
-        }
+    //    if (!simpleChunk.GetSimpleChunk(x, y+1, z).IsSolid(Direction.down))
+    //    {
+    //        meshData = FaceDataUp(simpleChunk, x, y, z, meshData);
+    //    }
 
-        if (!chunk.GetBlock(x, y - 1, z).IsSolid(Direction.up))
-        {
-            meshData = FaceDataDown(chunk, x, y, z, meshData);
-        }
+    //    if (!chunk.GetBlock(x, y - 1, z).IsSolid(Direction.up))
+    //    {
+    //        meshData = FaceDataDown(chunk, x, y, z, meshData);
+    //    }
 
-        if (!chunk.GetBlock(x, y, z + 1).IsSolid(Direction.south))
-        {
-            meshData = FaceDataNorth(chunk, x, y, z, meshData);
-        }
+    //    if (!chunk.GetBlock(x, y, z + 1).IsSolid(Direction.south))
+    //    {
+    //        meshData = FaceDataNorth(chunk, x, y, z, meshData);
+    //    }
 
-        if (!chunk.GetBlock(x, y, z - 1).IsSolid(Direction.north))
-        {
-            meshData = FaceDataSouth(chunk, x, y, z, meshData);
-        }
+    //    if (!chunk.GetBlock(x, y, z - 1).IsSolid(Direction.north))
+    //    {
+    //        meshData = FaceDataSouth(chunk, x, y, z, meshData);
+    //    }
 
-        if (!chunk.GetBlock(x + 1, y, z).IsSolid(Direction.west))
-        {
-            meshData = FaceDataEast(chunk, x, y, z, meshData);
-        }
+    //    if (!chunk.GetBlock(x + 1, y, z).IsSolid(Direction.west))
+    //    {
+    //        meshData = FaceDataEast(chunk, x, y, z, meshData);
+    //    }
 
-        if (!chunk.GetBlock(x - 1, y, z).IsSolid(Direction.east))
-        {
-            meshData = FaceDataWest(chunk, x, y, z, meshData);
-        }
+    //    if (!chunk.GetBlock(x - 1, y, z).IsSolid(Direction.east))
+    //    {
+    //        meshData = FaceDataWest(chunk, x, y, z, meshData);
+    //    }
 
-        return meshData;
+    //    return meshData;
 
-    }
+    //}
 
     protected virtual MeshData FaceDataUp
         (SimpleChunk chunk, int x, int y, int z, MeshData meshData)
