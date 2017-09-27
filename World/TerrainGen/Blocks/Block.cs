@@ -17,7 +17,6 @@ public class Block
     //Base block constructor
     public Block()
     {
-		
     }
 
     public virtual MeshData Blockdata
