@@ -57,7 +57,7 @@ public class TerrainGen
         return chunk;
     }
 
-	public Chunk ChunkColumnGen(Chunk chunk, int x, int z)
+    public Chunk ChunkColumnGen(Chunk chunk, int x, int z)
     {
         int stoneHeight = Mathf.FloorToInt(stoneBaseHeight);
         stoneHeight += GetNoise(x, 0, z, stoneMountainFrequency, Mathf.FloorToInt(stoneMountainHeight));
@@ -80,7 +80,7 @@ public class TerrainGen
 
             if (y <= stoneHeight && caveSize < caveChance)
             {
-                if(goldSize > goldChance)
+                if (goldSize > goldChance)
                 {
                     SetBlock(x, y, z, new BlockQuartzGold(), chunk);
                 }
@@ -97,7 +97,7 @@ public class TerrainGen
                 if (y == dirtHeight && y <= treeline && !chunk.hasTree && GetNoise(x, 0, z, treeFrequency, 100) < treeDensity)
                 {
                     chunk.hasTree = true;
-                    chunk.treeList.Add(new Vector3(x,y,z));
+                    chunk.treeList.Add(new Vector3(x, y, z));
                     //treeVar = (GameObject)Resources.Load("Tree1", typeof(GameObject));
                     //treeVar.transform.position = new Vector3(x, y, z);
                     //CreateTree(x, y + 1, z, chunk);
@@ -112,7 +112,7 @@ public class TerrainGen
                     //CreateTree(x, y + 1, z, chunk);
                 }
 
-                if (y == dirtHeight && y >treeline && GetNoise(x, 0, z, boneFrequency, 120) < boneDensity)
+                if (y == dirtHeight && y > treeline && GetNoise(x, 0, z, boneFrequency, 120) < boneDensity)
                 {
                     chunk.boneSpawn = true;
                     chunk.boneList.Add(new Vector3(x, y + 10, z));
@@ -139,6 +139,104 @@ public class TerrainGen
         }
 
         return chunk;
+    }
+
+    public Chunk16 Chunk16Gen(Chunk16 chunk16)
+    {
+        for (int x = chunk16.pos.x; x < chunk16.pos.x + Chunk16.chunk16Size*16; x+=16) //Change this line
+        {
+            for (int z = chunk16.pos.z; z < chunk16.pos.z + Chunk16.chunk16Size*16; z+=16)//and this line
+            {
+
+					chunk16 = Chunk16ColumnGen (chunk16, x, z);
+            }
+        }
+        return chunk16;
+    }
+
+	public Chunk16 Chunk16ColumnGen(Chunk16 chunk16, int x, int z)
+    {
+        int stoneHeight = Mathf.FloorToInt(stoneBaseHeight);
+        stoneHeight += GetNoise(x, 0, z, stoneMountainFrequency, Mathf.FloorToInt(stoneMountainHeight));
+
+        if (stoneHeight < stoneMinHeight)
+            stoneHeight = Mathf.FloorToInt(stoneMinHeight);
+
+        stoneHeight += GetNoise(x, 0, z, stoneBaseNoise, Mathf.FloorToInt(stoneBaseNoiseHeight));
+
+        int dirtHeight = stoneHeight + Mathf.FloorToInt(dirtBaseHeight);
+        dirtHeight += GetNoise(x, 100, z, dirtNoise, Mathf.FloorToInt(dirtNoiseHeight));
+
+        for (int y = chunk16.pos.y - 128; y < chunk16.pos.y + Chunk16.chunk16Size*16; y+=16)
+        {
+            //Get a value to base cave generation on
+            int caveChance = GetNoise(x, y, z, caveFrequency, 100);
+            int goldChance = GetNoise(x, y, z, goldFrequency, 100);
+            int copperChance = GetNoise(x, y, z, copperFrequency, 100);
+
+
+            if (y <= stoneHeight && caveSize < caveChance)
+            {
+                //if(goldSize > goldChance)
+                //{
+                //    SetBlock(x, y, z, new BlockQuartzGold(), chunk);
+                //}
+                //if (copperSize > copperChance)
+                //{
+                //    SetBlock(x, y, z, new BlockCopperOre(), chunk);
+                //}
+                //else { SetBlock(x, y, z, new Block(), chunk); }
+                SetBlock16(x, y, z, new Block16(), chunk16);
+            }
+            else if (y <= dirtHeight && caveSize < caveChance)
+            {
+                SetBlock16(x, y, z, new Block16Grass(), chunk16);
+
+                //if (y == dirtHeight && y <= treeline && !chunk.hasTree && GetNoise(x, 0, z, treeFrequency, 100) < treeDensity)
+                //{
+                //    chunk.hasTree = true;
+                //    chunk.treeList.Add(new Vector3(x,y,z));
+                //    //treeVar = (GameObject)Resources.Load("Tree1", typeof(GameObject));
+                //    //treeVar.transform.position = new Vector3(x, y, z);
+                //    //CreateTree(x, y + 1, z, chunk);
+                //}
+
+                //if (y == dirtHeight && y <= shrubline && GetNoise(x, 0, z, huckFrequency, 100) < huckDensity)
+                //{
+                //    chunk.hasBush = true;
+                //    chunk.bushList.Add(new Vector3(x, y, z));
+                //    //treeVar = (GameObject)Resources.Load("Tree1", typeof(GameObject));
+                //    //treeVar.transform.position = new Vector3(x, y, z);
+                //    //CreateTree(x, y + 1, z, chunk);
+                //}
+
+                //if (y == dirtHeight && y >treeline && GetNoise(x, 0, z, boneFrequency, 120) < boneDensity)
+                //{
+                //    chunk.boneSpawn = true;
+                //    chunk.boneList.Add(new Vector3(x, y + 10, z));
+                //    //treeVar = (GameObject)Resources.Load("Tree1", typeof(GameObject));
+                //    //treeVar.transform.position = new Vector3(x, y, z);
+                //    //CreateTree(x, y + 1, z, chunk);
+                //}
+
+                //if (y == dirtHeight && !chunk.hasTree && GetNoise(x, 0, z, horseFrequency, 120) < horseDensity)
+                //{
+                //    chunk.horseSpawn = true;
+                //    chunk.horseList.Add(new Vector3(x, y + 10, z));
+                //    //treeVar = (GameObject)Resources.Load("Tree1", typeof(GameObject));
+                //    //treeVar.transform.position = new Vector3(x, y, z);
+                //    //CreateTree(x, y + 1, z, chunk);
+                //}
+            }
+            else
+            {
+                SetBlock16(x, y, z, new Block16Air(), chunk16);
+                chunk16.airCount++;
+            }
+
+        }
+
+        return chunk16;
     }
 
     public SimpleChunk SimpleChunkGen(SimpleChunk simpleChunk)
@@ -321,6 +419,22 @@ public class TerrainGen
         {
             if (replaceBlocks || chunk.blocks[x, y, z] == null)
                 chunk.SetBlock(x, y, z, block);
+        }
+    }
+
+    public static void SetBlock16(int x, int y, int z, Block16 block16, Chunk16 chunk16, bool replaceBlocks = false)
+    {
+        x -= chunk16.pos.x;
+        x /= 16;
+        y -= chunk16.pos.y;
+        y /= 16;
+        z -= chunk16.pos.z;
+        z /= 16;
+
+        if (Chunk16.InRange(x) && Chunk16.InRange(y) && Chunk16.InRange(z))
+        {
+            if (replaceBlocks || chunk16.block16s[x, y, z] == null)
+                chunk16.SetBlock16(x, y, z, block16);
         }
     }
 

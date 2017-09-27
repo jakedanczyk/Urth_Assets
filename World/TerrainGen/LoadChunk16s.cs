@@ -2,9 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class LoadChunks : MonoBehaviour
+public class LoadChunk16s : MonoBehaviour
 {
-	static WorldPos[] chunkPositions = {   new WorldPos (0, 0, 0),
+	static WorldPos[] chunk16Positions = {   new WorldPos (0, 0, 0),
 		
 		new WorldPos (1, 0, 0), new WorldPos (-1, 0, 0), new WorldPos (0, 0, -1), new WorldPos (0, 0, 1), 
 		new WorldPos (-1, 0, -1), new WorldPos (-1, 0, 1), new WorldPos (1, 0, -1), new WorldPos (1, 0, 1), 
@@ -64,8 +64,7 @@ public class LoadChunks : MonoBehaviour
         //new WorldPos (7, 0, -2), new WorldPos (7, 0, 2)
     };
 
-    public World world;
-    public GameObject treePrefab;
+    public World16 world16;
     public Transform playerTransform;
 
     List<WorldPos> updateList = new List<WorldPos>();
@@ -81,74 +80,120 @@ public class LoadChunks : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (DeleteChunks())
+        Debug.Log("loadChunk16");
+        if (DeleteChunk16s())
             return;
 
-        FindChunksToLoad();
-        LoadAndRenderChunks();
+        FindChunk16sToLoad();
+        LoadAndRenderChunk16s();
     }
 
-    void FindChunksToLoad()
+    void FindChunk16sToLoad()
     {
         //Get the position of this gameobject to generate around
 
         WorldPos playerPos = new WorldPos(
-            Mathf.FloorToInt(transform.position.x / Chunk.chunkSize) * Chunk.chunkSize,
-            Mathf.FloorToInt(transform.position.y / Chunk.chunkSize) * Chunk.chunkSize,
-            Mathf.FloorToInt(transform.position.z / Chunk.chunkSize) * Chunk.chunkSize
+            Mathf.FloorToInt(transform.position.x / (Chunk16.chunk16Size * 16)) * (Chunk16.chunk16Size * 16),
+            Mathf.FloorToInt(transform.position.y / (Chunk16.chunk16Size * 16)) * (Chunk16.chunk16Size * 16),
+            Mathf.FloorToInt(transform.position.z / (Chunk16.chunk16Size * 16)) * (Chunk16.chunk16Size * 16)
             );
 		
 
-        //If there aren't already chunks to generate
+        //If there aren't already chunk16s to generate
         if (updateList.Count == 0)
         {
             //Cycle through the array of positions
-            for (int i = 0; i < chunkPositions.Length; i++)
+            for (int i = 0; i < chunk16Positions.Length; i++)
             {
-                //translate the player position and array position into chunk position
-                WorldPos newChunkPos = new WorldPos(
-                    chunkPositions[i].x * Chunk.chunkSize + playerPos.x,
-					chunkPositions[i].y * Chunk.chunkSize + playerPos.y,
-                    chunkPositions[i].z * Chunk.chunkSize + playerPos.z
+                //translate the player position and array position into chunk16 position
+                WorldPos newChunk16Pos = new WorldPos(
+                    chunk16Positions[i].x * Chunk16.chunk16Size*16 + playerPos.x,
+					chunk16Positions[i].y * Chunk16.chunk16Size*16 + playerPos.y,
+                    chunk16Positions[i].z * Chunk16.chunk16Size*16 + playerPos.z
                     );
 
-                //Get the chunk in the defined position
-                Chunk newChunk = world.GetChunk(
-                    newChunkPos.x, newChunkPos.y, newChunkPos.z);
+                //Get the chunk16 in the defined position
+                Chunk16 newChunk16 = world16.GetChunk16(
+                    newChunk16Pos.x, newChunk16Pos.y, newChunk16Pos.z);
 
-                //If the chunk already exists and it's already
+                //If the chunk16 already exists and it's already
                 //rendered or in queue to be rendered continue
-                if (newChunk != null
-                    && (newChunk.rendered || updateList.Contains(newChunkPos)))
+                if (newChunk16 != null
+                    && (newChunk16.rendered || updateList.Contains(newChunk16Pos)))
                     continue;
 
-				int player_y = (int)(Mathf.Floor (playerPos.y / Chunk.chunkSize));
+                int player_y = (int)(Mathf.Floor(playerPos.y / 256));
 
-                //load a column of chunks in this position
-				for (int y = player_y - 4; y < player_y+4; y++)
+                //load a column of chunk16s in this position
+
+                for (int y = player_y - 6; y < player_y + 6; y++)
                 {
-
-                    for (int x = newChunkPos.x - Chunk.chunkSize; x <= newChunkPos.x + Chunk.chunkSize; x += Chunk.chunkSize)
+                    for (int x = newChunk16Pos.x - 256; x <= newChunk16Pos.x + 256; x += 256)
                     {
-                        for (int z = newChunkPos.z - Chunk.chunkSize; z <= newChunkPos.z + Chunk.chunkSize; z += Chunk.chunkSize)
+                        for (int z = newChunk16Pos.z - 256; z <= newChunk16Pos.z + 256; z += 256)
                         {
-                            buildList.Add(new WorldPos(x, y * Chunk.chunkSize, z));
+                            buildList.Add(new WorldPos(
+                                x, y * Chunk16.chunk16Size * 16, z));
                         }
                     }
-                    updateList.Add(new WorldPos(newChunkPos.x, y * Chunk.chunkSize, newChunkPos.z));
+                    updateList.Add(new WorldPos(
+                                newChunk16Pos.x, y * Chunk16.chunk16Size * 16, newChunk16Pos.z));
                 }
                 return;
+                //for (int y = player_y - 1; y < player_y+1; y++)
+                //{
+
+                //    for (int x = newChunk16Pos.x - Chunk16.chunk16Size; x <= newChunk16Pos.x + Chunk16.chunk16Size; x += Chunk16.chunk16Size)
+                //    {
+                //        for (int z = newChunk16Pos.z - Chunk16.chunk16Size; z <= newChunk16Pos.z + Chunk16.chunk16Size; z += Chunk16.chunk16Size)
+                //        {
+                //            buildList.Add(new WorldPos(
+                //                x, y * Chunk16.chunk16Size, z));
+                //        }
+                //    }
+                //    updateList.Add(new WorldPos(
+                //                newChunk16Pos.x, y * Chunk16.chunk16Size, newChunk16Pos.z));
+                //}
+                //for (int y = player_y - 1; y > player_y - 4; y--)
+                //{
+
+                //    for (int x = newChunk16Pos.x - Chunk16.chunk16Size; x <= newChunk16Pos.x + Chunk16.chunk16Size; x += Chunk16.chunk16Size)
+                //    {
+                //        for (int z = newChunk16Pos.z - Chunk16.chunk16Size; z <= newChunk16Pos.z + Chunk16.chunk16Size; z += Chunk16.chunk16Size)
+                //        {
+                //            buildList.Add(new WorldPos(
+                //                x, y * Chunk16.chunk16Size, z));
+                //        }
+                //    }
+                //    updateList.Add(new WorldPos(
+                //                newChunk16Pos.x, y * Chunk16.chunk16Size, newChunk16Pos.z));
+                //}
+                //for (int y = player_y +1; y < player_y + 4; y++)
+                //{
+
+                //    for (int x = newChunk16Pos.x - Chunk16.chunk16Size; x <= newChunk16Pos.x + Chunk16.chunk16Size; x += Chunk16.chunk16Size)
+                //    {
+                //        for (int z = newChunk16Pos.z - Chunk16.chunk16Size; z <= newChunk16Pos.z + Chunk16.chunk16Size; z += Chunk16.chunk16Size)
+                //        {
+                //            buildList.Add(new WorldPos(
+                //                x, y * Chunk16.chunk16Size, z));
+                //        }
+                //    }
+                //    updateList.Add(new WorldPos(
+                //                newChunk16Pos.x, y * Chunk16.chunk16Size, newChunk16Pos.z));
+                //}
+                //return;
             }
         }
     }
 
-    void LoadAndRenderChunks()
+    void LoadAndRenderChunk16s()
     {
         if (buildList.Count != 0)
         {
             for (int i = 0; i < buildList.Count && i < 8; i++)
             {
-                BuildChunk(buildList[0]);
+                BuildChunk16(buildList[0]);
                 buildList.RemoveAt(0);
             }
 
@@ -158,40 +203,40 @@ public class LoadChunks : MonoBehaviour
 
         if (updateList.Count != 0)
         {
-            Chunk chunk = world.GetChunk(updateList[0].x, updateList[0].y, updateList[0].z);
-            if (chunk != null)
-                chunk.update = true;
+            Chunk16 chunk16 = world16.GetChunk16(updateList[0].x, updateList[0].y, updateList[0].z);
+            if (chunk16 != null)
+                chunk16.update = true;
             updateList.RemoveAt(0);
         }
     }
 
-    void BuildChunk(WorldPos pos)
+    void BuildChunk16(WorldPos pos)
     {
-        if (world.GetChunk(pos.x, pos.y, pos.z) == null)
+        if (world16.GetChunk16(pos.x, pos.y, pos.z) == null)
         {
-            world.CreateChunk(pos.x, pos.y, pos.z);
+            world16.CreateChunk16(pos.x, pos.y, pos.z);
         }
     }
 
     public int dist;
-    bool DeleteChunks()
+    bool DeleteChunk16s()
     {
 
-        if (timer == 60)
+        if (timer == 10)
         {
-            var chunksToDelete = new List<WorldPos>();
-            foreach (var chunk in world.chunks)
+            var chunk16sToDelete = new List<WorldPos>();
+            foreach (var chunk16 in world16.chunk16s)
             {
                 float distance = Vector3.Distance(
-					new Vector3(chunk.Value.pos.x, .5f * chunk.Value.pos.y, chunk.Value.pos.z),
-					new Vector3(playerTransform.position.x, .5f * playerTransform.position.y, playerTransform.position.z));
+					new Vector3(chunk16.Value.pos.x, 2*chunk16.Value.pos.y, chunk16.Value.pos.z),
+					new Vector3(playerTransform.position.x, 2* playerTransform.position.y, playerTransform.position.z));
 
-                if (distance > dist)
-                    chunksToDelete.Add(chunk.Key);
+                if (distance > 1024 || distance < 16)
+                    chunk16sToDelete.Add(chunk16.Key);
             }
 
-            foreach (var chunk in chunksToDelete)
-                world.DestroyChunk(chunk.x, chunk.y, chunk.z);
+            foreach (var chunk16 in chunk16sToDelete)
+                world16.DestroyChunk16(chunk16.x, chunk16.y, chunk16.z);
 
             timer = 0;
             return true;
