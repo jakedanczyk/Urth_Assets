@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System;
 
 [Serializable]
-public class Save16
+public class Save1
 {
-    public Dictionary<WorldPos, Block16> blocks = new Dictionary<WorldPos, Block16>();
+    public Dictionary<WorldPos, Block1> block1s = new Dictionary<WorldPos, Block1>();
 
-    public Save16(Chunk16 chunk16)
+    public Save1(Chunk1 chunk1)
     {
         for (int x = 0; x < 16; x++)
         {
@@ -16,11 +16,11 @@ public class Save16
             {
                 for (int z = 0; z < 16; z++)
                 {
-                    if (!chunk16.block16s[x, y, z].changed)
+                    if (!chunk1.block1s[x, y, z].changed)
                         continue;
 
-                    WorldPos pos = new WorldPos(16*x, 16*y, 16*z);
-                    blocks.Add(pos, chunk16.block16s[x, y, z]);
+                    WorldPos pos = new WorldPos(x, y, z);
+                    block1s.Add(pos, chunk1.block1s[x, y, z]);
                 }
             }
         }

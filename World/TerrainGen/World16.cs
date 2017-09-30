@@ -12,9 +12,6 @@ public class World16 : MonoBehaviour {
 
     public void CreateChunk16(int x, int y, int z)
     {
-        Debug.Log("World16createchunk16");
-        Debug.Log(x + "," + y + ","+z);
-
         WorldPos worldPos16 = new WorldPos(x, y, z);
 
         //Instantiate the chunk16 at the coordinates using the chunk16 prefab
@@ -22,7 +19,6 @@ public class World16 : MonoBehaviour {
                         chunk16Prefab, new Vector3(x, y, z),
                         Quaternion.Euler(Vector3.zero)
                     ) as GameObject;
-        Debug.Log("World16createchunk16-2");
 
         Chunk16 newChunk16 = newChunk16Object.GetComponent<Chunk16>();
 
@@ -31,14 +27,11 @@ public class World16 : MonoBehaviour {
 
         //Add it to the chunk16s dictionary with the position as the key
         chunk16s.Add(worldPos16, newChunk16);
-        Debug.Log("World16createchunk16-3");
 
         var terrainGen = new TerrainGen();
         newChunk16 = terrainGen.Chunk16Gen(newChunk16);
-        Debug.Log("new chunk made" + newChunk16.airCount);
         newChunk16.SetBlock16sUnmodified();
         if (newChunk16.airCount == 6144) { newChunk16.gameObject.SetActive(false); }
-        Debug.Log("World16createchunk16-4");
 
         //for(int i = 0; i < newChunk.treeList.Count; i++)
         //{
@@ -64,7 +57,6 @@ public class World16 : MonoBehaviour {
         //}
 
         Serialization16.Load16(newChunk16);
-        Debug.Log("newChunkSerialized");
     }
 
     public void DestroyChunk16(int x, int y, int z)
@@ -98,7 +90,6 @@ public class World16 : MonoBehaviour {
         y = Mathf.FloorToInt(y / 16) * 16;
         z = Mathf.FloorToInt(z / 16) * 16;
         Chunk16 containerChunk16 = GetChunk16(x, y, z);
-        Debug.Log("World16getblock");
 
         if (containerChunk16 != null)
         {

@@ -8,22 +8,22 @@ using System.Collections;
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshCollider))]
 
-public class Chunk16 : MonoBehaviour
+public class Chunk64 : MonoBehaviour
 {
     //public bool hasTree, hasBush;
     //public List<Vector3> treeList, boneList, bushList, horseList;
-    public Block16[, ,] block16s = new Block16[16, 16, 16];
+    public Block64[, ,] block64s = new Block64[16, 16, 16];
 
     public int airCount = 0;
     //public bool boneSpawn, horseSpawn, spawned;
-    public static int chunk16Size = 16;
+    public static int chunk64Size = 64;
     public bool update = false;
     public bool rendered;
 
     MeshFilter filter;
     MeshCollider coll;
 
-    public World16 world16;
+    public World64 world64;
     public WorldPos pos;
 
     void Start()
@@ -38,15 +38,15 @@ public class Chunk16 : MonoBehaviour
         if (update)
         {
             update = false;
-            UpdateChunk16();
+            UpdateChunk64();
         }
     }
 
-	public Block16 GetBlock16(int x, int y, int z)
+	public Block64 GetBlock64(int x, int y, int z)
 	{
         if (InRange(x) && InRange(y) && InRange(z))
-            return block16s[x, y, z];
-        return world16.GetBlock16(pos.x + x, pos.y + y, pos.z + z);
+            return block64s[x, y, z];
+        return world64.GetBlock64(pos.x + x, pos.y + y, pos.z + z);
     }
 
     public static bool InRange(int index)
@@ -57,39 +57,39 @@ public class Chunk16 : MonoBehaviour
         return true;
     }
 
-    public void SetBlock16(int x, int y, int z, Block16 block16)
+    public void SetBlock64(int x, int y, int z, Block64 block64)
     {
         if (InRange(x) && InRange(y) && InRange(z))
         {
-            block16s[x, y, z] = block16;
+            block64s[x, y, z] = block64;
         }
         else
         {
-            world16.SetBlock16(pos.x + x, pos.y + y, pos.z + z, block16);
+            world64.SetBlock64(pos.x + x, pos.y + y, pos.z + z, block64);
         }
     }
 
-    public void SetBlock16sUnmodified()
+    public void SetBlock64sUnmodified()
     {
-        foreach (Block16 block16 in block16s)
+        foreach (Block64 block64 in block64s)
         {
-            block16.changed = false;
+            block64.changed = false;
         }
     }
 
     // Updates the chunk based on its contents
-    void UpdateChunk16()
+    void UpdateChunk64()
     {
         rendered = true;
         MeshData meshData = new MeshData();
 
-        for (int x = 0; x < chunk16Size; x+=1)
+        for (int x = 0; x < 16; x+=1)
         {
-            for (int y = 0; y < chunk16Size; y+=1)
+            for (int y = 0; y < 16; y+=1)
             {
-                for (int z = 0; z < chunk16Size; z+=1)
+                for (int z = 0; z < 16; z+=1)
                 {
-                    meshData = block16s[x, y, z].Blockdata(this, x, y, z, meshData);
+                    meshData = block64s[x, y, z].Blockdata(this, x, y, z, meshData);
                 }
             }
         }

@@ -5,9 +5,9 @@ using System;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
 
-public static class Serialization
+public static class Serialization64
 {
-    public static string saveFolderName = "voxelGameSaves";
+    public static string saveFolderName = "terrain64saves";
 
     public static string SaveLocation(string worldName)
     {
@@ -21,32 +21,32 @@ public static class Serialization
         return saveLocation;
     }
 
-    public static string FileName(WorldPos chunkLocation)
+    public static string FileName(WorldPos chunk64Location)
     {
-        string fileName = chunkLocation.x + "," + chunkLocation.y + "," + chunkLocation.z + ".bin";
+        string fileName = chunk64Location.x + "," + chunk64Location.y + "," + chunk64Location.z + ".bin";
         return fileName;
     }
 
-    public static void SaveChunk(Chunk chunk)
+    public static void SaveChunk64(Chunk64 chunk64)
     {
-        Save save = new Save(chunk);
-        if (save.blocks.Count == 0)
+        Save64 save64 = new Save64(chunk64);
+        if (save64.blocks.Count == 0)
             return;
 
-        string saveFile = SaveLocation(chunk.world.worldName);
-        saveFile += FileName(chunk.pos);
+        string saveFile = SaveLocation(chunk64.world64.worldName);
+        saveFile += FileName(chunk64.pos);
 
         IFormatter formatter = new BinaryFormatter();
         Stream stream = new FileStream(saveFile, FileMode.Create, FileAccess.Write, FileShare.None);
-        formatter.Serialize(stream, save);
+        formatter.Serialize(stream, save64);
         stream.Close();
 
     }
 
-    public static bool Load(Chunk chunk)
+    public static bool Load64(Chunk64 chunk64)
     {
-        string saveFile = SaveLocation(chunk.world.worldName);
-        saveFile += FileName(chunk.pos);
+        string saveFile = SaveLocation(chunk64.world64.worldName);
+        saveFile += FileName(chunk64.pos);
 
         if (!File.Exists(saveFile))
             return false;
@@ -54,11 +54,11 @@ public static class Serialization
         IFormatter formatter = new BinaryFormatter();
         FileStream stream = new FileStream(saveFile, FileMode.Open);
 
-        Save save = (Save)formatter.Deserialize(stream);
+        Save64 save64 = (Save64)formatter.Deserialize(stream);
 
-        foreach (var block in save.blocks)
+        foreach (var block64 in save64.blocks)
         {
-            chunk.blocks[(int)block.Key.x, (int)block.Key.y, (int)block.Key.z] = block.Value;
+            chunk64.block64s[block64.Key.x, block64.Key.y, block64.Key.z] = block64.Value;
         }
 
         stream.Close();

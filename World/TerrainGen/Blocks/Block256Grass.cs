@@ -3,12 +3,11 @@ using System.Collections;
 using System;
 
 [Serializable]
-public class Block1Grass : Block1
+public class Block256Grass : Block256
 {
-    public int durability = 100;
 
 
-    public Block1Grass()
+    public Block256Grass()
         : base()
     {
     }
@@ -34,15 +33,4 @@ public class Block1Grass : Block1
 
         return tile;
     }
-
-    public void DamageDurability(int damage)
-    {
-        durability -= damage;
-    }
-
-    public int GetDurability()
-    {
-        return durability;
-    }
-
 }

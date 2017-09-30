@@ -5,7 +5,7 @@ using System;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
 
-public static class Serialization
+public static class Serialization1
 {
     public static string saveFolderName = "voxelGameSaves";
 
@@ -27,26 +27,26 @@ public static class Serialization
         return fileName;
     }
 
-    public static void SaveChunk(Chunk chunk)
+    public static void SaveChunk1(Chunk1 chunk1)
     {
-        Save save = new Save(chunk);
-        if (save.blocks.Count == 0)
+        Save1 save1 = new Save1(chunk1);
+        if (save1.block1s.Count == 0)
             return;
 
-        string saveFile = SaveLocation(chunk.world.worldName);
-        saveFile += FileName(chunk.pos);
+        string saveFile = SaveLocation(chunk1.world1.worldName);
+        saveFile += FileName(chunk1.pos);
 
         IFormatter formatter = new BinaryFormatter();
         Stream stream = new FileStream(saveFile, FileMode.Create, FileAccess.Write, FileShare.None);
-        formatter.Serialize(stream, save);
+        formatter.Serialize(stream, save1);
         stream.Close();
 
     }
 
-    public static bool Load(Chunk chunk)
+    public static bool Load(Chunk1 chunk1)
     {
-        string saveFile = SaveLocation(chunk.world.worldName);
-        saveFile += FileName(chunk.pos);
+        string saveFile = SaveLocation(chunk1.world1.worldName);
+        saveFile += FileName(chunk1.pos);
 
         if (!File.Exists(saveFile))
             return false;
@@ -54,11 +54,11 @@ public static class Serialization
         IFormatter formatter = new BinaryFormatter();
         FileStream stream = new FileStream(saveFile, FileMode.Open);
 
-        Save save = (Save)formatter.Deserialize(stream);
+        Save1 save1 = (Save1)formatter.Deserialize(stream);
 
-        foreach (var block in save.blocks)
+        foreach (var block1 in save1.block1s)
         {
-            chunk.blocks[(int)block.Key.x, (int)block.Key.y, (int)block.Key.z] = block.Value;
+            chunk1.block1s[block1.Key.x, block1.Key.y, block1.Key.z] = block1.Value;
         }
 
         stream.Close();

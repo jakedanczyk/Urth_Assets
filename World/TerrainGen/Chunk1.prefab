@@ -11,11 +11,11 @@ GameObject:
   - component: {fileID: 3300000}
   - component: {fileID: 6400000}
   - component: {fileID: 2300000}
+  - component: {fileID: 11423840}
   - component: {fileID: 205131219598924832}
   - component: {fileID: 114020797687277750}
-  - component: {fileID: 114146029764051342}
   m_Layer: 19
-  m_Name: Chunk
+  m_Name: Chunk1
   m_TagString: Terrain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -87,6 +87,34 @@ MeshCollider:
   m_InflateMesh: 0
   m_SkinWidth: 0.01
   m_Mesh: {fileID: 0}
+--- !u!114 &11423840
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c568d84efd77554c95fa5afb5ba2150, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hasTree: 0
+  hasBush: 0
+  treeList: []
+  boneList: []
+  bushList: []
+  horseList: []
+  airCount: 0
+  boneSpawn: 0
+  horseSpawn: 0
+  spawned: 0
+  update: 0
+  rendered: 0
+  world: {fileID: 0}
+  pos:
+    x: 0
+    y: 0
+    z: 0
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
@@ -109,34 +137,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e038bf700cfa444fb16c6ef963be9f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &114146029764051342
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f077d13516a034a4f883804e559c1618, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hasTree: 0
-  hasBush: 0
-  treeList: []
-  boneList: []
-  bushList: []
-  horseList: []
-  airCount: 0
-  boneSpawn: 0
-  horseSpawn: 0
-  spawned: 0
-  update: 0
-  rendered: 0
-  world: {fileID: 0}
-  pos:
-    x: 0
-    y: 0
-    z: 0
 --- !u!205 &205131219598924832
 LODGroup:
   m_ObjectHideFlags: 1
