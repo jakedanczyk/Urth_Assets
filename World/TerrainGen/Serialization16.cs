@@ -45,11 +45,9 @@ public static class Serialization16
 
     public static bool Load16(Chunk16 chunk16)
     {
-        Debug.Log(chunk16.world16.worldName + "," + chunk16.pos.x + chunk16.pos.y + chunk16.pos.z);
 
         string saveFile = SaveLocation(chunk16.world16.worldName);
         saveFile += FileName(chunk16.pos);
-        Debug.Log("newChunkAlmostSerialized1");
 
         if (!File.Exists(saveFile))
             return false;
@@ -63,7 +61,6 @@ public static class Serialization16
         {
             chunk16.block16s[block16.Key.x, block16.Key.y, block16.Key.z] = block16.Value;
         }
-        Debug.Log("newChunkAlmostSerialized2");
 
         stream.Close();
         return true;

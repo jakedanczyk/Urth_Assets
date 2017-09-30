@@ -51,5 +51,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 855d1cdb308d3c94aa40ecc030eddf09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chunkPrefab: {fileID: 100000, guid: d3e0916bbad4b82458f3fea875e6e685, type: 2}
+  chunkPrefab: {fileID: 100000, guid: 0d91a5902206943408cc6e6d2a77606c, type: 2}
+  treePrefab: {fileID: 0}
+  bonePrefab: {fileID: 0}
+  horsePrefab: {fileID: 0}
+  huckPrefab: {fileID: 0}
   worldName: world

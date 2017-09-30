@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 2300000}
   - component: {fileID: 205131219598924832}
   - component: {fileID: 114020797687277750}
-  - component: {fileID: 114146029764051342}
+  - component: {fileID: 114243307608097456}
   m_Layer: 19
-  m_Name: Chunk
+  m_Name: Chunk256
   m_TagString: Terrain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -109,7 +109,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e038bf700cfa444fb16c6ef963be9f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &114146029764051342
+--- !u!114 &114243307608097456
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -117,22 +117,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 100000}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f077d13516a034a4f883804e559c1618, type: 3}
+  m_Script: {fileID: 11500000, guid: 6c7e7157d36afd44aacdb6dd581598bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hasTree: 0
-  hasBush: 0
-  treeList: []
-  boneList: []
-  bushList: []
-  horseList: []
   airCount: 0
-  boneSpawn: 0
-  horseSpawn: 0
-  spawned: 0
   update: 0
   rendered: 0
-  world: {fileID: 0}
+  world256: {fileID: 0}
   pos:
     x: 0
     y: 0

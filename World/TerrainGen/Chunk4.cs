@@ -8,22 +8,22 @@ using System.Collections;
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshCollider))]
 
-public class Chunk16 : MonoBehaviour
+public class Chunk4 : MonoBehaviour
 {
-    //public bool hasTree, hasBush;
-    //public List<Vector3> treeList, boneList, bushList, horseList;
-    public Block16[, ,] block16s = new Block16[16, 16, 16];
+    public bool hasTree, hasBush;
+    public List<Vector3> treeList, boneList, bushList, horseList;
+    public Block4[, ,] block4s = new Block4[chunk4Size, chunk4Size, chunk4Size];
 
     public int airCount = 0;
-    //public bool boneSpawn, horseSpawn, spawned;
-    public static int chunk16Size = 16;
+    public bool boneSpawn, horseSpawn, spawned;
+    public static int chunk4Size = 16;
     public bool update = false;
     public bool rendered;
 
     MeshFilter filter;
     MeshCollider coll;
 
-    public World16 world16;
+    public World4 world4;
     public WorldPos pos;
 
     void Start()
@@ -38,58 +38,58 @@ public class Chunk16 : MonoBehaviour
         if (update)
         {
             update = false;
-            UpdateChunk16();
+            UpdateChunk4();
         }
     }
 
-	public Block16 GetBlock16(int x, int y, int z)
+	public Block4 GetBlock4(int x, int y, int z)
 	{
         if (InRange(x) && InRange(y) && InRange(z))
-            return block16s[x, y, z];
-        return world16.GetBlock16(pos.x + x, pos.y + y, pos.z + z);
+            return block4s[x, y, z];
+        return world4.GetBlock4(pos.x + x, pos.y + y, pos.z + z);
     }
 
     public static bool InRange(int index)
     {
-        if (index < 0 || index >= 16)
+        if (index < 0 || index >= chunk4Size)
             return false;
 
         return true;
     }
 
-    public void SetBlock16(int x, int y, int z, Block16 block16)
+    public void SetBlock4(int x, int y, int z, Block4 block4)
     {
         if (InRange(x) && InRange(y) && InRange(z))
         {
-            block16s[x, y, z] = block16;
+            block4s[x, y, z] = block4;
         }
         else
         {
-            world16.SetBlock16(pos.x + x, pos.y + y, pos.z + z, block16);
+            world4.SetBlock4(pos.x + x, pos.y + y, pos.z + z, block4);
         }
     }
 
-    public void SetBlock16sUnmodified()
+    public void SetBlock4sUnmodified()
     {
-        foreach (Block16 block16 in block16s)
+        foreach (Block4 block4 in block4s)
         {
-            block16.changed = false;
+            block4.changed = false;
         }
     }
 
-    // Updates the chunk based on its contents
-    void UpdateChunk16()
+    // Updates the chunk4 based on its contents
+    void UpdateChunk4()
     {
         rendered = true;
         MeshData meshData = new MeshData();
 
-        for (int x = 0; x < chunk16Size; x+=1)
+        for (int x = 0; x < chunk4Size; x+=1)
         {
-            for (int y = 0; y < chunk16Size; y+=1)
+            for (int y = 0; y < chunk4Size; y+=1)
             {
-                for (int z = 0; z < chunk16Size; z+=1)
+                for (int z = 0; z < chunk4Size; z+=1)
                 {
-                    meshData = block16s[x, y, z].Blockdata(this, x, y, z, meshData);
+                    meshData = block4s[x, y, z].Blockdata(this, x, y, z, meshData);
                 }
             }
         }

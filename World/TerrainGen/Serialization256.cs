@@ -5,9 +5,9 @@ using System;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
 
-public static class Serialization
+public static class Serialization256
 {
-    public static string saveFolderName = "voxelGameSaves";
+    public static string saveFolderName = "terrain256saves";
 
     public static string SaveLocation(string worldName)
     {
@@ -21,32 +21,32 @@ public static class Serialization
         return saveLocation;
     }
 
-    public static string FileName(WorldPos chunkLocation)
+    public static string FileName(WorldPos chunk256Location)
     {
-        string fileName = chunkLocation.x + "," + chunkLocation.y + "," + chunkLocation.z + ".bin";
+        string fileName = chunk256Location.x + "," + chunk256Location.y + "," + chunk256Location.z + ".bin";
         return fileName;
     }
 
-    public static void SaveChunk(Chunk chunk)
+    public static void SaveChunk256(Chunk256 chunk256)
     {
-        Save save = new Save(chunk);
-        if (save.blocks.Count == 0)
+        Save256 save256 = new Save256(chunk256);
+        if (save256.blocks.Count == 0)
             return;
 
-        string saveFile = SaveLocation(chunk.world.worldName);
-        saveFile += FileName(chunk.pos);
+        string saveFile = SaveLocation(chunk256.world256.worldName);
+        saveFile += FileName(chunk256.pos);
 
         IFormatter formatter = new BinaryFormatter();
         Stream stream = new FileStream(saveFile, FileMode.Create, FileAccess.Write, FileShare.None);
-        formatter.Serialize(stream, save);
+        formatter.Serialize(stream, save256);
         stream.Close();
 
     }
 
-    public static bool Load(Chunk chunk)
+    public static bool Load256(Chunk256 chunk256)
     {
-        string saveFile = SaveLocation(chunk.world.worldName);
-        saveFile += FileName(chunk.pos);
+        string saveFile = SaveLocation(chunk256.world256.worldName);
+        saveFile += FileName(chunk256.pos);
 
         if (!File.Exists(saveFile))
             return false;
@@ -54,11 +54,11 @@ public static class Serialization
         IFormatter formatter = new BinaryFormatter();
         FileStream stream = new FileStream(saveFile, FileMode.Open);
 
-        Save save = (Save)formatter.Deserialize(stream);
+        Save256 save256 = (Save256)formatter.Deserialize(stream);
 
-        foreach (var block in save.blocks)
+        foreach (var block256 in save256.blocks)
         {
-            chunk.blocks[(int)block.Key.x, (int)block.Key.y, (int)block.Key.z] = block.Value;
+            chunk256.block256s[block256.Key.x, block256.Key.y, block256.Key.z] = block256.Value;
         }
 
         stream.Close();

@@ -9,22 +9,22 @@ public class LoadChunks : MonoBehaviour
 		new WorldPos (1, 0, 0), new WorldPos (-1, 0, 0), new WorldPos (0, 0, -1), new WorldPos (0, 0, 1), 
 		new WorldPos (-1, 0, -1), new WorldPos (-1, 0, 1), new WorldPos (1, 0, -1), new WorldPos (1, 0, 1), 
 		new WorldPos (-2, 0, 0),
-		//new WorldPos (-3, 0, -3), new WorldPos (-3, 0, 3), new WorldPos (3, 0, -3),
-		//new WorldPos (3, 0, 3),
-		//new WorldPos (-4, 0, -1),
-		//new WorldPos (-4, 0, 1), new WorldPos (-1, 0, -4), new WorldPos (-1, 0, 4), new WorldPos (1, 0, -4), new WorldPos (1, 0, 4),
-		//new WorldPos (4, 0, -1), new WorldPos (4, 0, 1),
+		new WorldPos (-3, 0, -3), new WorldPos (-3, 0, 3), new WorldPos (3, 0, -3),
+		new WorldPos (3, 0, 3),
+		new WorldPos (-4, 0, -1),
+		new WorldPos (-4, 0, 1), new WorldPos (-1, 0, -4), new WorldPos (-1, 0, 4), new WorldPos (1, 0, -4), new WorldPos (1, 0, 4),
+		new WorldPos (4, 0, -1), new WorldPos (4, 0, 1),
 
-		//new WorldPos (-4, 0, 0), new WorldPos (0, 0, -4), new WorldPos (0, 0, 4), new WorldPos (4, 0, 0),
+		new WorldPos (-4, 0, 0), new WorldPos (0, 0, -4), new WorldPos (0, 0, 4), new WorldPos (4, 0, 0),
 
-		//new WorldPos (-3, 0, -2), new WorldPos (-3, 0, 2), new WorldPos (-2, 0, -3),
-		//new WorldPos (-2, 0, 3), new WorldPos (2, 0, -3), new WorldPos (2, 0, 3), new WorldPos (3, 0, -2), new WorldPos (3, 0, 2),
+		new WorldPos (-3, 0, -2), new WorldPos (-3, 0, 2), new WorldPos (-2, 0, -3),
+		new WorldPos (-2, 0, 3), new WorldPos (2, 0, -3), new WorldPos (2, 0, 3), new WorldPos (3, 0, -2), new WorldPos (3, 0, 2),
 
-		//new WorldPos (-3, 0, -1),
-		//new WorldPos (-3, 0, 1), new WorldPos (-1, 0, -3), new WorldPos (-1, 0, 3), new WorldPos (1, 0, -3), new WorldPos (1, 0, 3),
-		//new WorldPos (3, 0, -1), new WorldPos (3, 0, 1),
+		new WorldPos (-3, 0, -1),
+		new WorldPos (-3, 0, 1), new WorldPos (-1, 0, -3), new WorldPos (-1, 0, 3), new WorldPos (1, 0, -3), new WorldPos (1, 0, 3),
+		new WorldPos (3, 0, -1), new WorldPos (3, 0, 1),
 
-		//new WorldPos (-3, 0, 0), new WorldPos (0, 0, -3), new WorldPos (0, 0, 3), new WorldPos (3, 0, 0),
+		new WorldPos (-3, 0, 0), new WorldPos (0, 0, -3), new WorldPos (0, 0, 3), new WorldPos (3, 0, 0),
 
 		new WorldPos (-2, 0, -2), new WorldPos (-2, 0, 2), new WorldPos (2, 0, -2), new WorldPos (2, 0, 2),
 
@@ -93,9 +93,9 @@ public class LoadChunks : MonoBehaviour
         //Get the position of this gameobject to generate around
 
         WorldPos playerPos = new WorldPos(
-            Mathf.FloorToInt(transform.position.x / Chunk.chunkSize) * Chunk.chunkSize,
-            Mathf.FloorToInt(transform.position.y / Chunk.chunkSize) * Chunk.chunkSize,
-            Mathf.FloorToInt(transform.position.z / Chunk.chunkSize) * Chunk.chunkSize
+            Mathf.FloorToInt(transform.position.x / 4) * 4,
+            Mathf.FloorToInt(transform.position.y / 4) * 4,
+            Mathf.FloorToInt(transform.position.z / 4) * 4
             );
 		
 
@@ -107,9 +107,9 @@ public class LoadChunks : MonoBehaviour
             {
                 //translate the player position and array position into chunk position
                 WorldPos newChunkPos = new WorldPos(
-                    chunkPositions[i].x * Chunk.chunkSize + playerPos.x,
-					chunkPositions[i].y * Chunk.chunkSize + playerPos.y,
-                    chunkPositions[i].z * Chunk.chunkSize + playerPos.z
+                    chunkPositions[i].x * 4 + playerPos.x,
+					chunkPositions[i].y * 4 + playerPos.y,
+                    chunkPositions[i].z * 4 + playerPos.z
                     );
 
                 //Get the chunk in the defined position
@@ -122,20 +122,20 @@ public class LoadChunks : MonoBehaviour
                     && (newChunk.rendered || updateList.Contains(newChunkPos)))
                     continue;
 
-				int player_y = (int)(Mathf.Floor (playerPos.y / Chunk.chunkSize));
+				int player_y = (int)(Mathf.Floor (playerPos.y / 4));
 
                 //load a column of chunks in this position
 				for (int y = player_y - 4; y < player_y+4; y++)
                 {
 
-                    for (int x = newChunkPos.x - Chunk.chunkSize; x <= newChunkPos.x + Chunk.chunkSize; x += Chunk.chunkSize)
+                    for (int x = newChunkPos.x - 4; x <= newChunkPos.x + 4; x += 4)
                     {
-                        for (int z = newChunkPos.z - Chunk.chunkSize; z <= newChunkPos.z + Chunk.chunkSize; z += Chunk.chunkSize)
+                        for (int z = newChunkPos.z - 4; z <= newChunkPos.z + 4; z += 4)
                         {
-                            buildList.Add(new WorldPos(x, y * Chunk.chunkSize, z));
+                            buildList.Add(new WorldPos(x, y * 4, z));
                         }
                     }
-                    updateList.Add(new WorldPos(newChunkPos.x, y * Chunk.chunkSize, newChunkPos.z));
+                    updateList.Add(new WorldPos(newChunkPos.x, y * 4, newChunkPos.z));
                 }
                 return;
             }
@@ -146,7 +146,7 @@ public class LoadChunks : MonoBehaviour
     {
         if (buildList.Count != 0)
         {
-            for (int i = 0; i < buildList.Count && i < 8; i++)
+            for (int i = 0; i < buildList.Count && i < 16; i++)
             {
                 BuildChunk(buildList[0]);
                 buildList.RemoveAt(0);

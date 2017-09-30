@@ -60,12 +60,12 @@ public class Block
     }
 
     protected virtual MeshData FaceDataUp
-        (Chunk chunk, int x, int y, int z, MeshData meshData)
+        (Chunk chunk, float x, float y, float z, MeshData meshData)
     {
-        meshData.AddVertex(new Vector3(x - .5f, y + .5f, z + .5f));
-        meshData.AddVertex(new Vector3(x + .5f, y + .5f, z + .5f));
-        meshData.AddVertex(new Vector3(x + .5f, y + .5f, z - .5f));
-        meshData.AddVertex(new Vector3(x - .5f, y + .5f, z - .5f));
+        meshData.AddVertex(new Vector3(.25f*x - .125f, .25f*y + .125f, .25f*z + .125f));
+        meshData.AddVertex(new Vector3(.25f*x + .125f, .25f*y + .125f, .25f*z + .125f));
+        meshData.AddVertex(new Vector3(.25f*x + .125f, .25f*y + .125f, .25f*z - .125f));
+        meshData.AddVertex(new Vector3(.25f*x - .125f, .25f*y + .125f, .25f*z - .125f));
 
         meshData.AddQuadTriangles();
         meshData.uv.AddRange(FaceUVs(Direction.up));
@@ -75,10 +75,10 @@ public class Block
     protected virtual MeshData FaceDataDown
         (Chunk chunk, int x, int y, int z, MeshData meshData)
     {
-        meshData.AddVertex(new Vector3(x - .5f, y - .5f, z - .5f));
-        meshData.AddVertex(new Vector3(x + .5f, y - .5f, z - .5f));
-        meshData.AddVertex(new Vector3(x + .5f, y - .5f, z + .5f));
-        meshData.AddVertex(new Vector3(x - .5f, y - .5f, z + .5f));
+        meshData.AddVertex(new Vector3(.25f*x - .125f, .25f*y - .125f, .25f*z - .125f));
+        meshData.AddVertex(new Vector3(.25f*x + .125f, .25f*y - .125f, .25f*z - .125f));
+        meshData.AddVertex(new Vector3(.25f*x + .125f, .25f*y - .125f, .25f*z + .125f));
+        meshData.AddVertex(new Vector3(.25f*x - .125f, .25f*y - .125f, .25f*z + .125f));
 
         meshData.AddQuadTriangles();
         meshData.uv.AddRange(FaceUVs(Direction.down));
@@ -88,10 +88,10 @@ public class Block
     protected virtual MeshData FaceDataNorth
         (Chunk chunk, int x, int y, int z, MeshData meshData)
     {
-        meshData.AddVertex(new Vector3(x + .5f, y - .5f, z + .5f));
-        meshData.AddVertex(new Vector3(x + .5f, y + .5f, z + .5f));
-        meshData.AddVertex(new Vector3(x - .5f, y + .5f, z + .5f));
-        meshData.AddVertex(new Vector3(x - .5f, y - .5f, z + .5f));
+        meshData.AddVertex(new Vector3(.25f*x + .125f, .25f*y - .125f, .25f*z + .125f));
+        meshData.AddVertex(new Vector3(.25f*x + .125f, .25f*y + .125f, .25f*z + .125f));
+        meshData.AddVertex(new Vector3(.25f*x - .125f, .25f*y + .125f, .25f*z + .125f));
+        meshData.AddVertex(new Vector3(.25f*x - .125f, .25f*y - .125f, .25f*z + .125f));
 
         meshData.AddQuadTriangles();
         meshData.uv.AddRange(FaceUVs(Direction.north));
@@ -101,10 +101,10 @@ public class Block
     protected virtual MeshData FaceDataEast
         (Chunk chunk, int x, int y, int z, MeshData meshData)
     {
-        meshData.AddVertex(new Vector3(x + .5f, y - .5f, z - .5f));
-        meshData.AddVertex(new Vector3(x + .5f, y + .5f, z - .5f));
-        meshData.AddVertex(new Vector3(x + .5f, y + .5f, z + .5f));
-        meshData.AddVertex(new Vector3(x + .5f, y - .5f, z + .5f));
+        meshData.AddVertex(new Vector3(.25f*x + .125f, .25f*y - .125f, .25f*z - .125f));
+        meshData.AddVertex(new Vector3(.25f*x + .125f, .25f*y + .125f, .25f*z - .125f));
+        meshData.AddVertex(new Vector3(.25f*x + .125f, .25f*y + .125f, .25f*z + .125f));
+        meshData.AddVertex(new Vector3(.25f*x + .125f, .25f*y - .125f, .25f*z + .125f));
 
         meshData.AddQuadTriangles();
         meshData.uv.AddRange(FaceUVs(Direction.east));
@@ -114,10 +114,10 @@ public class Block
     protected virtual MeshData FaceDataSouth
         (Chunk chunk, int x, int y, int z, MeshData meshData)
     {
-        meshData.AddVertex(new Vector3(x - .5f, y - .5f, z - .5f));
-        meshData.AddVertex(new Vector3(x - .5f, y + .5f, z - .5f));
-        meshData.AddVertex(new Vector3(x + .5f, y + .5f, z - .5f));
-        meshData.AddVertex(new Vector3(x + .5f, y - .5f, z - .5f));
+        meshData.AddVertex(new Vector3(.25f*x - .125f, .25f*y - .125f, .25f*z - .125f));
+        meshData.AddVertex(new Vector3(.25f*x - .125f, .25f*y + .125f, .25f*z - .125f));
+        meshData.AddVertex(new Vector3(.25f*x + .125f, .25f*y + .125f, .25f*z - .125f));
+        meshData.AddVertex(new Vector3(.25f*x + .125f, .25f*y - .125f, .25f*z - .125f));
 
         meshData.AddQuadTriangles();
         meshData.uv.AddRange(FaceUVs(Direction.south));
@@ -127,10 +127,10 @@ public class Block
     protected virtual MeshData FaceDataWest
         (Chunk chunk, int x, int y, int z, MeshData meshData)
     {
-        meshData.AddVertex(new Vector3(x - .5f, y - .5f, z + .5f));
-        meshData.AddVertex(new Vector3(x - .5f, y + .5f, z + .5f));
-        meshData.AddVertex(new Vector3(x - .5f, y + .5f, z - .5f));
-        meshData.AddVertex(new Vector3(x - .5f, y - .5f, z - .5f));
+        meshData.AddVertex(new Vector3(.25f*x - .125f, .25f*y - .125f, .25f*z + .125f));
+        meshData.AddVertex(new Vector3(.25f*x - .125f, .25f*y + .125f, .25f*z + .125f));
+        meshData.AddVertex(new Vector3(.25f*x - .125f, .25f*y + .125f, .25f*z - .125f));
+        meshData.AddVertex(new Vector3(.25f*x - .125f, .25f*y - .125f, .25f*z - .125f));
 
         meshData.AddQuadTriangles();
         meshData.uv.AddRange(FaceUVs(Direction.west));

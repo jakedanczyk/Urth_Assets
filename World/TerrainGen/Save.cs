@@ -6,7 +6,7 @@ using System;
 [Serializable]
 public class Save
 {
-    public Dictionary<WorldPos, Block> blocks = new Dictionary<WorldPos, Block>();
+    public Dictionary<WorldPosFloat, Block> blocks = new Dictionary<WorldPosFloat, Block>();
 
     public Save(Chunk chunk)
     {
@@ -19,7 +19,7 @@ public class Save
                     if (!chunk.blocks[x, y, z].changed)
                         continue;
 
-                    WorldPos pos = new WorldPos(x, y, z);
+                    WorldPosFloat pos = new WorldPosFloat(.25f*x, .25f * y, z * .25f);
                     blocks.Add(pos, chunk.blocks[x, y, z]);
                 }
             }
