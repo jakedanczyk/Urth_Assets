@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 11423840}
   - component: {fileID: 205131219598924832}
   - component: {fileID: 114020797687277750}
-  m_Layer: 19
+  m_Layer: 17
   m_Name: Chunk1
   m_TagString: Terrain
   m_Icon: {fileID: 0}
@@ -110,7 +110,7 @@ MonoBehaviour:
   spawned: 0
   update: 0
   rendered: 0
-  world: {fileID: 0}
+  world1: {fileID: 0}
   pos:
     x: 0
     y: 0

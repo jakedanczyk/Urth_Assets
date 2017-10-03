@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 205131219598924832}
   - component: {fileID: 114020797687277750}
   - component: {fileID: 114405241344206200}
-  m_Layer: 19
+  m_Layer: 17
   m_Name: Chunk64
   m_TagString: Terrain
   m_Icon: {fileID: 0}

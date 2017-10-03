@@ -67,6 +67,8 @@ public class LoadChunk1s : MonoBehaviour
     public World1 world1;
     //public GameObject treePrefab;
     public Transform playerTransform;
+    public Rigidbody playerRigidBody;
+    public UnityStandardAssets.Characters.FirstPerson.PlayerControls playerControls;
 
     List<WorldPos> updateList = new List<WorldPos>();
     List<WorldPos> buildList = new List<WorldPos>();
@@ -177,8 +179,9 @@ public class LoadChunk1s : MonoBehaviour
     bool DeleteChunk1s()
     {
 
-        if (timer == 60)
+        if (timer == 10)
         {
+            float v = playerRigidBody.velocity.magnitude;
             var chunk1sToDelete = new List<WorldPos>();
             foreach (var chunk1 in world1.chunk1s)
             {
@@ -186,7 +189,7 @@ public class LoadChunk1s : MonoBehaviour
 					new Vector3(chunk1.Value.pos.x, .5f * chunk1.Value.pos.y, chunk1.Value.pos.z),
 					new Vector3(playerTransform.position.x, .5f * playerTransform.position.y, playerTransform.position.z));
 
-                if (distance > 96 || distance < 15)
+                if (distance > 96 || (distance < 15 && v < 1 && playerControls.aboveDetailedChunk))
                     chunk1sToDelete.Add(chunk1.Key);
             }
 

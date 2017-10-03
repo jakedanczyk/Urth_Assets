@@ -15,7 +15,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public RPGStatCollection playerStats;
         public RPGStat jump;
         public float f1;
-        public bool crouching, autoMove;
+        public bool crouching, autoMove, aboveDetailedChunk;
         public Rigidbody m_Rigidbody;
         public Animator anim;
         public GameObject shoulderGirdle;
@@ -131,16 +131,30 @@ namespace UnityStandardAssets.Characters.FirstPerson
         }
 
         public Vector3 lastPosition;
+        bool check;
 
         // Update is called once per frame
         private void Update()
         {
-            RaycastHit ground;
-            if (!Physics.Raycast(this.transform.position, Vector3.down, out ground, 512f, mask))
-            {
-                this.transform.position = lastPosition;
-            }
+
+                RaycastHit ground;
+                if (Physics.Raycast(this.transform.position, Vector3.down, out ground, 512f, mask1))
+                {
+                    aboveDetailedChunk = true;
+                    lastPosition = this.transform.position;
+                }
+                else if (Physics.Raycast(this.transform.position, Vector3.down, out ground, 512f, mask2))
+                {
+                    aboveDetailedChunk = false;
+                    lastPosition = this.transform.position;
+                }
+                else
+                {
+                    aboveDetailedChunk = false;
+                    this.transform.position = lastPosition;
+                }
             lastPosition = this.transform.position;
+
             // the jump state needs to read here to make sure it is not missed
             if (!m_Jump)
             {
@@ -502,7 +516,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         m_MouseLook.UpdateCursorLock();
         }
 
-        public LayerMask mask = 256 | 1024;
+        public LayerMask mask1, mask2;
         public bool falling = false;
 
         private void LateUpdate()
