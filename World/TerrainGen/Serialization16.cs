@@ -5,9 +5,9 @@ using System;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
 
-public static class Serialization
+public static class Serialization16
 {
-    public static string saveFolderName = "voxelGameSaves";
+    public static string saveFolderName = "terrain16saves";
 
     public static string SaveLocation(string worldName)
     {
@@ -21,32 +21,33 @@ public static class Serialization
         return saveLocation;
     }
 
-    public static string FileName(WorldPos chunkLocation)
+    public static string FileName(WorldPos chunk16Location)
     {
-        string fileName = chunkLocation.x + "," + chunkLocation.y + "," + chunkLocation.z + ".bin";
+        string fileName = chunk16Location.x + "," + chunk16Location.y + "," + chunk16Location.z + ".bin";
         return fileName;
     }
 
-    public static void SaveChunk(Chunk chunk)
+    public static void SaveChunk16(Chunk16 chunk16)
     {
-        Save save = new Save(chunk);
-        if (save.blocks.Count == 0)
+        Save16 save16 = new Save16(chunk16);
+        if (save16.blocks.Count == 0)
             return;
 
-        string saveFile = SaveLocation(chunk.world.worldName);
-        saveFile += FileName(chunk.pos);
+        string saveFile = SaveLocation(chunk16.world16.worldName);
+        saveFile += FileName(chunk16.pos);
 
         IFormatter formatter = new BinaryFormatter();
         Stream stream = new FileStream(saveFile, FileMode.Create, FileAccess.Write, FileShare.None);
-        formatter.Serialize(stream, save);
+        formatter.Serialize(stream, save16);
         stream.Close();
 
     }
 
-    public static bool Load(Chunk chunk)
+    public static bool Load16(Chunk16 chunk16)
     {
-        string saveFile = SaveLocation(chunk.world.worldName);
-        saveFile += FileName(chunk.pos);
+
+        string saveFile = SaveLocation(chunk16.world16.worldName);
+        saveFile += FileName(chunk16.pos);
 
         if (!File.Exists(saveFile))
             return false;
@@ -54,11 +55,11 @@ public static class Serialization
         IFormatter formatter = new BinaryFormatter();
         FileStream stream = new FileStream(saveFile, FileMode.Open);
 
-        Save save = (Save)formatter.Deserialize(stream);
+        Save16 save16 = (Save16)formatter.Deserialize(stream);
 
-        foreach (var block in save.blocks)
+        foreach (var block16 in save16.blocks)
         {
-            chunk.blocks[(int)block.Key.x, (int)block.Key.y, (int)block.Key.z] = block.Value;
+            chunk16.block16s[block16.Key.x, block16.Key.y, block16.Key.z] = block16.Value;
         }
 
         stream.Close();

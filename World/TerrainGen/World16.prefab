@@ -9,51 +9,47 @@ Prefab:
     m_Modifications: []
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 1000010287974272}
+  m_RootGameObject: {fileID: 1950861297983474}
   m_IsPrefabParent: 1
---- !u!1 &1000010287974272
+--- !u!1 &1950861297983474
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 5
   m_Component:
-  - component: {fileID: 4000013040149058}
-  - component: {fileID: 114000010500198638}
+  - component: {fileID: 4360337624564944}
+  - component: {fileID: 114112525191975738}
   m_Layer: 0
-  m_Name: World
-  m_TagString: Terrain
+  m_Name: World16
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4000013040149058
+--- !u!4 &4360337624564944
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000010287974272}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.9295888, y: -40.48, z: 7.7194777}
+  m_GameObject: {fileID: 1950861297983474}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -29.947987, y: 9.546114, z: 3.4317088}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114000010500198638
+--- !u!114 &114112525191975738
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000010287974272}
+  m_GameObject: {fileID: 1950861297983474}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 855d1cdb308d3c94aa40ecc030eddf09, type: 3}
+  m_Script: {fileID: 11500000, guid: cc2b5b717ee4d1648a9c2c8893610527, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chunkPrefab: {fileID: 100000, guid: 0d91a5902206943408cc6e6d2a77606c, type: 2}
-  treePrefab: {fileID: 0}
-  bonePrefab: {fileID: 0}
-  horsePrefab: {fileID: 0}
-  huckPrefab: {fileID: 0}
-  worldName: world
+  chunk16Prefab: {fileID: 100000, guid: fb94233c5aa22c545baf38678e993897, type: 2}
+  worldName: world16

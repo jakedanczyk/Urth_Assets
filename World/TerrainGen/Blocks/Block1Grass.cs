@@ -3,12 +3,12 @@ using System.Collections;
 using System;
 
 [Serializable]
-public class Block1Grass : Block1
+public class BlockGrass : Block
 {
     public int durability = 100;
 
 
-    public Block1Grass()
+    public BlockGrass()
         : base()
     {
     }

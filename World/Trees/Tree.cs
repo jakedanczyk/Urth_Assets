@@ -26,7 +26,7 @@ public class Tree : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        size = UnityEngine.Random.Range(.25f, 20f);
+        size = UnityEngine.Random.Range(.2f, 5f);
         transform.localScale = new Vector3(size, size, size);
         standing = true;
         health = 100 * size * size;
