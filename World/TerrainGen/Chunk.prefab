@@ -122,16 +122,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hasTree: 0
   hasBush: 0
+  hasWater: 0
   treeList: []
   boneList: []
   bushList: []
   horseList: []
+  waterList: []
   airCount: 0
   boneSpawn: 0
   horseSpawn: 0
   spawned: 0
-  update: 0
+  update: 1
   rendered: 0
+  filter: {fileID: 0}
+  coll: {fileID: 0}
+  chunkWater: {fileID: 0}
+  water: {fileID: 0}
   world: {fileID: 0}
   pos:
     x: 0
@@ -149,10 +155,10 @@ LODGroup:
   m_FadeMode: 0
   m_AnimateCrossFading: 0
   m_LODs:
-  - screenRelativeHeight: 0.014414092
+  - screenRelativeHeight: 0.0012948116
     fadeTransitionWidth: 0
     renderers: []
-  - screenRelativeHeight: 0.014414092
+  - screenRelativeHeight: 0.0012948116
     fadeTransitionWidth: 0
     renderers: []
   m_Enabled: 1

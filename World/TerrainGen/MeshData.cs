@@ -8,6 +8,10 @@ public class MeshData
     public List<int> triangles = new List<int>();
     public List<Vector2> uv = new List<Vector2>();
 
+    public List<Vector3> fluidVertices = new List<Vector3>();
+    public List<int> fluidTriangles = new List<int>();
+    public List<Vector2> fluiduv = new List<Vector2>();
+
     public List<Vector3> colVertices = new List<Vector3>();
     public List<int> colTriangles = new List<int>();
 
@@ -55,5 +59,26 @@ public class MeshData
         {
             colTriangles.Add(tri - (vertices.Count - colVertices.Count));
         }
+    }
+
+    public void AddQuadFluidTriangles()
+    {
+        fluidTriangles.Add(fluidVertices.Count - 4);
+        fluidTriangles.Add(fluidVertices.Count - 3);
+        fluidTriangles.Add(fluidVertices.Count - 2);
+
+        fluidTriangles.Add(fluidVertices.Count - 4);
+        fluidTriangles.Add(fluidVertices.Count - 2);
+        fluidTriangles.Add(fluidVertices.Count - 1);
+    }
+
+    public void AddFluidVertex(Vector3 vertex)
+    {
+        fluidVertices.Add(vertex);
+    }
+
+    public void AddFluidTriangle(int tri)
+    {
+        fluidTriangles.Add(tri);
     }
 }

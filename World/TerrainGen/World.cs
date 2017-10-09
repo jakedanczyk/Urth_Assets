@@ -10,6 +10,8 @@ public class World : MonoBehaviour {
     public GameObject bonePrefab;
     public GameObject horsePrefab;
     public GameObject huckPrefab;
+    public GameObject waterPrefab;
+
 
     public string worldName = "world";
 
@@ -35,7 +37,8 @@ public class World : MonoBehaviour {
         newChunk = terrainGen.ChunkGen(newChunk);
         if (newChunk.airCount == 6144) { newChunk.gameObject.SetActive(false); }
         newChunk.SetBlocksUnmodified();
-        for(int i = 0; i < newChunk.treeList.Count; i++)
+
+        for (int i = 0; i < newChunk.treeList.Count; i++)
         {
             GameObject newTree = Instantiate(treePrefab);
             newTree.transform.position = newChunk.treeList[i];
@@ -58,6 +61,13 @@ public class World : MonoBehaviour {
             newHorse.transform.position = newChunk.horseList[0];
         }
         Serialization.Load(newChunk);
+        if (newChunk.hasWater)
+        {
+            GameObject newWater = Instantiate(waterPrefab);
+            newWater.transform.position = newChunk.transform.position;
+            newChunk.water = newWater;
+            newChunk.chunkWater = newWater.GetComponent<ChunkWater>();
+        }
     }
 
     public void DestroyChunk(int x, int y, int z)
@@ -75,9 +85,9 @@ public class World : MonoBehaviour {
     {
         WorldPos pos = new WorldPos();
         //float multiple = 4;
-        pos.x = Mathf.FloorToInt(x / 4) * 4;
-        pos.y = Mathf.FloorToInt(y / 4) * 4;
-        pos.z = Mathf.FloorToInt(z / 4) * 4;
+        pos.x = Mathf.FloorToInt(x / 4f) * 4;
+        pos.y = Mathf.FloorToInt(y / 4f) * 4;
+        pos.z = Mathf.FloorToInt(z / 4f) * 4;
 
         Chunk containerChunk = null;
 
@@ -86,17 +96,12 @@ public class World : MonoBehaviour {
         return containerChunk;
     }
 
-    public Block GetBlock(int x, int y, int z)
+    public Block GetBlock(float x, float y, float z)
     {
-        x = (x / 4);
-        y = (y / 4);
-        z = (y / 4);
-
-        Chunk containerChunk = GetChunk(x, y, z);
+        Chunk containerChunk = GetChunk(Mathf.FloorToInt(x), Mathf.FloorToInt(y), Mathf.FloorToInt(z));
 
         if (containerChunk != null)
         {
-
             Block block = containerChunk.GetBlock(
                 (int)(4 * (x - containerChunk.pos.x)),
                 (int)(4 * (y - containerChunk.pos.y)),

@@ -231,7 +231,7 @@ public class LoadChunk64s : MonoBehaviour
 					new Vector3(chunk64.Value.pos.x, chunk64.Value.pos.y, chunk64.Value.pos.z),
 					new Vector3(playerTransform.position.x, playerTransform.position.y, playerTransform.position.z));
 
-                if (distance > 500000 || distance < 1024)
+                if (distance > 6000 || distance < 1024)
                     chunk64sToDelete.Add(chunk64.Key);
             }
 

@@ -20,7 +20,7 @@ public class Block
     }
 
     public virtual MeshData Blockdata
-     (Chunk chunk, int x, int y, int z, MeshData meshData)
+    (Chunk chunk, int x, int y, int z, MeshData meshData)
     {
 
         meshData.useRenderDataForCol = true;
@@ -180,7 +180,6 @@ public class Block
             case Direction.down:
                 return true;
         }
-
         return false;
     }
 

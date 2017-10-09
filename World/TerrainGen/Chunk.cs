@@ -10,8 +10,8 @@ using System.Collections;
 
 public class Chunk : MonoBehaviour
 {
-    public bool hasTree, hasBush;
-    public List<Vector3> treeList, boneList, bushList, horseList;
+    public bool hasTree, hasBush, hasWater;
+    public List<Vector3> treeList, boneList, bushList, horseList, waterList;
     public Block[, ,] blocks = new Block[chunkSize, chunkSize, chunkSize];
 
     public int airCount = 0;
@@ -20,8 +20,11 @@ public class Chunk : MonoBehaviour
     public bool update = false;
     public bool rendered;
 
-    MeshFilter filter;
-    MeshCollider coll;
+    public MeshFilter filter;
+    public MeshCollider coll;
+
+    public ChunkWater chunkWater;
+    public GameObject water;
 
     public World world;
     public WorldPos pos;
@@ -46,7 +49,7 @@ public class Chunk : MonoBehaviour
 	{
         if (InRange(x) && InRange(y) && InRange(z))
             return blocks[x, y, z];
-        return world.GetBlock(pos.x + x, pos.y + y, pos.z + z);
+        return world.GetBlock((float)pos.x + x*.25f, (float)pos.y + y * .25f, (float)pos.z + z * .25f);
     }
 
     public static bool InRange(int index)
@@ -108,6 +111,15 @@ public class Chunk : MonoBehaviour
         filter.mesh.uv = meshData.uv.ToArray();
         filter.mesh.RecalculateNormals();
 
+        if (hasWater)
+        {
+            chunkWater.fluidFilter.mesh.Clear();
+            chunkWater.fluidFilter.mesh.vertices = meshData.fluidVertices.ToArray();
+            chunkWater.fluidFilter.mesh.triangles = meshData.fluidTriangles.ToArray();
+
+            chunkWater.fluidFilter.mesh.uv = meshData.fluiduv.ToArray();
+            chunkWater.fluidFilter.mesh.RecalculateNormals();
+        }
         coll.sharedMesh = null;
         Mesh mesh = new Mesh();
         mesh.vertices = meshData.colVertices.ToArray();

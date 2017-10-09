@@ -6,19 +6,19 @@ using SimplexNoise;
 public class TerrainGen
 {
     float stoneBaseHeight = -24;
-    float stoneBaseNoise = 0.05f;
+    float stoneBaseNoise = 0.5f;
     float stoneBaseNoiseHeight = 4;
 
     float stoneMountainHeight = 8800;
-    float stoneMountainFrequency = 0.000013f;
+    float stoneMountainFrequency = 0.000043f;
     float stoneMinHeight = 2000;
 
-    float dirtBaseHeight = 4;
+    float dirtBaseHeight = 1;
     float dirtNoise = 0.04f;
     float dirtNoiseHeight = 1;
 
-    float treeline = 5900;
-    float shrubline = 6150;
+    float treeline = 9900;
+    float shrubline = 9150;
 
     float caveFrequency = 0.0025f;
     int caveSize = 21;
@@ -30,7 +30,7 @@ public class TerrainGen
     int copperSize = 15;
 
     float treeFrequency = 0.2f;
-    int treeDensity = 2;
+    int treeDensity = 200;
     GameObject treeVar;
 
     float huckFrequency = 0.2f;
@@ -44,6 +44,8 @@ public class TerrainGen
     float horseFrequency = 1.05f;
     float horseDensity = 1.0000001f;
     GameObject horseVar;
+
+    GameObject waterVar;
 
     public Chunk ChunkGen(Chunk chunk)
     {
@@ -60,16 +62,16 @@ public class TerrainGen
 
     public Chunk ChunkColumnGen(Chunk chunk, float x, float z)
     {
-        int stoneHeight = Mathf.FloorToInt(stoneBaseHeight);
-        stoneHeight += GetNoise((int)x, 0, (int)z, stoneMountainFrequency, Mathf.FloorToInt(stoneMountainHeight));
+        float stoneHeight = stoneBaseHeight;
+        stoneHeight += GetNoiseF(x, 0, z, stoneMountainFrequency, stoneMountainHeight);
 
         if (stoneHeight < stoneMinHeight)
-            stoneHeight = Mathf.FloorToInt(stoneMinHeight);
+            stoneHeight = stoneMinHeight;
 
-        stoneHeight += GetNoise((int)x, 0, (int)z, stoneBaseNoise, Mathf.FloorToInt(stoneBaseNoiseHeight));
+        stoneHeight += GetNoiseF(x, 0, z, stoneBaseNoise, stoneBaseNoiseHeight);
 
-        int dirtHeight = stoneHeight + Mathf.FloorToInt(dirtBaseHeight);
-        dirtHeight += GetNoise((int)x, 100, (int)z, dirtNoise, Mathf.FloorToInt(dirtNoiseHeight));
+        float dirtHeight = stoneHeight + dirtBaseHeight;
+        dirtHeight += GetNoiseF(x, 100, z, dirtNoise, dirtNoiseHeight);
 
         for (float y = chunk.pos.y - 2; y < chunk.pos.y + 4; y +=.25f )
         {
@@ -94,9 +96,34 @@ public class TerrainGen
             }
             else if (y <= dirtHeight && caveSize < caveChance)
             {
-                SetBlock(x, y, z, new BlockGrass(), chunk);
-
+                //System.Random rnd = new System.Random();
+                //int month = rnd.Next(1, 13);
+                //if (month < 11)
+                //{
+                    SetBlock(x, y, z, new BlockGrass(), chunk);
+                if (y <= treeline && !chunk.hasTree && GetNoise((int)x, 0, (int)z, treeFrequency, 100) < treeDensity)
+                {
+                    chunk.hasTree = true;
+                        chunk.treeList.Add(new Vector3(x, y, z));
+                    //treeVar = (GameObject)Resources.Load("Tree1", typeof(GameObject));
+                    //treeVar.transform.position = new Vector3(x, y, z);
+                }
+                if (y == dirtHeight && y <= shrubline && GetNoise((int)x, 0, (int)z, huckFrequency, 100) < huckDensity)
+                {
+                    chunk.hasBush = true;
+                    chunk.bushList.Add(new Vector3(x, y, z));
+                    //treeVar = (GameObject)Resources.Load("Tree1", typeof(GameObject));
+                    //treeVar.transform.position = new Vector3(x, y, z);
+                    //CreateTree(x, y + 1, z, chunk);
+                }
+                //}
+                //else
+                //{
+                //    SetBlock(x, y, z, new BlockWater(), chunk);
+                //    chunk.hasWater = true;
+                //}
             }
+
             else
             {
                 SetBlock(x, y, z, new BlockAir(), chunk);
@@ -728,5 +755,9 @@ public class TerrainGen
     public static int GetNoise(int x, int y, int z, float scale, int max)
     {
         return Mathf.FloorToInt((Noise.Generate(x * scale, y * scale, z * scale) + 1f) * (max / 2f));
+    }
+    public static float GetNoiseF(float x, float y, float z, float scale, float max)
+    {
+        return (Noise.Generate(x * scale, y * scale, z * scale) + 1f) * (max / 2f);
     }
 }
