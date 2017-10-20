@@ -5,8 +5,7 @@ using System;
 using System.Linq;
 using UnityStandardAssets.Characters.FirstPerson;
 using MORPH3D;
-using UnityEditor.Animations;
-
+using System.Threading;
 
 public class BodyManager_Human_Player : BodyManager {
 
@@ -75,6 +74,11 @@ public class BodyManager_Human_Player : BodyManager {
 
     private void Update()
     {
+        RaycastHit hit;
+        if (Physics.Raycast(aimPoint.position, aimPoint.forward, out hit, 540))
+        {
+            Debug.DrawLine(aimPoint.position, hit.point, Color.green);
+        }
         if (inTask)
         {
             controls.enabled = false;
@@ -159,7 +163,6 @@ public class BodyManager_Human_Player : BodyManager {
     {
         if (attacking) { return; }
         collisionList.Clear();
-        print("main attack");
 
         Invoke(mainAttackDict[rHandWeapon.weaponType], 0);
     }
@@ -170,34 +173,43 @@ public class BodyManager_Human_Player : BodyManager {
         anim.SetTrigger("AxeChop"); //punch trigger
     }
 
-    void AxeChop()
+    private IEnumerator WeaponSwing()
     {
-        print("chop");
-
-        rHandWeapon.collList[0].isTrigger = true;
-        print("chop");
-        anim.SetTrigger("AxeChop");
-        //yield return new WaitForSeconds(anim.GetCurrentAnimatorClipInfo.length);
-        if (collisionList.Count >= 0)
+        print("Start");
+        yield return new WaitForSeconds(0.5f);
+        if (collisionList.Count > 0)
         {
             int cut = rHandWeapon.baseCut * (1 + (stats.GetStat(RPGStatType.Axe).StatValue / 10));
             int blunt = rHandWeapon.itemWeight * stats.GetStat(RPGStatType.Dexterity).StatValue * stats.GetStat(RPGStatType.Strength).StatValue;
             if (collisionList[0].transform.root.tag == "Tree")
             {
-                Debug.LogWarning("2");
+                print(collisionList[0].transform.root.GetComponent<Tree>().health);
                 collisionList[0].transform.root.GetComponent<Tree>().health -= (cut * blunt + 10);
+                print(collisionList[0].transform.root.GetComponent<Tree>().health);
+
             }
         }
+        print("turning off trigger");
         rHandWeapon.collList[0].isTrigger = false;
+    }
+    void AxeChop()
+    {
+        print("chop");
+
+        rHandWeapon.collList[0].isTrigger = true;
+        anim.SetTrigger("AxeChop");
+        StartCoroutine(WeaponSwing());
+        //yield return new WaitForSeconds(anim.GetCurrentAnimatorClipInfo.length);
+
+
     }
 
     void PickSwing()
     {
         rHandWeapon.collList[0].isTrigger = true;
         anim.SetTrigger("PickSwing");
-        print(1);
         RaycastHit hit;
-        if (Physics.Raycast(aimPoint.position, aimPoint.forward, out hit, 12f))
+        if (Physics.Raycast(aimPoint.position, aimPoint.forward, out hit, 240f))
         {
             print(hit.transform.tag);
 
@@ -206,7 +218,7 @@ public class BodyManager_Human_Player : BodyManager {
                 int pierce = rHandWeapon.basePierce * (1 + (stats.GetStat(RPGStatType.Pick).StatValue / 10));
                 int blunt = (rHandWeapon.baseBlunt * 5 + rHandWeapon.itemWeight) * stats.GetStat(RPGStatType.Dexterity).StatValue * stats.GetStat(RPGStatType.Strength).StatValue;
                 Block block = EditTerrain.GetBlock(hit);
-
+                print(EditTerrain.GetBlockPos(hit).x + "," + EditTerrain.GetBlockPos(hit).y + "," + EditTerrain.GetBlockPos(hit).z);
                 if (block is BlockGrass)
                 {
                     EditTerrain.HitBlock(hit, 100*(pierce + (blunt / 2)));

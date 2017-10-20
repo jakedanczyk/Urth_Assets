@@ -123,7 +123,7 @@ Transform:
   m_GameObject: {fileID: 1123321472784534}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_Children: []
   m_Father: {fileID: 4201986868826650}
   m_RootOrder: 1
@@ -231,6 +231,7 @@ MonoBehaviour:
   componentItems: []
   itemUIelement: {fileID: 1087713053775682}
   itemUIElementScript: {fileID: 114634221458009058}
+  matDict: {fileID: 0}
   block:
     changed: 1
     con: 0

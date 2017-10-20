@@ -65,13 +65,13 @@ public class WeatherControl : MonoBehaviour {
         UpdateSun();
         if (day && dayHour > 18)
         {
-            RenderSettings.skybox = skyboxMaterials[0];
+            RenderSettings.skybox = skyboxMaterials[1];
             day = false;
             night = true;
         }
         else if (night && dayHour > 6 && dayHour < 17.5)
         {
-            RenderSettings.skybox = skyboxMaterials[1];
+            RenderSettings.skybox = skyboxMaterials[0];
             day = true;
             night = false;
         }

@@ -31,14 +31,15 @@ public class Tree : MonoBehaviour {
         standing = true;
         health = 100 * size * size;
 	}
-	
-	// Update is called once per frame
-	//void Update () {
-	//	if(standing && health <= 0)
- //       { Fall(); }
- //       if(!standing && downedHealth < 0)
- //       { TurnToWoodPile(); }
-	//}
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (standing && health <= 0)
+        { Fall(); }
+        if (!standing && downedHealth < 0)
+        { TurnToWoodPile(); }
+    }
 
     public void Fall()
     {

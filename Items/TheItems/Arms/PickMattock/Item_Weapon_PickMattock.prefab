@@ -123,9 +123,9 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1413549548508706}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.0300084, y: 0.03000836, z: 0.03000839}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 10120, y: 6910.58, z: -1525.911}
+  m_LocalScale: {x: 0.008000841, y: 0.00800836, z: 0.0080084}
   m_Children:
   - {fileID: 4817221150181016}
   - {fileID: 224552555349881980}
@@ -372,9 +372,11 @@ MonoBehaviour:
   componentItems: []
   itemUIelement: {fileID: 1108885006677192}
   itemUIElementScript: {fileID: 114743040387965176}
+  matDict: {fileID: 0}
   baseBlunt: 3
   baseCut: 0
   basePierce: 5
+  butcheringAid: 0
   weaponType: 7
   gripAdjust: {x: 0, y: 0, z: 0}
   gripOrientation: {x: 0, y: 0, z: 0}

@@ -5,8 +5,6 @@ using System;
 using System.Linq;
 using UnityStandardAssets.Characters.FirstPerson;
 using MORPH3D;
-using UnityEditor.Animations;
-
 
 public class BodyManager_Human : BodyManager {
 

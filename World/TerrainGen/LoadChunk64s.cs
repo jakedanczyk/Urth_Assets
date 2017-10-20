@@ -67,6 +67,8 @@ public class LoadChunk64s : MonoBehaviour
 
     public World64 world64;
     public Transform playerTransform;
+    public Rigidbody playerRigidBody;
+    public UnityStandardAssets.Characters.FirstPerson.PlayerControls playerControls;
 
     List<WorldPos> updateList = new List<WorldPos>();
     List<WorldPos> buildList = new List<WorldPos>();
@@ -224,6 +226,8 @@ public class LoadChunk64s : MonoBehaviour
 
         if (timer == 10)
         {
+            float v = playerRigidBody.velocity.magnitude;
+
             var chunk64sToDelete = new List<WorldPos>();
             foreach (var chunk64 in world64.chunk64s)
             {
@@ -231,7 +235,7 @@ public class LoadChunk64s : MonoBehaviour
 					new Vector3(chunk64.Value.pos.x, chunk64.Value.pos.y, chunk64.Value.pos.z),
 					new Vector3(playerTransform.position.x, playerTransform.position.y, playerTransform.position.z));
 
-                if (distance > 6000 || distance < 1024)
+                if (distance > 6000 || (distance < 1024 && v < 1 && playerControls.aboveDetailedChunk))
                     chunk64sToDelete.Add(chunk64.Key);
             }
 

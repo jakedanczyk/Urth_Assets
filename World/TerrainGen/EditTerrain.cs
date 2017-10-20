@@ -1,20 +1,21 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public static class EditTerrain
 {
-    public static WorldPos GetBlockPos(Vector3 pos)
+    public static WorldPosFloat GetBlockPos(Vector3 pos)
     {
-        WorldPos blockPos = new WorldPos(
-            Mathf.RoundToInt(pos.x),
-            Mathf.RoundToInt(pos.y),
-            Mathf.RoundToInt(pos.z)
+        WorldPosFloat blockPos = new WorldPosFloat(
+            (float)Math.Round(Math.Round(pos.x * 4)/4f, 2),
+            (float)Math.Round(Math.Round(pos.y * 4) / 4f, 2),
+            (float)Math.Round(Math.Round(pos.z * 4) / 4f, 2)
             );
 
         return blockPos;
     }
 
-    public static WorldPos GetBlockPos(RaycastHit hit, bool adjacent = false)
+    public static WorldPosFloat GetBlockPos(RaycastHit hit, bool adjacent = false)
     {
         Vector3 pos = new Vector3(
             MoveWithinBlock(hit.point.x, hit.normal.x, adjacent),
@@ -27,15 +28,15 @@ public static class EditTerrain
 
     static float MoveWithinBlock(float pos, float norm, bool adjacent = false)
     {
-        if (pos - (int)pos == 0.5f || pos - (int)pos == -0.5f)
+        if (pos - Math.Round(Math.Round(pos*4)/4f,2) == 0.125f || pos - Math.Round(Math.Round(pos * 4) / 4f, 2) == -0.125f)
         {
             if (adjacent)
             {
-                pos += (norm / 2);
+                pos += (norm / 8);
             }
             else
             {
-                pos -= (norm / 2);
+                pos -= (norm / 8);
             }
         }
 
@@ -48,9 +49,9 @@ public static class EditTerrain
         if (chunk == null)
             return false;
 
-        WorldPos pos = GetBlockPos(hit, adjacent);
+        WorldPosFloat pos = GetBlockPos(hit, adjacent);
 
-        chunk.world.SetBlock(pos.x, pos.y, pos.z, block);
+        chunk.world.SetBlockEdit(pos.x, pos.y, pos.z, block);
 
         return true;
     }
@@ -61,7 +62,7 @@ public static class EditTerrain
         if (chunk == null)
             return null;
 
-        WorldPos pos = GetBlockPos(hit, adjacent);
+        WorldPosFloat pos = GetBlockPos(hit, adjacent);
 
         Block block = chunk.world.GetBlock(pos.x, pos.y, pos.z);
 
@@ -74,7 +75,7 @@ public static class EditTerrain
         if (chunk == null)
             return false;
         
-        WorldPos pos = GetBlockPos(hit, adjacent);
+        WorldPosFloat pos = GetBlockPos(hit, adjacent);
 
         Block block = chunk.world.GetBlock(pos.x, pos.y, pos.z);
 

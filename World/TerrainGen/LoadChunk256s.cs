@@ -67,6 +67,8 @@ public class LoadChunk256s : MonoBehaviour
 
     public World256 world256;
     public Transform playerTransform;
+    public Rigidbody playerRigidBody;
+    public UnityStandardAssets.Characters.FirstPerson.PlayerControls playerControls;
 
     List<WorldPos> updateList = new List<WorldPos>();
     List<WorldPos> buildList = new List<WorldPos>();
@@ -224,6 +226,8 @@ public class LoadChunk256s : MonoBehaviour
 
         if (timer == 10)
         {
+            float v = playerRigidBody.velocity.magnitude;
+
             var chunk256sToDelete = new List<WorldPos>();
             foreach (var chunk256 in world256.chunk256s)
             {
@@ -231,7 +235,7 @@ public class LoadChunk256s : MonoBehaviour
 					new Vector3(chunk256.Value.pos.x, chunk256.Value.pos.y, chunk256.Value.pos.z),
 					new Vector3(playerTransform.position.x, playerTransform.position.y, playerTransform.position.z));
 
-                if (distance > 500000 || distance < 4096)
+                if (distance > 500000 || (distance < 4096 && v < 1 && playerControls.aboveDetailedChunk))
                     chunk256sToDelete.Add(chunk256.Key);
             }
 

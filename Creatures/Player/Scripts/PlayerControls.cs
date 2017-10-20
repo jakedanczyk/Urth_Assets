@@ -182,7 +182,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                         RaycastHit hit;
                         if (Physics.Raycast(pc_bodyManager.aimPoint.position, pc_bodyManager.aimPoint.forward, out hit, 12f))
                         {
-                            WorldPos pos1 = EditTerrain.GetBlockPos(hit);
+                            WorldPosFloat pos1 = EditTerrain.GetBlockPos(hit);
                             Vector3 direction = pc_bodyManager.aimPoint.position - hit.point;
                             direction = direction.normalized;
                             WorldPos pos2 = new WorldPos((int)(pos1.x + (2 * direction.x)), (int)(pos1.y + (2 * direction.y)), (int)(pos1.z + (2 * direction.z)));
@@ -231,7 +231,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                             //Destroy(hit.collider.gameObject);
                             return;
                         }
-                        if (hit.collider.gameObject.tag == "Tree" && pc_bodyManager.rHandWeapon is Item_Weapon_Axe)
+                        if (hit.collider.gameObject.tag == "Tree" && (pc_bodyManager.rHandWeapon is Item_Weapon_Axe || pc_bodyManager.rHandWeapon is Item_Weapon_Hatchet))
                         {
                             Tree hitTree = hit.collider.gameObject.GetComponent<Tree>();
                             pc_bodyManager.FellTree(hitTree, (Item_Weapon_Axe)pc_bodyManager.rHandWeapon);
