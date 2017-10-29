@@ -7,7 +7,8 @@ using System;
 public abstract class BodyManager : MonoBehaviour {
 
     public List<Item_Garment> outfit;
-    public Inventory inventory; // all carried items
+    public Inventory baseInventory; // all carried items
+    public LootInventory lootInventory;
     public Transform aimPoint;
 
     public Animator anim;
@@ -62,9 +63,12 @@ public abstract class BodyManager : MonoBehaviour {
 
     public abstract void RemoveGarment(Item_Garment aGarment);
 
+    public abstract void SheatheWeapon(Item_Weapon aWeapon);
+
+
     public void PickupItem(Item anItem)
     {
-        inventory.AddItem(anItem);
+        baseInventory.AddItem(anItem);
         //anItem.loose = false;
         //        anItem.transform.SetParent(transform.parent);
         //anItem.gameObject.SetActive(false);
@@ -73,13 +77,18 @@ public abstract class BodyManager : MonoBehaviour {
 
     public void DropItem(Item anItem)
     {
-        print(1);
-        if(anItem is Item_Garment)
+        if (anItem == null)
+            return;
+        if (anItem is Item_Garment)
         {
             RemoveGarment((Item_Garment)anItem);
         }
-        inventory.selectedItem = null;
-        inventory.RemoveItem(anItem);
+        else if (anItem is Item_Weapon)
+        {
+            SheatheWeapon((Item_Weapon)anItem);
+        }
+        baseInventory.selectedItem = null;
+        baseInventory.RemoveItem(anItem);
         anItem.loose = true;
         anItem.gameObject.SetActive(true);
         anItem.transform.position = this.transform.position;
@@ -99,7 +108,7 @@ public abstract class BodyManager : MonoBehaviour {
     public float carryWeight;
     void Encumbrance()
     {
-        encumbrance = ((outfit.Select(c => c.itemWeight).ToList().Sum() * .25f) + inventory.SumWeight()) / stats.GetStat<RPGAttribute>(RPGStatType.CarryWeight).StatValue;
+        encumbrance = (baseInventory.SumWeight() - (outfit.Select(c => c.itemWeight).ToList().Sum() * .75f)) / stats.GetStat<RPGAttribute>(RPGStatType.CarryWeight).StatValue;
         carryWeight = stats.GetStat<RPGAttribute>(RPGStatType.CarryWeight).StatValue;
     }
 

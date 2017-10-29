@@ -22,13 +22,21 @@ public class Inventory : MonoBehaviour {
 	
 	}
 
-    void RebuildUIPanel()
+    public void RebuildUIPanel()
     {
         int childs = inventoryUIPanel.childCount;
-        for(int i = childs-1; i>=0; i--) { GameObject.Destroy(inventoryUIPanel.transform.GetChild(i).gameObject); }
-        foreach(Item item in inventoryContents)
+        List<Item> temp = new List<Item>();
+        temp.AddRange(inventoryContents);
+        //for(int i = childs-1; i>=0; i--) { GameObject.Destroy(inventoryUIPanel.transform.GetChild(i).gameObject); }
+        foreach(Item item in temp)
         {
-            Instantiate(item.itemUIelement, inventoryUIPanel.transform);
+            Item aItem = item;
+            print(item.itemName);
+            DropItem(aItem);
+            AddItem(aItem);
+            //item.itemUIElementScript.parentInventory = this;
+
+            //Instantiate(item.itemUIelement, inventoryUIPanel.transform);
         }
     }
 
@@ -47,6 +55,8 @@ public class Inventory : MonoBehaviour {
 
     public void RemoveItem(Item newItem)
     {
+        if (newItem == null)
+            return;
         inventoryContents.Remove(newItem);
         newItem.itemUIelement.transform.SetParent(newItem.transform);
         newItem.itemUIElementScript.parentInventory = null;
@@ -55,6 +65,8 @@ public class Inventory : MonoBehaviour {
 
     public void DropItem(Item anItem)
     {
+        if (anItem == null)
+            return;
         anItem.loose = true;
         anItem.gameObject.SetActive(true);
         anItem.transform.position = this.transform.position;

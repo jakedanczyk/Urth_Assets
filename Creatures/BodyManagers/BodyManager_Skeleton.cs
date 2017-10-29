@@ -13,6 +13,7 @@ public class BodyManager_Skeleton : BodyManager {
     public Item_Ammo currentAmmo;
 
     public AICharacterControl aiControl;
+    public Chase chaseScript;
 
     public Collider rHandCollider;
 
@@ -48,6 +49,8 @@ public class BodyManager_Skeleton : BodyManager {
             anim.SetBool("isAlive", false);
             anim.SetBool("isDead", true);
             aiControl.enabled = false;
+            chaseScript.enabled = false;
+            this.tag = "DeadCreature";
         }
     }
 
@@ -88,6 +91,16 @@ public class BodyManager_Skeleton : BodyManager {
         else { guardRaised = true; }
     }
 
+    public override void SheatheWeapon(Item_Weapon aWeapon)
+    {
+        if (!aWeapon.wielded)
+            return;
+        Debug.LogWarning("Sheate weapon: " + aWeapon.itemName);
+        aWeapon.GetComponent<Rigidbody>().isKinematic = false;
+        aWeapon.GetComponent<Rigidbody>().useGravity = true;
+        aWeapon.gameObject.SetActive(false);
+    }
+
     void RaiseWeapons()
     {
         //anim.RaiseWeapons
@@ -121,9 +134,6 @@ public class BodyManager_Skeleton : BodyManager {
 
     public IEnumerator Claw()
     {
-        print(6688);
-
-
         anim.SetTrigger("Attack_Claw");
         yield return new WaitForSeconds(.2f);
         rHandCollider.isTrigger = true;

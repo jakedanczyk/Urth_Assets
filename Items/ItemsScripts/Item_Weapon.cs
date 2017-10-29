@@ -7,7 +7,7 @@ public abstract class Item_Weapon : Item {
     public int baseBlunt, baseCut, basePierce;
 
     public int butcheringAid;
-
+    public bool wielded;
     public WeaponType weaponType;
 
     public Vector3 gripAdjust;

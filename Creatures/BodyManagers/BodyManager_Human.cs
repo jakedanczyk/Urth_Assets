@@ -109,8 +109,10 @@ public class BodyManager_Human : BodyManager {
         }
     }
 
-    void SheatheWeapon()
+    public override void SheatheWeapon(Item_Weapon heldWeapon)
     {
+        print("Sheate weapon: " + heldWeapon.itemName);
+
     }
 
     public void DrawWeapon(Item_Weapon drawnWeapon)
@@ -723,7 +725,7 @@ public class BodyManager_Human : BodyManager {
     //public float carryWeight;
     //void Encumbrance()
     //{
-    //    encumbrance = ((outfit.Select(c => c.itemWeight).ToList().Sum()*.25f) + inventory.SumWeight())/stats.GetStat<RPGAttribute>(RPGStatType.CarryWeight).StatValue;
+    //    encumbrance = ((outfit.Select(c => c.itemWeight).ToList().Sum()*.25f) + baseInventory.SumWeight())/stats.GetStat<RPGAttribute>(RPGStatType.CarryWeight).StatValue;
     //    carryWeight = stats.GetStat<RPGAttribute>(RPGStatType.CarryWeight).StatValue;
     //}
 
@@ -899,14 +901,14 @@ public class BodyManager_Human : BodyManager {
                 {
                     GameObject harvest = Instantiate(plant.fruitPrefab);
                     harvest.GetComponent<Item_Stack>().numItems = (int)totalGathered;
-                    inventory.AddItem(harvest.GetComponent<Item_Stack>());
+                    baseInventory.AddItem(harvest.GetComponent<Item_Stack>());
                 }
                 else if (plant.fruitPrefab.GetComponent<Item>())
                 {
                     for (int i = 0; i < totalGathered; i++)
                     {
                         GameObject harvest = Instantiate(plant.fruitPrefab);
-                        inventory.AddItem(harvest.GetComponent<Item>());
+                        baseInventory.AddItem(harvest.GetComponent<Item>());
                     }
                 }
                 stats.GetStat<RPGSkill>(RPGStatType.Gathering).GainXP((int)(plant.difficulty * totalGathered * 1.1));
@@ -938,7 +940,7 @@ public class BodyManager_Human : BodyManager {
             {
                 for(int i = 0; i < body.butcheringReturns.Count; i++)
                 {
-                    body.inventory.AddItem(body.butcheringReturns[i].GetComponent<Item>());
+                    body.baseInventory.AddItem(body.butcheringReturns[i].GetComponent<Item>());
                     body.butchered = true;
                     print("finished butchering");
                 }
@@ -966,7 +968,7 @@ public class BodyManager_Human : BodyManager {
             {
                 GameObject harvest = Instantiate(targetPlant.fruitPrefab);
                 harvest.GetComponent<Item_Stack>().numItems = (int)Math.Floor(totalGathered);
-                inventory.AddItem(harvest.GetComponent<Item_Stack>());
+                baseInventory.AddItem(harvest.GetComponent<Item_Stack>());
             }
             else if (targetPlant.fruitPrefab.GetComponent<Item>())
             {
@@ -974,7 +976,7 @@ public class BodyManager_Human : BodyManager {
                 for (int i = 0; i < totalGathered; i++)
                 {
                     GameObject harvest = Instantiate(targetPlant.fruitPrefab);
-                    inventory.AddItem(harvest.GetComponent<Item>());
+                    baseInventory.AddItem(harvest.GetComponent<Item>());
                 }
             }
             stats.GetStat<RPGSkill>(RPGStatType.Gathering).GainXP((int)(targetPlant.difficulty * totalGathered));

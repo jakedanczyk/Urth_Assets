@@ -22,7 +22,7 @@ public class BodyManager_Human_Player : BodyManager {
     //                leftThighCollider, rightThighCollider, leftLowerLegCollider, rightLowerLegCollider, leftFootCollider, rightFootCollider,
     //                lShoulderCollider, rShoulderCollider, lUpperArmCollider, rUpperArmCollider, lForearmCollider, rForearmCollider, lHandCollider, rHandCollider;
 
-    public bool meleeWeaponDrawn, rangedWeaponDrawn;
+    public bool meleeWeaponDrawn, rangedWeaponDrawn, weaponReadied;
     public Transform rHandTransform, lHandTransform;
     public Item_Weapon rHandWeapon;
     public Item_Weapon lHandWeapon;
@@ -59,6 +59,7 @@ public class BodyManager_Human_Player : BodyManager {
         speed = 5F + 5 * gait;
         stamina = maxStamina = stats.GetStat(RPGStatType.Endurance).StatValue*10;
         heartRate = stats.GetStat(RPGStatType.RestingHeartRate).StatValue;
+        UpdateWeatherProtection();
         InvokeRepeating("UpdateHeartRate", 6f, 6f);
         InvokeRepeating("ReadWeather", 1.5f, 300f);
         InvokeRepeating("UpdateCoreTemp", 7f, 6f);
@@ -109,17 +110,43 @@ public class BodyManager_Human_Player : BodyManager {
         }
     }
 
-    void SheatheWeapon()
+    public override void SheatheWeapon(Item_Weapon aWeapon)
     {
+        if (!aWeapon.wielded)
+            return;
+        aWeapon.wielded = false;
+        Debug.LogWarning("Sheate weapon: " + aWeapon.itemName);
+        aWeapon.GetComponent<Rigidbody>().isKinematic = false;
+        aWeapon.GetComponent<Rigidbody>().useGravity = true;
+        aWeapon.gameObject.SetActive(false);
+        anim.SetBool("ArmsRaised", false);
+        if (aWeapon is Item_Weapon_Bow)
+        {
+            wieldingBow = false;
+            rangedWeaponDrawn = false;
+            lHandWeapon = null;
+        }
+        else
+        {
+            meleeWeaponDrawn = false;
+            rHandWeapon = null;
+        }
     }
 
     public void DrawWeapon(Item_Weapon drawnWeapon)
     {
+        if (rHandWeapon != null)
+        {
+            Item_Weapon droppingItem = rHandWeapon;
+            SheatheWeapon(rHandWeapon);
+            DropItem(droppingItem);
+        }
+            
+        drawnWeapon.wielded = true;
         Debug.LogWarning("Draw weapon: " + drawnWeapon.itemName);
         drawnWeapon.GetComponent<Rigidbody>().isKinematic = true;
         drawnWeapon.GetComponent<Rigidbody>().useGravity = false;
         drawnWeapon.gameObject.SetActive(true);
-        drawnWeapon.gameObject.transform.localScale *= .25f;// new Vector3(.25f, .25f, .25f);
         if (drawnWeapon is Item_Weapon_Bow)
         {
             wieldingBow = true;
@@ -138,19 +165,64 @@ public class BodyManager_Human_Player : BodyManager {
         drawnWeapon.gameObject.transform.localRotation.Equals(0);
         drawnWeapon.gameObject.transform.Rotate(drawnWeapon.gripOrientation);
         drawnWeapon.gameObject.transform.Translate(drawnWeapon.gripAdjust);
+        anim.SetBool("ArmsRaised", true);
+    }
+
+    public void OffHandDrawWeapon(Item_Weapon drawnWeapon)
+    {
+        if (lHandWeapon != null)
+        {
+            Item_Weapon droppingItem = rHandWeapon;
+            SheatheWeapon(rHandWeapon);
+            DropItem(droppingItem);
+        }
+
+        drawnWeapon.wielded = true;
+        Debug.LogWarning("OffHandDraw weapon: " + drawnWeapon.itemName);
+        drawnWeapon.GetComponent<Rigidbody>().isKinematic = true;
+        drawnWeapon.GetComponent<Rigidbody>().useGravity = false;
+        drawnWeapon.gameObject.SetActive(true);
+        if (drawnWeapon is Item_Weapon_Bow)
+        {
+            wieldingBow = true;
+            rangedWeaponDrawn = true;
+            lHandWeapon = drawnWeapon;
+            drawnWeapon.gameObject.transform.SetParent(lHandTransform, false);
+            drawnWeapon.gameObject.transform.position = lHandTransform.position;
+        }
+        else
+        {
+            meleeWeaponDrawn = true;
+            lHandWeapon = drawnWeapon;
+            drawnWeapon.gameObject.transform.SetParent(lHandTransform, false);
+            drawnWeapon.gameObject.transform.position = lHandTransform.position;
+        }
+        drawnWeapon.gameObject.transform.localRotation.Equals(0);
+        drawnWeapon.gameObject.transform.localPosition.Equals(0);
+        drawnWeapon.gameObject.transform.Rotate(drawnWeapon.gripOrientation);
+        drawnWeapon.gameObject.transform.Translate(drawnWeapon.gripAdjust);
+        anim.SetBool("ArmsRaised", true);
     }
 
     void RaiseGuard()
     {
+
         if (guardRaised) { guardRaised = false; }
         else { guardRaised = true; }
     }
 
+    void LowerGuard()
+    {
+        anim.SetBool("ArmsRaised", false);
+
+    }
+
     void RaiseWeapons()
     {
+        anim.SetBool("ArmsRaised", true);
+        weaponReadied = !weaponReadied;
         //anim.RaiseWeapons
         //bodyStatus.weaponsStatus = raised
-
     }
 
     public Dictionary<WeaponType, string> mainAttackDict = new Dictionary<WeaponType, string>
@@ -399,6 +471,7 @@ public class BodyManager_Human_Player : BodyManager {
                     bodyPart.protection[i] = newWearable.protection[i] + stats.GetStat<RPGBodyPart>(partCovered).protection[i];
                 }
             }
+            UpdateWeatherProtection();
             if (newWearable.hasModel)
             {
                 mcs.SetClothingVisibility(newWearable.modelID, true);
@@ -408,6 +481,8 @@ public class BodyManager_Human_Player : BodyManager {
 
     public override void RemoveGarment(Item_Garment thisWearable)
     {
+        if (!thisWearable.equipped)
+            return;
         foreach (RPGStatType partCovered in thisWearable.bodyPartCoverage)
         {
             RPGBodyPart bodyPart = stats.GetStat<RPGBodyPart>(partCovered);
@@ -607,14 +682,18 @@ public class BodyManager_Human_Player : BodyManager {
         speed = 5F + 5 * gait;
     }
 
+    float lastHeartCheckTime = 0;
     void UpdateHeartRate()
     {
         test = stats.GetStat(RPGStatType.RestingHeartRate).StatValue;
         float target;
-        target = stats.GetStat(RPGStatType.RestingHeartRate).StatValue + (moving ? 0 : (gait * 30 * (crouching ? 1:1.5f))) + (.001f * (maxStamina - stamina)) + (shivering ? 0 : 30);
+        target = stats.GetStat(RPGStatType.RestingHeartRate).StatValue + (moving ? 0 : (gait * 30 * (crouching ? 1:1.5f))) + (.001f * (maxStamina - stamina)) + (shivering ? 30 : 0);
         target += encumbrance * 60;
         float diff = target - heartRate;
-        heartRate = heartRate + (.0005f * diff * diff) + (.01f * diff);
+        float now = worldTime.totalGameSeconds;
+        heartRate = Math.Min(heartRate + (now - lastHeartCheckTime) / 6 * ((.0005f * diff * diff) + (.01f * diff)),200);
+        heartRate = Math.Max(10, heartRate);
+        lastHeartCheckTime = 0;
     }
 
     public float coreTempBase = 37f;
@@ -630,12 +709,16 @@ public class BodyManager_Human_Player : BodyManager {
     public float totalWaterCover = 0;
     public float totalWindCover = 0;
 
+    float lastTempCheckTime = 0;
 
     void UpdateCoreTemp()
     {
         ReadWeather();
-        float heatProduction = stats.GetStat(RPGStatType.Weight).StatValue * heartRate * heartRate / (stats.GetStat(RPGStatType.RestingHeartRate).StatValue * stats.GetStat(RPGStatType.RestingHeartRate).StatValue);
+        float heatProduction = 0.005f * stats.GetStat(RPGStatType.Weight).StatValue * heartRate * heartRate / (stats.GetStat(RPGStatType.RestingHeartRate).StatValue * stats.GetStat(RPGStatType.RestingHeartRate).StatValue);
         float heatLoss = ((coreTemp - localTemperature) * (.1f+humidity) + localTemperature * localTemperature * humidity) * stats.GetStat(RPGStatType.Height).StatValue / totalInsulation;
+        print(heatProduction);
+        print(heatLoss);
+        print(coreTemp + ", " + localTemperature + ", " + heartRate);
         //float coolingFactor = coreTemp * (0.000001f * (coreTemp - localTemperature + 10 - (5*heartRate/60)));
         //float heatingFactor = coreTemp * (0.000001f * (coreTemp - localTemperature + 5 - (5 * heartRate / 60)));
         //if (localTemperature < 15)
@@ -647,11 +730,14 @@ public class BodyManager_Human_Player : BodyManager {
         //{
         //    coreTemp = (coreTemp - coreTempBase) + (heatingFactor * (1 + totalInsulation));
         //}
-        coreTemp += (heatProduction - heatLoss) / stats.GetStat(RPGStatType.Weight).StatValue;
+        float now = worldTime.totalGameSeconds;
+        coreTemp += (now - lastTempCheckTime) / 6 * (heatProduction - heatLoss) / stats.GetStat(RPGStatType.Weight).StatValue;
+
         if(coreTemp > (coreTempBase+1))
         {
-            Sweat();
+            Sweat((now - lastTempCheckTime)/6);
         }
+        lastTempCheckTime = now;
         if (coreTemp < (coreTempBase - 1))
         {
             shivering = true;
@@ -761,7 +847,7 @@ public class BodyManager_Human_Player : BodyManager {
     //public float carryWeight;
     //void Encumbrance()
     //{
-    //    encumbrance = ((outfit.Select(c => c.itemWeight).ToList().Sum()*.25f) + inventory.SumWeight())/stats.GetStat<RPGAttribute>(RPGStatType.CarryWeight).StatValue;
+    //    encumbrance = ((outfit.Select(c => c.itemWeight).ToList().Sum()*.25f) + baseInventory.SumWeight())/stats.GetStat<RPGAttribute>(RPGStatType.CarryWeight).StatValue;
     //    carryWeight = stats.GetStat<RPGAttribute>(RPGStatType.CarryWeight).StatValue;
     //}
 
@@ -770,7 +856,9 @@ public class BodyManager_Human_Player : BodyManager {
     float calorieTime,hydrationTime,sleepTime;
     void CalorieBurn()
     {
-        calorieBurn = stats.GetStat(RPGStatType.Weight).StatValue * (Math.Max(heartRate-50, 0) * .00000068481f + 0.000001175f) * (worldTime.totalGameSeconds - calorieTime)/6; // TODO 
+        float now = worldTime.totalGameSeconds;
+        calorieBurn = stats.GetStat(RPGStatType.Weight).StatValue * (Math.Max(heartRate-50, 0) * .00000068481f + 0.000001175f) * (now - calorieTime)/6; // TODO
+        calorieTime = now;
         calories -= calorieBurn; 
     }
 
@@ -780,9 +868,9 @@ public class BodyManager_Human_Player : BodyManager {
     {
         hydration -= calorieBurn * Math.Max(localTemperature*.1f, 1);
     }
-    void Sweat()
+    void Sweat(float amount)
     {
-        hydration -= .01f;
+        hydration -= .001f * amount;
     }
 
     public float sleepDebt = 1f; // hours sleep debt
@@ -972,14 +1060,14 @@ public class BodyManager_Human_Player : BodyManager {
                 {
                     GameObject harvest = Instantiate(plant.fruitPrefab);
                     harvest.GetComponent<Item_Stack>().numItems = (int)totalGathered;
-                    inventory.AddItem(harvest.GetComponent<Item_Stack>());
+                    baseInventory.AddItem(harvest.GetComponent<Item_Stack>());
                 }
                 else if (plant.fruitPrefab.GetComponent<Item>())
                 {
                     for (int i = 0; i < totalGathered; i++)
                     {
                         GameObject harvest = Instantiate(plant.fruitPrefab);
-                        inventory.AddItem(harvest.GetComponent<Item>());
+                        baseInventory.AddItem(harvest.GetComponent<Item>());
                     }
                 }
                 stats.GetStat<RPGSkill>(RPGStatType.Gathering).GainXP((int)(plant.difficulty * totalGathered * 1.1));
@@ -1011,7 +1099,7 @@ public class BodyManager_Human_Player : BodyManager {
             {
                 for(int i = 0; i < body.butcheringReturns.Count; i++)
                 {
-                    body.inventory.AddItem(body.butcheringReturns[i].GetComponent<Item>());
+                    body.baseInventory.AddItem(body.butcheringReturns[i].GetComponent<Item>());
                     body.butchered = true;
                     print("finished butchering");
                 }
@@ -1037,7 +1125,7 @@ public class BodyManager_Human_Player : BodyManager {
             {
                 GameObject harvest = Instantiate(targetPlant.fruitPrefab);
                 harvest.GetComponent<Item_Stack>().numItems = (int)Math.Floor(totalGathered);
-                inventory.AddItem(harvest.GetComponent<Item_Stack>());
+                baseInventory.AddItem(harvest.GetComponent<Item_Stack>());
             }
             else if (targetPlant.fruitPrefab.GetComponent<Item>())
             {
@@ -1045,7 +1133,7 @@ public class BodyManager_Human_Player : BodyManager {
                 for (int i = 0; i < totalGathered; i++)
                 {
                     GameObject harvest = Instantiate(targetPlant.fruitPrefab);
-                    inventory.AddItem(harvest.GetComponent<Item>());
+                    baseInventory.AddItem(harvest.GetComponent<Item>());
                 }
             }
             stats.GetStat<RPGSkill>(RPGStatType.Gathering).GainXP((int)(targetPlant.difficulty * totalGathered));

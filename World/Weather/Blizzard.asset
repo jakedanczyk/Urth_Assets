@@ -13,7 +13,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weatherID: 2
   weatherName: Blizzard
-  areaTemperature: -10
+  globalTemperature: -5
   windSpeed: 10
   precipRate: 10
   weatherFX: {fileID: 1886143452679846, guid: f71e655c36cc8bf4898b98b77edf2d58, type: 2}

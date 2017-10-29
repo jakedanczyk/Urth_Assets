@@ -6,7 +6,7 @@ public class FocusPanel : MonoBehaviour, IPointerDownHandler
 {
 
     private RectTransform panel;
-
+    public UnityStandardAssets.Characters.FirstPerson.PlayerControls playerControls;
     void Awake()
     {
         panel = GetComponent<RectTransform>();

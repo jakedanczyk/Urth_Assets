@@ -15,13 +15,15 @@ public class Thermometer : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
     {
+        temperature = 0;
         for(int i = 0; i < heatRadiators.Count; i++)
         {
             float dist = Vector3.Distance(heatRadiators[i].gameObject.transform.position, this.transform.position);
             temperature = Mathf.Max(heatRadiators[i].power / (dist * dist), heatRadiators[i].coreTemp);
         }
         float altitude = this.transform.position.y;
-        temperature += weatherSystem.currentWeather.globalTemperature - (.0016f * (altitude - 8000)) + heatZones.Sum(temp => temp.temperatureDifference);
+        print("thermo " + temperature);
+        temperature += weatherSystem.currentWeather.globalTemperature - (.0064f * (altitude - 2000)) + heatZones.Sum(temp => temp.temperatureDifference);
         InvokeRepeating("ReadTemp", 6, 6);
 	}
 	
@@ -32,12 +34,15 @@ public class Thermometer : MonoBehaviour {
 
     public float ReadTemp()
     {
+        temperature = 0;
         for (int i = 0; i < heatRadiators.Count; i++)
         {
             float dist = Vector3.Distance(heatRadiators[i].gameObject.transform.position, this.transform.position);
             temperature = Mathf.Max(heatRadiators[i].power / (dist * dist), heatRadiators[i].coreTemp);
         }
+        print("thermo " + temperature);
+
         float altitude = this.transform.position.y;
-        return temperature += weatherSystem.currentWeather.globalTemperature + heatZones.Sum(temp => temp.temperatureDifference);
+        return temperature += weatherSystem.currentWeather.globalTemperature - (.0064f * (altitude - 2000)) + heatZones.Sum(temp => temp.temperatureDifference);
     }
 }

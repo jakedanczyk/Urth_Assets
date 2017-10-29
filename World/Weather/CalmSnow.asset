@@ -13,6 +13,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weatherID: 0
   weatherName: CalmHeavySnow
-  areaTemperature: -4
+  globalTemperature: -3
   windSpeed: 0
+  precipRate: 0
   weatherFX: {fileID: 1396155096622800, guid: c7f721b806fdf724a8598e913b0520ac, type: 2}
