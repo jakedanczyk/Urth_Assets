@@ -19,6 +19,8 @@ public class WorldTime : MonoBehaviour
 
     private float secondsPerSecond;
 
+    public DayNightController dayNightController;
+
     void Start()
     {
 
@@ -36,32 +38,27 @@ public class WorldTime : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             secondsPerSecond = 1;
-
-
+            dayNightController.daySpeedMultiplier = secondsPerSecond / 3600;
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             secondsPerSecond = 60;
-
-
+            dayNightController.daySpeedMultiplier = secondsPerSecond / 3600;
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3))
         {
             secondsPerSecond = 3600;
-
-
+            dayNightController.daySpeedMultiplier = secondsPerSecond / 3600;
         }
         else if (Input.GetKeyDown(KeyCode.Alpha4))
         {
             secondsPerSecond = 86400;
-
-
+            dayNightController.daySpeedMultiplier = secondsPerSecond / 3600;
         }
         else if (Input.GetKeyDown(KeyCode.Alpha5))
         {
             secondsPerSecond = 2629743;
-
-
+            dayNightController.daySpeedMultiplier = secondsPerSecond / 3600;
         }
 
         totalGameSeconds += secondsPerSecond * Time.deltaTime;

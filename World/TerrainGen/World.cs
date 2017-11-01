@@ -11,6 +11,7 @@ public class World : MonoBehaviour {
     public GameObject horsePrefab;
     public GameObject huckPrefab;
     public GameObject waterPrefab;
+    public ItemDictionary itemDictionary;
 
 
     public string worldName = "world";
@@ -53,6 +54,9 @@ public class World : MonoBehaviour {
             print("boneSpawn");
             GameObject newBone = Instantiate(bonePrefab);
             newBone.transform.position = newChunk.boneList[0];
+            int r = Random.Range(0, 9);
+            GameObject randomItem = Instantiate(itemDictionary.items[r]);
+            newBone.GetComponent<LootInventory>().AddItem(randomItem.GetComponent<Item>());
         }
         if (newChunk.horseSpawn)
         {

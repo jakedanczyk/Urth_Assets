@@ -45,12 +45,15 @@ public class BodyManager_Skeleton : BodyManager {
         }
         if (vital.StatCurrentValue <= 0)
         {
+            StopCoroutine(Claw());
             alive = false;
             anim.SetBool("isAlive", false);
             anim.SetBool("isDead", true);
             aiControl.enabled = false;
+            chaseScript.CancelInvoke();
             chaseScript.enabled = false;
             this.tag = "DeadCreature";
+            StopAllCoroutines();
         }
     }
 

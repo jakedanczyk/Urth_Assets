@@ -14,7 +14,6 @@ public class LootInventory : Inventory {
         {
             buttons.Add(inventoryUIPanel.transform.GetChild(i).gameObject.GetComponent<ItemUI_ButtonScript>());
         }
-
         foreach (ItemUI_ButtonScript button in buttons)
         {
             button.gameObject.transform.parent = button.parentItem.transform;
@@ -29,6 +28,19 @@ public class LootInventory : Inventory {
 
             //Instantiate(item.itemUIelement, inventoryUIPanel.transform);
         }
+    }
+
+    public new void AddItem(Item newItem)
+    {
+        newItem.itemUIelement.transform.SetParent(inventoryUIPanel);
+        newItem.itemUIelement.GetComponent<RectTransform>().localPosition = Vector3.zero;
+        newItem.itemUIelement.GetComponent<RectTransform>().localRotation = Quaternion.identity;
+        newItem.itemUIelement.GetComponent<RectTransform>().localScale = Vector3.one;
+        newItem.itemUIElementScript.parentInventory = this;
+        newItem.loose = false;
+        newItem.gameObject.SetActive(false);
+        inventoryContents.Add(newItem);
+        contentsWeight += newItem.itemWeight;
     }
 
 }

@@ -97,7 +97,7 @@ public abstract class BodyManager : MonoBehaviour {
 
     public int[] SendArmorNumbers(RPGStatType bodyPart)
     {
-        int[] z = new int[] { 0, 0, 0 };
+        int[] z = new int[] { 1, 1, 1 };
         z[0] = stats.GetStat<RPGBodyPart>(bodyPart).protection[0];
         z[1] = stats.GetStat<RPGBodyPart>(bodyPart).protection[1];
         z[2] = stats.GetStat<RPGBodyPart>(bodyPart).protection[2];

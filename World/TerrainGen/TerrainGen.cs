@@ -44,8 +44,8 @@ public class TerrainGen
     int huckDensity = 8;
     GameObject huckVar;
 
-    float boneFrequency = 1.05f;
-    float boneDensity = 1.00001f;
+    float boneFrequency = 10.05f;
+    float boneDensity = 10.00001f;
     GameObject boneVar;
 
     float horseFrequency = 1.05f;
@@ -138,6 +138,14 @@ public class TerrainGen
                 //}
                 //else { SetBlock(x, y, z, new Block(), chunk); }
                 SetBlock(x, y, z, new Block(), chunk);
+                if (y == stoneHeight && GetNoise((int)x, 0, (int)z, boneFrequency, 11) < boneDensity)
+                {
+                    chunk.boneSpawn = true;
+                    chunk.boneList.Add(new Vector3(x, y + 10, z));
+                    //treeVar = (GameObject)Resources.Load("Tree1", typeof(GameObject));
+                    //treeVar.transform.position = new Vector3(x, y, z);
+                    //CreateTree(x, y + 1, z, chunk);
+                }
             }
             else if (y < shrubline && y <= dirtHeight && caveSize < caveChance)
             {
@@ -171,6 +179,14 @@ public class TerrainGen
             else if (y >= snowline && y <= snowHeight)
             {
                 SetBlock(x, y, z, new BlockSnow(), chunk);
+                if (y == snowHeight && GetNoise((int)x, 0, (int)z, boneFrequency, 120) < boneDensity)
+                {
+                    chunk.boneSpawn = true;
+                    chunk.boneList.Add(new Vector3(x, y + 10, z));
+                    //treeVar = (GameObject)Resources.Load("Tree1", typeof(GameObject));
+                    //treeVar.transform.position = new Vector3(x, y, z);
+                    //CreateTree(x, y + 1, z, chunk);
+                }
             }
             else
             {
@@ -228,7 +244,9 @@ public class TerrainGen
                 //{
                 //    SetBlock(x, y, z, new BlockCopperOre(), chunk1);
                 //}
-                 SetBlock1(x, y, z, new Block1(), chunk1); 
+                 SetBlock1(x, y, z, new Block1(), chunk1);
+
+
             }
             else if (y < shrubline && y <= dirtHeight && caveSize < caveChance)
             {

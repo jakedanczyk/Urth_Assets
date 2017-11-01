@@ -342,10 +342,10 @@ public class SkeletonStats : CreatureStats
         //leftHand.StatBaseValue = 100;
         //leftHand.protection = new int[] { 0, 0, 0, 0, 0, 0 };
 
-        //var rightHand = CreateOrGetStat<RPGBodyPart>(RPGStatType.RightHand);
-        //rightHand.StatName = "Right Hand";
-        //rightHand.StatBaseValue = 100;
-        //rightHand.protection = new int[] { 0, 0, 0, 0, 0, 0 };
+        var rightHand = CreateOrGetStat<RPGBodyPart>(RPGStatType.RightHand);
+        rightHand.StatName = "Right Hand";
+        rightHand.StatBaseValue = 100;
+        rightHand.protection = new int[] { 1, 5, 3, 1, 1, 1 };
 
         //var leftThigh = CreateOrGetStat<RPGBodyPart>(RPGStatType.LeftThigh);
         //leftThigh.StatName = "Left Thigh";

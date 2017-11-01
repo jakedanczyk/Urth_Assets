@@ -1132,7 +1132,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7bcf7e246136845458912c08525063c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parentItem: {fileID: 0}
+  parentItem: {fileID: 114079397253661476}
   parentInventory: {fileID: 0}
   thisButton: {fileID: 114850094450404074}
 --- !u!114 &114079397253661476
@@ -1147,8 +1147,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemID: 0
-  itemName: Horse Leather Trousers
-  itemDesc: Trousers made from horse leather
+  itemName: Iron Maille Trousers
+  itemDesc: Trousers made from linked rings of iron
   itemWeight: 0
   itemVolume: 0
   baseQuality: 0
@@ -1158,12 +1158,12 @@ MonoBehaviour:
   itemModel: {fileID: 1954615306091342}
   itemAttributes: []
   componentItems: []
-  itemUIelement: {fileID: 1254978913479558}
+  itemUIelement: {fileID: 1211754125316240}
   itemUIElementScript: {fileID: 114062599325279210}
   matDict: {fileID: 0}
   bodyPartCoverage: 
   protection: 070000001500000015000000010000000100000001000000
-  hasModel: 0
+  hasModel: 1
   modelID: c241ec10-3705-4281-a044-53d2354d8262
   equipped: 0
 --- !u!114 &114085107385768526

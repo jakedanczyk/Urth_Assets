@@ -4378,7 +4378,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7bcf7e246136845458912c08525063c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parentItem: {fileID: 0}
+  parentItem: {fileID: 114472015302639072}
   parentInventory: {fileID: 0}
   thisButton: {fileID: 114427188667655622}
 --- !u!114 &114089801142417824
@@ -4550,10 +4550,10 @@ MonoBehaviour:
   itemUIelement: {fileID: 1201150917113132}
   itemUIElementScript: {fileID: 114061884537967640}
   matDict: {fileID: 0}
-  bodyPartCoverage: 
+  bodyPartCoverage: b30f0000b10f0000
   protection: 000000000000000000000000000000000000000000000000
-  hasModel: 0
-  modelID: 
+  hasModel: 1
+  modelID: 52a648ba-90df-47ae-8d03-bb82778fe302
   equipped: 0
 --- !u!114 &114586855872876244
 MonoBehaviour:

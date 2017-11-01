@@ -4599,7 +4599,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7bcf7e246136845458912c08525063c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parentItem: {fileID: 0}
+  parentItem: {fileID: 114963064849232016}
   parentInventory: {fileID: 0}
   thisButton: {fileID: 114662065176286620}
 --- !u!114 &114745139417163990
@@ -4692,10 +4692,10 @@ MonoBehaviour:
   itemUIelement: {fileID: 1403878517194678}
   itemUIElementScript: {fileID: 114684928611815468}
   matDict: {fileID: 0}
-  bodyPartCoverage: 
+  bodyPartCoverage: b40f0000b20f0000
   protection: 000000000000000000000000000000000000000000000000
-  hasModel: 0
-  modelID: 
+  hasModel: 1
+  modelID: 2611f0d2-7469-446d-ab52-73cb23f81661
   equipped: 0
 --- !u!137 &137534361337473604
 SkinnedMeshRenderer:

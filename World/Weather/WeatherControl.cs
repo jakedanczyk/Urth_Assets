@@ -63,6 +63,7 @@ public class WeatherControl : MonoBehaviour {
     void Update () {
         dayHour = time.hours % 24;
         UpdateSun();
+        UpdateMoon();
         if (day && dayHour > 18)
         {
             RenderSettings.skybox = skyboxMaterials[1];
@@ -125,7 +126,8 @@ public class WeatherControl : MonoBehaviour {
 
     void UpdateMoon()
     {
-        moon.transform.eulerAngles = new Vector3((monthDay) / 1.02f *  180, 90, 0);
+        //moon.transform.eulerAngles = new Vector3((monthDay) / 1.02f *  180, 90, 0);
+        moon.transform.eulerAngles = new Vector3((dayHour - 6) / 13 * 180, 90, 0);
     }
 
     void SunPosition()

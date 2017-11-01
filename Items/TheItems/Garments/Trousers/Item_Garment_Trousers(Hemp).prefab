@@ -1391,12 +1391,12 @@ MonoBehaviour:
   itemModel: {fileID: 1058681368033102}
   itemAttributes: []
   componentItems: []
-  itemUIelement: {fileID: 1764776079156770}
+  itemUIelement: {fileID: 1043178185646794}
   itemUIElementScript: {fileID: 114003510376958606}
   matDict: {fileID: 0}
   bodyPartCoverage: 
   protection: 010000000100000001000000020000000100000001000000
-  hasModel: 0
+  hasModel: 1
   modelID: c241ec10-3705-4281-a044-53d2354d8262
   equipped: 0
 --- !u!114 &114859942261920336
