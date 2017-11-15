@@ -126,3 +126,5 @@ MonoBehaviour:
   selectedButton: {fileID: 0}
   selectedItem: {fileID: 0}
   contentsWeight: 0
+  waterVessels: []
+  waterVesselItems: []

@@ -15,6 +15,9 @@ public class MeshData
     public List<Vector3> colVertices = new List<Vector3>();
     public List<int> colTriangles = new List<int>();
 
+    public List<Vector3> fluidColVertices = new List<Vector3>();
+    public List<int> fluidColTriangles = new List<int>();
+
     public bool useRenderDataForCol;
 
     public MeshData() { }
@@ -70,15 +73,32 @@ public class MeshData
         fluidTriangles.Add(fluidVertices.Count - 4);
         fluidTriangles.Add(fluidVertices.Count - 2);
         fluidTriangles.Add(fluidVertices.Count - 1);
+        if (useRenderDataForCol)
+        {
+            fluidColTriangles.Add(fluidColVertices.Count - 4);
+            fluidColTriangles.Add(fluidColVertices.Count - 3);
+            fluidColTriangles.Add(fluidColVertices.Count - 2);
+            fluidColTriangles.Add(fluidColVertices.Count - 4);
+            fluidColTriangles.Add(fluidColVertices.Count - 2);
+            fluidColTriangles.Add(fluidColVertices.Count - 1);
+        }
     }
 
     public void AddFluidVertex(Vector3 vertex)
     {
         fluidVertices.Add(vertex);
+        if (useRenderDataForCol)
+        {
+            fluidColVertices.Add(vertex);
+        }
     }
 
     public void AddFluidTriangle(int tri)
     {
         fluidTriangles.Add(tri);
+        if (useRenderDataForCol)
+        {
+            fluidColTriangles.Add(tri - (fluidVertices.Count - fluidColVertices.Count));
+        }
     }
 }

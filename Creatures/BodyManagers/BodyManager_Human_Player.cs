@@ -36,6 +36,8 @@ public class BodyManager_Human_Player : BodyManager {
     public Inventory pockets;
     public Inventory[] bags;
     public M3DCharacterManager mcs;
+    public List<Item_WaterVessel> waterVessels;
+    public new PlayerInventory baseInventory;
 
     public bool crouching;
     public bool inTask;
@@ -328,7 +330,7 @@ public class BodyManager_Human_Player : BodyManager {
     {
         float dodgeChance = (targetStats.GetStat(RPGStatType.Dodge).StatValue *3 +  (targetStats.GetStat(RPGStatType.Agility).StatValue)) / (1 + 3 * bp.parentBody.encumbrance);
         float deflectChance = targetStats.GetStat(RPGStatType.Deflect).StatValue *3 +  targetStats.GetStat(RPGStatType.Agility).StatValue + targetStats.GetStat(RPGStatType.Strength).StatValue + d[2] * targetStats.GetStat(RPGStatType.Armor).StatValue;
-        float absorbChance = targetStats.GetStat(RPGStatType.Absorb).StatValue * 3 + targetStats.GetStat(RPGStatType.Agility).StatValue  + 2 * targetStats.GetStat(RPGStatType.Strength).StatValue + d[2] * targetStats.GetStat(RPGStatType.Armor).StatValue + targetStats.GetStat(RPGStatType.Weight).StatValue;
+        float absorbChance = targetStats.GetStat(RPGStatType.Absorb).StatValue * 3 + targetStats.GetStat(RPGStatType.Agility).StatValue  + 2 * targetStats.GetStat(RPGStatType.Strength).StatValue + d[2] * targetStats.GetStat(RPGStatType.Armor).StatValue + Mathf.Log(targetStats.GetStat(RPGStatType.Weight).StatValue);
         float hitChance = attackSkill.StatValue * 5 + stats.GetStat(RPGStatType.Agility).StatValue + stats.GetStat(RPGStatType.Strength).StatValue;
         float criticalChance = 0.001f * attackSkill.StatValue * attackSkill.StatValue + stats.GetStat(RPGStatType.Agility).StatValue + stats.GetStat(RPGStatType.Strength).StatValue;
         float sum = dodgeChance + deflectChance + absorbChance + hitChance + criticalChance;
@@ -716,8 +718,6 @@ public class BodyManager_Human_Player : BodyManager {
         ReadWeather();
         float heatProduction = 0.005f * stats.GetStat(RPGStatType.Weight).StatValue * heartRate * heartRate / (stats.GetStat(RPGStatType.RestingHeartRate).StatValue * stats.GetStat(RPGStatType.RestingHeartRate).StatValue);
         float heatLoss = ((coreTemp - localTemperature) * (.1f+humidity) + localTemperature * localTemperature * humidity) * stats.GetStat(RPGStatType.Height).StatValue / totalInsulation;
-        print(heatProduction);
-        print(heatLoss);
         print(coreTemp + ", " + localTemperature + ", " + heartRate);
         //float coolingFactor = coreTemp * (0.000001f * (coreTemp - localTemperature + 10 - (5*heartRate/60)));
         //float heatingFactor = coreTemp * (0.000001f * (coreTemp - localTemperature + 5 - (5 * heartRate / 60)));
@@ -863,11 +863,13 @@ public class BodyManager_Human_Player : BodyManager {
     }
 
     public bool shivering;
+    float waterContent;
     public float hydration = 66f; // body water %
     void Hydration()
     {
-        hydration -= calorieBurn * Math.Max(localTemperature*.1f, 1);
+        hydration -= calorieBurn * .000042f * Math.Max(localTemperature*.1f, 4);
     }
+
     void Sweat(float amount)
     {
         hydration -= .001f * amount;
@@ -1107,6 +1109,21 @@ public class BodyManager_Human_Player : BodyManager {
             }
             yield return new WaitForSeconds(1);
         }
+    }
+
+    public void Eat(Item_Food foodItem)
+    {
+        hydration += foodItem.water / stats.GetStat<RPGAttribute>(RPGStatType.Weight).StatValue;
+        calories += foodItem.calories;
+        if (!foodItem.loose)
+            foodItem.itemUIElementScript.parentInventory.DropItem(foodItem);
+        Destroy(foodItem.itemUIelement);
+        Destroy(foodItem.gameObject);
+    }
+
+    public void Drink()
+    {
+
     }
 
     public override void ProcessThisBody()

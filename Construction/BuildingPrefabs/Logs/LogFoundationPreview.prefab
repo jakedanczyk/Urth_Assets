@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4458855987031924}
   - component: {fileID: 33421498794816706}
   - component: {fileID: 23171476198445036}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: Wood-1tier log_n (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -37,7 +37,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4260006977420128}
   - component: {fileID: 114566595232990612}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: LogFoundationPreview
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -54,7 +54,7 @@ GameObject:
   - component: {fileID: 4808534462787932}
   - component: {fileID: 33188157928191530}
   - component: {fileID: 23046617370691380}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: Wood-1tier log_n
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -71,7 +71,7 @@ GameObject:
   - component: {fileID: 4601119246979276}
   - component: {fileID: 33358131585316612}
   - component: {fileID: 23840390312428192}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: Wood-10tier log_n (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -88,7 +88,7 @@ GameObject:
   - component: {fileID: 4075665829132518}
   - component: {fileID: 33146790580306248}
   - component: {fileID: 23066011071838382}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: Wood-10tier log_n (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -106,7 +106,7 @@ GameObject:
   - component: {fileID: 33908364947937746}
   - component: {fileID: 23795352622907622}
   - component: {fileID: 64776859813625124}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: Wood-1tier log_n (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -124,7 +124,7 @@ GameObject:
   - component: {fileID: 33469537598059568}
   - component: {fileID: 23140550311212276}
   - component: {fileID: 64805881819212756}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: Wood-1tier log_n
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -139,7 +139,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4294387027809260}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: Graphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -156,7 +156,7 @@ GameObject:
   - component: {fileID: 4732060892436862}
   - component: {fileID: 33388206630360270}
   - component: {fileID: 23393540001046564}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: Wood-1tier log_n (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -174,7 +174,7 @@ GameObject:
   - component: {fileID: 33874207163966664}
   - component: {fileID: 23009261905264872}
   - component: {fileID: 64194339678828296}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: Wood-1tier log_n (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -191,7 +191,7 @@ GameObject:
   - component: {fileID: 4900566742005310}
   - component: {fileID: 33257423695972512}
   - component: {fileID: 23023032975510772}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: Wood-10tier log_n
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -208,7 +208,7 @@ GameObject:
   - component: {fileID: 4886591044964148}
   - component: {fileID: 33104829734031598}
   - component: {fileID: 23546025797874702}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: Wood-10tier log_n (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -224,7 +224,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4156767258125306}
   - component: {fileID: 114483935734780732}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -242,7 +242,7 @@ GameObject:
   - component: {fileID: 33993475025910618}
   - component: {fileID: 23932649512168034}
   - component: {fileID: 64548858133549270}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: Wood-1tier log_n (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -259,7 +259,7 @@ GameObject:
   - component: {fileID: 4643142457536994}
   - component: {fileID: 33324088337053726}
   - component: {fileID: 23113805990864484}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: Wood-1tier log_n (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -317,7 +317,7 @@ Transform:
   m_GameObject: {fileID: 1014951086545390}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 4.8, y: 4.8, z: 4.8}
+  m_LocalScale: {x: 1.2, y: 1.2, z: 1.2}
   m_Children:
   - {fileID: 4156767258125306}
   - {fileID: 4294387027809260}

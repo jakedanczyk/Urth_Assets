@@ -18,7 +18,7 @@ public class BlockWater : Block
     (Chunk chunk, int x, int y, int z, MeshData meshData)
     {
 
-        meshData.useRenderDataForCol = false;
+        meshData.useRenderDataForCol = true;
 
         if (chunk.GetBlock(x, y + 1, z) is BlockWater)
         {

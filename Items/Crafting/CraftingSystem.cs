@@ -9,6 +9,7 @@ public class CraftingSystem : MonoBehaviour
     public List<CraftingRecipe> knownRecipeList;
     public bool isCrafting;
     public CraftingRecipe selectedRecipe;
+    public BodyManager_Human_Player player_bodyManager;
 
     void Update()
     {
@@ -21,6 +22,11 @@ public class CraftingSystem : MonoBehaviour
 
     public void CraftItem()
     {
+        if (!selectedRecipe.RequirementsCheck())
+        {
+            print("Requirements Missing");
+            return;
+        }
         print("hey");
         for (int i = 0; i < selectedRecipe.inputs.Count; i++)
         {

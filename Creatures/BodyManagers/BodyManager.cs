@@ -40,11 +40,6 @@ public abstract class BodyManager : MonoBehaviour {
         health.OnCurrentValueChange += OnStatValueChange;
     }
 
-    void Update()
-    {
-
-    }
-
     void OnStatValueChange(object sender, EventArgs args)
     {
         print("stat change");

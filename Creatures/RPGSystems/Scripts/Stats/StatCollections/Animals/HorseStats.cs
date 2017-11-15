@@ -201,7 +201,7 @@ public class HorseStats : CreatureStats
         neck.StatName = "Neck";
         neck.StatBaseValue = 100;
         neck.bodyPartType = BodyPartType.Neck;
-        neck.protection = new int[] { 0, 0, 0, 0, 0, 0 };
+        neck.protection = new int[] { 1, 5, 3, 1, 1, 1 };
         neck.damageModifer = 2;
 
         var torso = CreateOrGetStat<RPGBodyPart>(RPGStatType.Torso);
@@ -215,7 +215,7 @@ public class HorseStats : CreatureStats
         leg.StatName = "Leg";
         leg.StatBaseValue = 100;
         leg.bodyPartType = BodyPartType.Leg;
-        leg.protection = new int[] { 0, 0, 0, 0, 0, 0 };
+        leg.protection = new int[] { 1, 5, 3, 1, 1, 1 };
         leg.damageModifer = 1;
 
         //var stomach = CreateOrGetStat<RPGBodyPart>(RPGStatType.Stomach);

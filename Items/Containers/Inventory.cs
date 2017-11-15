@@ -10,10 +10,11 @@ public class Inventory : MonoBehaviour {
     public Button selectedButton;
     public Item selectedItem;
     public float contentsWeight;
+    public List<Item_WaterVessel> waterVessels;
+    public List<Item> waterVesselItems;
 
-
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         SumWeight();
 	}
 	
@@ -51,6 +52,12 @@ public class Inventory : MonoBehaviour {
         newItem.gameObject.SetActive(false);
         inventoryContents.Add(newItem);
         contentsWeight += newItem.itemWeight;
+        //if (newItem.GetType().IsAssignableFrom(typeof(Item_WaterVessel)))
+        if (newItem is Item_WaterVessel)
+        {
+            Debug.Log("vessel");
+            waterVesselItems.Add(newItem);
+        }
     }
 
     public void RemoveItem(Item newItem)

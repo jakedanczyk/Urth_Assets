@@ -88,7 +88,7 @@ public class StaticBuildingSystem : MonoBehaviour {
         currentPos = hit2.point;
         currentPos -= Vector3.one * offset;
         currentPos /= gridSize;
-        currentPos = new Vector3(Mathf.Round(currentPos.x), Mathf.Round(currentPos.y), Mathf.Round(currentPos.z));
+        currentPos = new Vector3(Mathf.Round(currentPos.x), currentPos.y, Mathf.Round(currentPos.z));
         currentPos *= gridSize;
         currentPos += Vector3.one * offset;
         currentPreview.position = currentPos;

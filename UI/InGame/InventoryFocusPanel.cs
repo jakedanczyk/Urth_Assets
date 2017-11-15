@@ -7,7 +7,7 @@ public class InventoryFocusPanel : MonoBehaviour, IPointerDownHandler
 
     private RectTransform panel;
     public UnityStandardAssets.Characters.FirstPerson.PlayerControls playerControls;
-    public Inventory attachedInventory;
+    public PlayerInventory attachedInventory;
     void Awake()
     {
         panel = GetComponent<RectTransform>();

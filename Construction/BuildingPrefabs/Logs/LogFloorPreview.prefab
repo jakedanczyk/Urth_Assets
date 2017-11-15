@@ -19,7 +19,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4388939128589812}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: Graphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -38,7 +38,7 @@ GameObject:
   - component: {fileID: 65292242705785964}
   - component: {fileID: 23194767819116660}
   - component: {fileID: 54640762783658448}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: LogFloorPreview
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -55,7 +55,7 @@ GameObject:
   - component: {fileID: 4788419130087000}
   - component: {fileID: 114433622816439248}
   - component: {fileID: 65251275699715020}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: LogFloorPreview
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -72,7 +72,7 @@ GameObject:
   - component: {fileID: 4336025387315644}
   - component: {fileID: 65808583397450796}
   - component: {fileID: 114738310533878084}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -87,7 +87,7 @@ Transform:
   m_GameObject: {fileID: 1848910113741468}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.02, y: 1.5, z: 1.02}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4788419130087000}
   m_RootOrder: 1
@@ -113,8 +113,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1584294650830822}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 8, y: 0.3, z: 8}
+  m_LocalPosition: {x: -1882.9537, y: 2002.6937, z: -9168.424}
+  m_LocalScale: {x: 1.8, y: 0.075, z: 1.8}
   m_Children:
   - {fileID: 4388939128589812}
   - {fileID: 4336025387315644}
@@ -198,8 +198,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1, y: 0.5, z: 1}
+  m_Center: {x: 0, y: 0.25, z: 0}
 --- !u!65 &65292242705785964
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -208,7 +208,7 @@ BoxCollider:
   m_GameObject: {fileID: 1473976304283168}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
@@ -222,7 +222,7 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 1.07, y: 1.8, z: 1.06}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &114433622816439248
 MonoBehaviour:
@@ -257,7 +257,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   col: []
-  sort: 0
+  sort: 2
   green: {fileID: 2100000, guid: 62b418c11dfec7f40991623b23c4d5a1, type: 2}
   red: {fileID: 2100000, guid: d76dc81b6603c5542971413768936dd7, type: 2}
   isBuildable: 0

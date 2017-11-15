@@ -127,7 +127,6 @@ public class LoadChunks : MonoBehaviour
                 //load a column of chunks in this position
 				for (int y = player_y - 4; y < player_y+4; y++)
                 {
-
                     for (int x = newChunkPos.x - 4; x <= newChunkPos.x + 4; x += 4)
                     {
                         for (int z = newChunkPos.z - 4; z <= newChunkPos.z + 4; z += 4)
@@ -176,7 +175,6 @@ public class LoadChunks : MonoBehaviour
     public int dist;
     bool DeleteChunks()
     {
-
         if (timer == 60)
         {
             var chunksToDelete = new List<WorldPos>();

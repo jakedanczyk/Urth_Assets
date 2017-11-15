@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,21 @@ public class Item : MonoBehaviour {
 
     public void Awake()
     { 
+    }
+
+    public void Start()
+    {
+        if (itemUIelement == null)
+        {
+            itemUIelement = Instantiate(Resources.Load("ItemUI_Element") as GameObject);
+            itemUIElementScript = itemUIelement.GetComponent<ItemUI_ButtonScript>();
+            itemUIElementScript.parentItem = this;
+            itemUIElementScript.thisButton.GetComponentInChildren<Text>().text = itemUIElementScript.parentItem.itemName;
+        }
+        else
+        {
+            itemUIElementScript = itemUIelement.GetComponent<ItemUI_ButtonScript>();
+        }
     }
 
     public bool HasAttributeType(ItemAttribute attribute)

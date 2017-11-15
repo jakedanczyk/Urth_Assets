@@ -77,6 +77,8 @@ GameObject:
   - component: {fileID: 64443046770755324}
   - component: {fileID: 114688558055659382}
   - component: {fileID: 114765840412558864}
+  - component: {fileID: 82571760351422604}
+  - component: {fileID: 114039120987665226}
   m_Layer: 21
   m_Name: Campfire
   m_TagString: UnlitFire
@@ -328,6 +330,86 @@ MeshCollider:
   m_InflateMesh: 0
   m_SkinWidth: 0.01
   m_Mesh: {fileID: 4300000, guid: 9a7cc71be3b095e419a4eac068e18066, type: 3}
+--- !u!82 &82571760351422604
+AudioSource:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1551830720882300}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: 26c28902c490e4c128e59eefe0f6c229, type: 3}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 1
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 150.68
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
 --- !u!108 &108877964454144902
 Light:
   m_ObjectHideFlags: 1
@@ -377,6 +459,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   temp: 500
   heatZone: {fileID: 135647026510076912}
+--- !u!114 &114039120987665226
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1551830720882300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd7942e50713cd14a965682147a760d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inventoryContents: []
+  inventoryUIPanel: {fileID: 0}
+  selectedButton: {fileID: 0}
+  selectedItem: {fileID: 0}
+  contentsWeight: 0
+  waterVessels: []
+  waterVesselItems: []
 --- !u!114 &114276964961682952
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -434,6 +534,8 @@ MonoBehaviour:
   selectedButton: {fileID: 0}
   selectedItem: {fileID: 0}
   contentsWeight: 0
+  waterVessels: []
+  waterVesselItems: []
 --- !u!114 &114765840412558864
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -446,11 +548,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fireContents: {fileID: 114688558055659382}
+  fireLoot: {fileID: 114039120987665226}
   fuelRate: 30
   fuel: 899
   isLit: 0
-  heat: {fileID: 0}
+  heat: {fileID: 1896129691153210}
   flameFX: {fileID: 1696387208775508}
+  soundFX: {fileID: 82571760351422604}
   worldTime: {fileID: 0}
 --- !u!135 &135647026510076912
 SphereCollider:

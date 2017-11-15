@@ -6,6 +6,7 @@ using System.Linq;
 public class Fire : MonoBehaviour {
 
     public Inventory fireContents;
+    public LootInventory fireLoot;
     public float fuelRate = 666f;
     public float fuel = 10000f;
     public bool isLit;
@@ -14,6 +15,7 @@ public class Fire : MonoBehaviour {
     float temp = 500f;
     public GameObject heat;
     public GameObject flameFX;
+    public AudioSource soundFX;
 
     public WorldTime worldTime;
 
@@ -21,6 +23,7 @@ public class Fire : MonoBehaviour {
     {
         flameFX.SetActive(true);
         heat.SetActive(true);
+        soundFX.enabled = true;
         isLit = true;
         gameObject.tag = "LitFire";
         InvokeRepeating("BurnFuel", 30, 30);

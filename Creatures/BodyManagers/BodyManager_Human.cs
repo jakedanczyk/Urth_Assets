@@ -950,7 +950,11 @@ public class BodyManager_Human : BodyManager {
         }
     }
 
-
+    public void Eat(Item_Food foodItem)
+    {
+        calories += foodItem.calories;
+        Destroy(foodItem.gameObject);
+    }
 
     public override void ProcessThisBody()
     {

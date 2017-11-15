@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class CraftingRecipe : MonoBehaviour {
+public abstract class CraftingRecipe : MonoBehaviour {
 
     Inventory supplyInventory;
 
@@ -12,6 +12,8 @@ public class CraftingRecipe : MonoBehaviour {
 
     public List<GameObject> outputs;
     public List<int> outQuantities;
+
+    public abstract bool RequirementsCheck();
 
     //public void CraftItem(CraftingRecipe recipe)
     //{

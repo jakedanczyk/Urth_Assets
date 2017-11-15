@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4070580458712958}
   - component: {fileID: 33896332181075948}
   - component: {fileID: 23798500874226180}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: Wood-10tier log_n (6)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -38,7 +38,7 @@ GameObject:
   - component: {fileID: 4075510547782160}
   - component: {fileID: 33723984997445304}
   - component: {fileID: 23148726544799806}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: Wood-10tier log_n (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -55,7 +55,7 @@ GameObject:
   - component: {fileID: 4743079647195134}
   - component: {fileID: 33595081192438778}
   - component: {fileID: 23797744871032602}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: Wood-10tier log_n
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -72,7 +72,7 @@ GameObject:
   - component: {fileID: 4108913722854376}
   - component: {fileID: 33529372904466658}
   - component: {fileID: 23050965973978014}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: Wood-10tier log_n (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -89,7 +89,7 @@ GameObject:
   - component: {fileID: 4148103675085014}
   - component: {fileID: 33177840463635068}
   - component: {fileID: 23281525903048396}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: Wood-10tier log_n (5)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -104,7 +104,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4624013875444582}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: Graphics
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -121,7 +121,7 @@ GameObject:
   - component: {fileID: 4760612773287496}
   - component: {fileID: 114300885945136948}
   - component: {fileID: 65661189472185604}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: LogWallPreview
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -138,7 +138,7 @@ GameObject:
   - component: {fileID: 4207316570689950}
   - component: {fileID: 33307947445821780}
   - component: {fileID: 23962187954973956}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: Wood-10tier log_n (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -155,7 +155,7 @@ GameObject:
   - component: {fileID: 4132174754715640}
   - component: {fileID: 33564104893006852}
   - component: {fileID: 23109576152603602}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: Wood-10tier log_n (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -172,7 +172,7 @@ GameObject:
   - component: {fileID: 4564222447189738}
   - component: {fileID: 65844248420124912}
   - component: {fileID: 114855859768463604}
-  m_Layer: 0
+  m_Layer: 22
   m_Name: Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -310,8 +310,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1685020254525826}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 4, y: 5, z: 4}
+  m_LocalPosition: {x: -1875.417, y: 2001.8826, z: -9171.563}
+  m_LocalScale: {x: 1, y: 1.25, z: 1}
   m_Children:
   - {fileID: 4624013875444582}
   - {fileID: 4564222447189738}
@@ -601,8 +601,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1.65, y: 1.45, z: 0.25}
-  m_Center: {x: -0.85, y: 0.75, z: 0}
+  m_Size: {x: 1.65, y: 1.24, z: 0.25}
+  m_Center: {x: -0.85, y: 0.7, z: 0}
 --- !u!65 &65844248420124912
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -627,7 +627,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   col: []
-  sort: 0
+  sort: 3
   green: {fileID: 2100000, guid: 62b418c11dfec7f40991623b23c4d5a1, type: 2}
   red: {fileID: 2100000, guid: d76dc81b6603c5542971413768936dd7, type: 2}
   isBuildable: 0
@@ -648,7 +648,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   col: []
-  sort: 0
+  sort: 3
   green: {fileID: 2100000, guid: 62b418c11dfec7f40991623b23c4d5a1, type: 2}
   red: {fileID: 2100000, guid: d76dc81b6603c5542971413768936dd7, type: 2}
   isBuildable: 0

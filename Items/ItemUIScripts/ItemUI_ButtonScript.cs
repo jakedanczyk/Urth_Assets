@@ -12,22 +12,24 @@ public    Item parentItem;
 public    Inventory parentInventory;
 public    Button thisButton;
 
-    void Awake()
-    {
+    //void Awake()
+    //{
         //parentItem = GetComponentInParent<Item>();
         //thisButton = GetComponentInParent<Button>();
        // GetComponentInChildren<Text>().text = parentItem.itemName;
-    }
+    //}
 
     // Use this for initialization
     void Start ()
     {
+        if (parentItem == null)
+            parentItem = this.GetComponentInParent<Item>();
         thisButton.GetComponentInChildren<Text>().text = parentItem.itemName;
     }
 
     // Update is called once per frame
-    void Update () {
-    }
+    //void Update () {
+    //}
 
     public void AttachToInventory()
     {

@@ -201,8 +201,7 @@ MonoBehaviour:
   itemModel: {fileID: 1208179686322622}
   itemAttributes: []
   componentItems: []
-  itemUIelement: {fileID: 1000010169283832, guid: 3bf0adf6558483e448a09d9d5dc50dab,
-    type: 2}
+  itemUIelement: {fileID: 1558007597482764}
   itemUIElementScript: {fileID: 114684610639921652}
   matDict: {fileID: 0}
 --- !u!114 &114128772501968234

@@ -40,8 +40,6 @@ public class Thermometer : MonoBehaviour {
             float dist = Vector3.Distance(heatRadiators[i].gameObject.transform.position, this.transform.position);
             temperature = Mathf.Max(heatRadiators[i].power / (dist * dist), heatRadiators[i].coreTemp);
         }
-        print("thermo " + temperature);
-
         float altitude = this.transform.position.y;
         return temperature += weatherSystem.currentWeather.globalTemperature - (.0064f * (altitude - 2000)) + heatZones.Sum(temp => temp.temperatureDifference);
     }

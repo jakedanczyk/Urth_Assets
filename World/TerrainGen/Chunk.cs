@@ -119,6 +119,12 @@ public class Chunk : MonoBehaviour
 
             chunkWater.fluidFilter.mesh.uv = meshData.fluiduv.ToArray();
             chunkWater.fluidFilter.mesh.RecalculateNormals();
+            chunkWater.coll.sharedMesh = null;
+            Mesh fluidMesh = new Mesh();
+            fluidMesh.vertices = meshData.fluidVertices.ToArray();
+            fluidMesh.triangles = meshData.fluidColTriangles.ToArray();
+            fluidMesh.RecalculateNormals();
+            chunkWater.coll.sharedMesh = fluidMesh;
         }
         coll.sharedMesh = null;
         Mesh mesh = new Mesh();
