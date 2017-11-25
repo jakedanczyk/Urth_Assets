@@ -9,35 +9,28 @@ public class LoadChunk64s : MonoBehaviour
 
         new WorldPos (1, 0, 0), new WorldPos (-1, 0, 0), new WorldPos (0, 0, -1), new WorldPos (0, 0, 1),
         new WorldPos (-1, 0, -1), new WorldPos (-1, 0, 1), new WorldPos (1, 0, -1), new WorldPos (1, 0, 1),
-        new WorldPos (-2, 0, 0),
-		//new WorldPos (-3, 0, -3), new WorldPos (-3, 0, 3), new WorldPos (3, 0, -3),
-		//new WorldPos (3, 0, 3),
-		//new WorldPos (-4, 0, -1),
-		//new WorldPos (-4, 0, 1), new WorldPos (-1, 0, -4), new WorldPos (-1, 0, 4), new WorldPos (1, 0, -4), new WorldPos (1, 0, 4),
-		//new WorldPos (4, 0, -1), new WorldPos (4, 0, 1),
+        new WorldPos (-2, 0, 0), new WorldPos (0, 0, -2), new WorldPos (0, 0, 2), new WorldPos (2, 0, 0),
 
-		//new WorldPos (-4, 0, 0), new WorldPos (0, 0, -4), new WorldPos (0, 0, 4), new WorldPos (4, 0, 0),
+        new WorldPos (-2, 0, -1), new WorldPos (-2, 0, 1), new WorldPos (-1, 0, -2), new WorldPos (-1, 0, 2),
+        new WorldPos (1, 0, -2), new WorldPos (1, 0, 2), new WorldPos (2, 0, -1), new WorldPos (2, 0, 1),
 
-		//new WorldPos (-3, 0, -2), new WorldPos (-3, 0, 2), new WorldPos (-2, 0, -3),
-		//new WorldPos (-2, 0, 3), new WorldPos (2, 0, -3), new WorldPos (2, 0, 3), new WorldPos (3, 0, -2), new WorldPos (3, 0, 2),
+        new WorldPos (-2, 0, -2), new WorldPos (-2, 0, 2), new WorldPos (2, 0, -2), new WorldPos (2, 0, 2),
 
-		//new WorldPos (-3, 0, -1),
-		//new WorldPos (-3, 0, 1), new WorldPos (-1, 0, -3), new WorldPos (-1, 0, 3), new WorldPos (1, 0, -3), new WorldPos (1, 0, 3),
-		//new WorldPos (3, 0, -1), new WorldPos (3, 0, 1),
+        new WorldPos (-3, 0, -3), new WorldPos (-3, 0, 3), new WorldPos (3, 0, -3), new WorldPos (3, 0, 3),
 
-		//new WorldPos (-3, 0, 0), new WorldPos (0, 0, -3), new WorldPos (0, 0, 3), new WorldPos (3, 0, 0),
+        new WorldPos (-3, 0, -2), new WorldPos (-3, 0, 2), new WorldPos (-2, 0, -3),
+        new WorldPos (-2, 0, 3), new WorldPos (2, 0, -3), new WorldPos (2, 0, 3), new WorldPos (3, 0, -2), new WorldPos (3, 0, 2),
 
-		new WorldPos (-2, 0, -2), new WorldPos (-2, 0, 2), new WorldPos (2, 0, -2), new WorldPos (2, 0, 2),
+        new WorldPos (-3, 0, -1),
+        new WorldPos (-3, 0, 1), new WorldPos (-1, 0, -3), new WorldPos (-1, 0, 3), new WorldPos (1, 0, -3), new WorldPos (1, 0, 3),
+        new WorldPos (3, 0, -1), new WorldPos (3, 0, 1),
 
-		new WorldPos (-2, 0, -1), new WorldPos (-2, 0, 1),
-		new WorldPos (-1, 0, -2), new WorldPos (-1, 0, 2), new WorldPos (1, 0, -2), new WorldPos (1, 0, 2), new WorldPos (2, 0, -1),
-		new WorldPos (2, 0, 1),
+        new WorldPos (-3, 0, 0), new WorldPos (0, 0, -3), new WorldPos (0, 0, 3), new WorldPos (3, 0, 0),
 
-		new WorldPos (0, 0, -2), new WorldPos (0, 0, 2), new WorldPos (2, 0, 0),
+        //new WorldPos (-4, 0, -1), new WorldPos (-4, 0, 1), new WorldPos (-1, 0, -4), new WorldPos (-1, 0, 4),
+        //new WorldPos (1, 0, -4), new WorldPos (1, 0, 4), new WorldPos (4, 0, -1), new WorldPos (4, 0, 1),
 
-        new WorldPos (-2, 0, -2), new WorldPos (-2, 0, 2), new WorldPos (-2, 0, -2),
-		new WorldPos (-2, 0, 2), new WorldPos (2, 0, -2), new WorldPos (2, 0, 2), new WorldPos (2, 0, -2), new WorldPos (2, 0, 2),
-
+        //new WorldPos (-4, 0, 0), new WorldPos (0, 0, -4), new WorldPos (0, 0, 4), new WorldPos (4, 0, 0),
 
         // new WorldPos (-4, 0, -2), new WorldPos (-4, 0, 2), new WorldPos (-2, 0, -4), new WorldPos (-2, 0, 4),
         //new WorldPos (2, 0, -4), new WorldPos (2, 0, 4), new WorldPos (4, 0, -2), new WorldPos (4, 0, 2), new WorldPos (-5, 0, 0),
@@ -128,7 +121,7 @@ public class LoadChunk64s : MonoBehaviour
 
                 //load a column of chunk64s in this position
 
-                for (int y = player_y - 3; y < player_y + 3; y++)
+                for (int y = player_y - 3; y < player_y + 4; y++)
                 {
                     for (int x = newChunk64Pos.x - 1024; x <= newChunk64Pos.x + 1024; x += 1024)
                     {
@@ -235,7 +228,7 @@ public class LoadChunk64s : MonoBehaviour
 					new Vector3(chunk64.Value.pos.x, chunk64.Value.pos.y, chunk64.Value.pos.z),
 					new Vector3(playerTransform.position.x, playerTransform.position.y, playerTransform.position.z));
 
-                if (distance > 6000 || (distance < 1024 && v < 1 && playerControls.aboveDetailedChunk))
+                if (distance > 8000 || (distance < 1446 && v < 1 && playerControls.aboveDetailedChunk))
                     chunk64sToDelete.Add(chunk64.Key);
             }
 

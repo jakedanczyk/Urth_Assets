@@ -24,7 +24,6 @@ public class BodyManager_Skeleton : BodyManager {
         //stats = GetComponentInParent<SkeletonStats>();
     }
 
-
     void Start()
     {
         attacking = guardRaised = sneaking = false;
@@ -56,8 +55,6 @@ public class BodyManager_Skeleton : BodyManager {
             StopAllCoroutines();
         }
     }
-
-
 
     private void OnTriggerEnter(Collider other)
     {
@@ -119,7 +116,6 @@ public class BodyManager_Skeleton : BodyManager {
 
     public void MainAttack()
     {
-        print(666);
         if (attacking) { return; }
         collisionList.Clear();
         if (rHandWeapon)
@@ -128,10 +124,7 @@ public class BodyManager_Skeleton : BodyManager {
         }
         else
         {
-            print(667);
-            StartCoroutine(Claw());
-            print(668);
-
+            StartCoroutine(Claw());           
         }
     }
 
@@ -143,7 +136,6 @@ public class BodyManager_Skeleton : BodyManager {
 
         if (collisionList.Count > 0)
         {
-            print(669);
             if (collisionList[0] is CharacterController)
             {
                 collisionList.RemoveAt(0);
@@ -151,7 +143,6 @@ public class BodyManager_Skeleton : BodyManager {
 
             if (collisionList[0].tag == "BodyPart")
             {
-                print(670);
                 int cut = 1 + (stats.GetStat(RPGStatType.ArmStrike).StatValue);
                 int blunt = (int)(1 + (stats.GetStat(RPGStatType.ArmStrike).StatValue + stats.GetStat(RPGStatType.Strength).StatValue) * .1f);
                 BodyPartColliderScript bp = collisionList[0].GetComponent<BodyPartColliderScript>();

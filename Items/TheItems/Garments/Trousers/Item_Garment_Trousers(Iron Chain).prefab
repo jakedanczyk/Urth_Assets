@@ -1149,7 +1149,7 @@ MonoBehaviour:
   itemID: 0
   itemName: Iron Maille Trousers
   itemDesc: Trousers made from linked rings of iron
-  itemWeight: 0
+  itemWeight: 5500
   itemVolume: 0
   baseQuality: 0
   currQuality: 0

@@ -30,7 +30,7 @@ public    Button thisButton;
     // Update is called once per frame
     //void Update () {
     //}
-
+    
     public void AttachToInventory()
     {
         parentInventory = GetComponentInParent<Inventory>();

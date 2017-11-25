@@ -725,7 +725,7 @@ public class BodyManager_Human : BodyManager {
     //public float carryWeight;
     //void Encumbrance()
     //{
-    //    encumbrance = ((outfit.Select(c => c.itemWeight).ToList().Sum()*.25f) + baseInventory.SumWeight())/stats.GetStat<RPGAttribute>(RPGStatType.CarryWeight).StatValue;
+    //    encumbrance = ((outfit.Select(c => c.itemWeight).ToList().Sum()*.25f) + inventory.SumWeight())/stats.GetStat<RPGAttribute>(RPGStatType.CarryWeight).StatValue;
     //    carryWeight = stats.GetStat<RPGAttribute>(RPGStatType.CarryWeight).StatValue;
     //}
 
@@ -901,14 +901,14 @@ public class BodyManager_Human : BodyManager {
                 {
                     GameObject harvest = Instantiate(plant.fruitPrefab);
                     harvest.GetComponent<Item_Stack>().numItems = (int)totalGathered;
-                    baseInventory.AddItem(harvest.GetComponent<Item_Stack>());
+                    inventory.AddItem(harvest.GetComponent<Item_Stack>());
                 }
                 else if (plant.fruitPrefab.GetComponent<Item>())
                 {
                     for (int i = 0; i < totalGathered; i++)
                     {
                         GameObject harvest = Instantiate(plant.fruitPrefab);
-                        baseInventory.AddItem(harvest.GetComponent<Item>());
+                        inventory.AddItem(harvest.GetComponent<Item>());
                     }
                 }
                 stats.GetStat<RPGSkill>(RPGStatType.Gathering).GainXP((int)(plant.difficulty * totalGathered * 1.1));
@@ -940,7 +940,7 @@ public class BodyManager_Human : BodyManager {
             {
                 for(int i = 0; i < body.butcheringReturns.Count; i++)
                 {
-                    body.baseInventory.AddItem(body.butcheringReturns[i].GetComponent<Item>());
+                    body.inventory.AddItem(body.butcheringReturns[i].GetComponent<Item>());
                     body.butchered = true;
                     print("finished butchering");
                 }
@@ -972,7 +972,7 @@ public class BodyManager_Human : BodyManager {
             {
                 GameObject harvest = Instantiate(targetPlant.fruitPrefab);
                 harvest.GetComponent<Item_Stack>().numItems = (int)Math.Floor(totalGathered);
-                baseInventory.AddItem(harvest.GetComponent<Item_Stack>());
+                inventory.AddItem(harvest.GetComponent<Item_Stack>());
             }
             else if (targetPlant.fruitPrefab.GetComponent<Item>())
             {
@@ -980,7 +980,7 @@ public class BodyManager_Human : BodyManager {
                 for (int i = 0; i < totalGathered; i++)
                 {
                     GameObject harvest = Instantiate(targetPlant.fruitPrefab);
-                    baseInventory.AddItem(harvest.GetComponent<Item>());
+                    inventory.AddItem(harvest.GetComponent<Item>());
                 }
             }
             stats.GetStat<RPGSkill>(RPGStatType.Gathering).GainXP((int)(targetPlant.difficulty * totalGathered));

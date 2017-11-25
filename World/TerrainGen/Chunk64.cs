@@ -46,7 +46,7 @@ public class Chunk64 : MonoBehaviour
 	{
         if (InRange(x) && InRange(y) && InRange(z))
             return block64s[x, y, z];
-        return world64.GetBlock64(pos.x + x, pos.y + y, pos.z + z);
+        return world64.GetBlock64(pos.x + (64 * x), pos.y + (64 * y), pos.z + (64 * z));
     }
 
     public static bool InRange(int index)

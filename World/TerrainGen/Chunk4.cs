@@ -46,7 +46,7 @@ public class Chunk4 : MonoBehaviour
 	{
         if (InRange(x) && InRange(y) && InRange(z))
             return block4s[x, y, z];
-        return world4.GetBlock4(pos.x + x, pos.y + y, pos.z + z);
+        return world4.GetBlock4(pos.x + (4*x), pos.y + (4 * y), pos.z + (4 * z));
     }
 
     public static bool InRange(int index)

@@ -103,6 +103,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private bool m_Jumping;
         private AudioSource m_AudioSource;
 
+        public PlayerAudio_Manager playerAudioManager;
+
         public bool e_down;
         Camera m_Camera;
 
@@ -297,6 +299,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                                 inventoryUIPanel.SetActive(true);
                                 print(hitBody.lootInventory.name);
                                 lootPanelScript.attachedInventory = hitBody.lootInventory;
+                                m_AudioSource.PlayOneShot(playerAudioManager.openInventory);
                             }
                         }
                         else if (hit.collider.gameObject.tag == "Water")
@@ -329,6 +332,13 @@ namespace UnityStandardAssets.Characters.FirstPerson
                             lootPanelScript.attachedInventory = fire.fireLoot;
                         }
                     }
+                }
+
+                if (Input.GetKeyDown(KeyCode.R))
+                {
+                    player_bodyManager.weaponReadied = !player_bodyManager.weaponReadied;
+                    player_bodyManager.meleeWeaponDrawn = !player_bodyManager.meleeWeaponDrawn;
+                    anim.SetBool("ArmsRaised", !anim.GetBool("ArmsRaised"));
                 }
             }//--^^--inventory UI closed--^^--
 
@@ -445,7 +455,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
                             {
                                 player_bodyManager.SheatheWeapon(selectedItem);
                             }
-
                         }
                     }
                     if (Input.GetKey(KeyCode.E) && Input.GetMouseButtonDown(1))
@@ -474,10 +483,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
                             Item_Garment selectedItem = (Item_Garment)inventory.selectedItem;
                             if (!selectedItem.equipped)
                             {
+                                m_AudioSource.PlayOneShot(playerAudioManager.equip);
                                 player_bodyManager.EquipWearable(selectedItem);
                             }
                             else if (selectedItem.equipped)
                             {
+                                m_AudioSource.PlayOneShot(playerAudioManager.equip);
                                 player_bodyManager.RemoveGarment(selectedItem);
                             }
                         }
@@ -489,16 +500,17 @@ namespace UnityStandardAssets.Characters.FirstPerson
                             {
                                 player_bodyManager.SheatheWeapon(selectedItem);
                             }
-
                             else if (player_bodyManager.rHandWeapon == null)
                             {
                                 if (!selectedItem.wielded)
                                 {
                                     player_bodyManager.DrawWeapon(selectedItem);
+                                    m_AudioSource.PlayOneShot(playerAudioManager.draw);
                                 }
                                 else if (selectedItem.wielded)
                                 {
                                     player_bodyManager.SheatheWeapon(selectedItem);
+                                    m_AudioSource.PlayOneShot(playerAudioManager.sheathe);
                                 }
                             }
                             else if (player_bodyManager.lHandWeapon == null)
@@ -608,10 +620,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
                             if (!selectedItem.equipped)
                             {
                                 player_bodyManager.EquipWearable(selectedItem);
+                                m_AudioSource.PlayOneShot(playerAudioManager.equip);
                             }
                             else if (selectedItem.equipped)
                             {
                                 player_bodyManager.RemoveGarment(selectedItem);
+                                m_AudioSource.PlayOneShot(playerAudioManager.equip);
                             }
                         }
 
@@ -622,6 +636,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                             if (selectedItem.wielded)
                             {
                                 player_bodyManager.SheatheWeapon(selectedItem);
+                                m_AudioSource.PlayOneShot(playerAudioManager.sheathe);
                             }
 
                             else if (player_bodyManager.rHandWeapon == null)
@@ -629,10 +644,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
                                 if (!selectedItem.wielded)
                                 {
                                     player_bodyManager.DrawWeapon(selectedItem);
+                                    m_AudioSource.PlayOneShot(playerAudioManager.draw);
                                 }
                                 else if (selectedItem.wielded)
                                 {
                                     player_bodyManager.SheatheWeapon(selectedItem);
+                                    m_AudioSource.PlayOneShot(playerAudioManager.sheathe);
                                 }
                             }
                             else if (player_bodyManager.lHandWeapon == null)
@@ -640,10 +657,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
                                 if (!selectedItem.wielded)
                                 {
                                     player_bodyManager.OffHandDrawWeapon(selectedItem);
+                                    m_AudioSource.PlayOneShot(playerAudioManager.draw);
                                 }
                                 else if (selectedItem.wielded)
                                 {
                                     player_bodyManager.SheatheWeapon(selectedItem);
+                                    m_AudioSource.PlayOneShot(playerAudioManager.sheathe);
                                 }
                             }
                         }
@@ -701,11 +720,13 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     fireUIPanel.SetActive(false);
                     showInventory = false;
                     playerCrafting.isCrafting = false;
+                    m_AudioSource.PlayOneShot(playerAudioManager.openInventory);
                 }
                 else
                 {
                     inventoryUIPanel.SetActive(true);
                     showInventory = true;
+                    m_AudioSource.PlayOneShot(playerAudioManager.openInventory);
                 }
             }
 

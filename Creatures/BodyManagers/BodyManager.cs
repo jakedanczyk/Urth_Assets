@@ -7,7 +7,7 @@ using System;
 public abstract class BodyManager : MonoBehaviour {
 
     public List<Item_Garment> outfit;
-    public Inventory baseInventory; // all carried items
+    public Inventory inventory; // all carried items
     public LootInventory lootInventory;
     public Transform aimPoint;
 
@@ -63,7 +63,7 @@ public abstract class BodyManager : MonoBehaviour {
 
     public void PickupItem(Item anItem)
     {
-        baseInventory.AddItem(anItem);
+        inventory.AddItem(anItem);
         //anItem.loose = false;
         //        anItem.transform.SetParent(transform.parent);
         //anItem.gameObject.SetActive(false);
@@ -82,8 +82,8 @@ public abstract class BodyManager : MonoBehaviour {
         {
             SheatheWeapon((Item_Weapon)anItem);
         }
-        baseInventory.selectedItem = null;
-        baseInventory.RemoveItem(anItem);
+        inventory.selectedItem = null;
+        inventory.RemoveItem(anItem);
         anItem.loose = true;
         anItem.gameObject.SetActive(true);
         anItem.transform.position = this.transform.position;
@@ -103,7 +103,7 @@ public abstract class BodyManager : MonoBehaviour {
     public float carryWeight;
     void Encumbrance()
     {
-        encumbrance = (baseInventory.SumWeight() - (outfit.Select(c => c.itemWeight).ToList().Sum() * .75f)) / stats.GetStat<RPGAttribute>(RPGStatType.CarryWeight).StatValue;
+        encumbrance = (inventory.SumWeight() - (outfit.Select(c => c.itemWeight).ToList().Sum() * .5f)) / stats.GetStat<RPGAttribute>(RPGStatType.CarryWeight).StatValue;
         carryWeight = stats.GetStat<RPGAttribute>(RPGStatType.CarryWeight).StatValue;
     }
 

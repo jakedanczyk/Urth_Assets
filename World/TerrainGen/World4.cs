@@ -74,10 +74,9 @@ public class World4 : MonoBehaviour {
     public Chunk4 GetChunk4(int x, int y, int z)
     {
         WorldPos pos = new WorldPos();
-        int multiple = 64;
-        pos.x = Mathf.FloorToInt(x / multiple) * multiple;
-        pos.y = Mathf.FloorToInt(y / multiple) * multiple;
-        pos.z = Mathf.FloorToInt(z / multiple) * multiple;
+        pos.x = Mathf.FloorToInt(x / 64f) * 64;
+        pos.y = Mathf.FloorToInt(y / 64f) * 64;
+        pos.z = Mathf.FloorToInt(z / 64f) * 64;
 
         Chunk4 containerChunk4 = null;
 
@@ -88,9 +87,9 @@ public class World4 : MonoBehaviour {
 
     public Block4 GetBlock4(int x, int y, int z)
     {
-        x = Mathf.FloorToInt(x / 4) * 4;
-        y = Mathf.FloorToInt(y / 4) * 4;
-        z = Mathf.FloorToInt(z / 4) * 4;
+        //x = Mathf.FloorToInt(x / 4) * 4;
+        //y = Mathf.FloorToInt(y / 4) * 4;
+        //z = Mathf.FloorToInt(z / 4) * 4;
         Chunk4 containerChunk4 = GetChunk4(x, y, z);
 
         if (containerChunk4 != null)

@@ -46,7 +46,7 @@ public class Chunk256 : MonoBehaviour
 	{
         if (InRange(x) && InRange(y) && InRange(z))
             return block256s[x, y, z];
-        return world256.GetBlock256(pos.x + x, pos.y + y, pos.z + z);
+        return world256.GetBlock256(pos.x + (256 * x), pos.y + (256 * y), pos.z + (256 * z));
     }
 
     public static bool InRange(int index)

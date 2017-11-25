@@ -73,9 +73,9 @@ public class World64 : MonoBehaviour {
     public Chunk64 GetChunk64(int x, int y, int z)
     {
         WorldPos pos = new WorldPos();
-        pos.x = Mathf.FloorToInt(x / 1024) * 1024;
-        pos.y = Mathf.FloorToInt(y / 1024) * 1024;
-        pos.z = Mathf.FloorToInt(z / 1024) * 1024;
+        pos.x = Mathf.FloorToInt(x / 1024f) * 1024;
+        pos.y = Mathf.FloorToInt(y / 1024f) * 1024;
+        pos.z = Mathf.FloorToInt(z / 1024f) * 1024;
 
         Chunk64 containerChunk64 = null;
 
@@ -86,9 +86,9 @@ public class World64 : MonoBehaviour {
 
     public Block64 GetBlock64(int x, int y, int z)
     {
-        x = Mathf.FloorToInt(x / 64) * 64;
-        y = Mathf.FloorToInt(y / 64) * 64;
-        z = Mathf.FloorToInt(z / 64) * 64;
+        //x = Mathf.FloorToInt(x / 64) * 64;
+        //y = Mathf.FloorToInt(y / 64) * 64;
+        //z = Mathf.FloorToInt(z / 64) * 64;
         Chunk64 containerChunk64 = GetChunk64(x, y, z);
 
         if (containerChunk64 != null)

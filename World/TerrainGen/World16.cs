@@ -73,9 +73,9 @@ public class World16 : MonoBehaviour {
     public Chunk16 GetChunk16(int x, int y, int z)
     {
         WorldPos pos = new WorldPos();
-        pos.x = Mathf.FloorToInt(x / 256) * 256;
-        pos.y = Mathf.FloorToInt(y / 256) * 256;
-        pos.z = Mathf.FloorToInt(z / 256) * 256;
+        pos.x = Mathf.FloorToInt(x / 256f) * 256;
+        pos.y = Mathf.FloorToInt(y / 256f) * 256;
+        pos.z = Mathf.FloorToInt(z / 256f) * 256;
 
         Chunk16 containerChunk16 = null;
 
@@ -86,9 +86,9 @@ public class World16 : MonoBehaviour {
 
     public Block16 GetBlock16(int x, int y, int z)
     {
-        x = Mathf.FloorToInt(x / 16) * 16;
-        y = Mathf.FloorToInt(y / 16) * 16;
-        z = Mathf.FloorToInt(z / 16) * 16;
+        //x = Mathf.FloorToInt(x / 16) * 16;
+        //y = Mathf.FloorToInt(y / 16) * 16;
+        //z = Mathf.FloorToInt(z / 16) * 16;
         Chunk16 containerChunk16 = GetChunk16(x, y, z);
 
         if (containerChunk16 != null)

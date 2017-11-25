@@ -17,7 +17,6 @@ public class Chase : MonoBehaviour {
         playerBody = player.GetComponent<BodyManager>();
         anim = GetComponent<Animator>();
         anim.speed = 2.0f;
-
     }
 
     // Update is called once per frame
@@ -35,7 +34,7 @@ public class Chase : MonoBehaviour {
                     //this.transform.rotation = Quaternion.Slerp(this.transform.rotation,
                     //Quaternion.LookRotation(direction), 0.2f);
                     anim.SetBool("isIdle", false);
-                    if (direction.magnitude > 8)
+                    if (direction.magnitude > 1.5)
                     {
                         //this.transform.Translate(0, 0, 0.510f);
                         anim.SetBool("isWalking", true);
@@ -62,6 +61,8 @@ public class Chase : MonoBehaviour {
             anim.SetBool("isIdle", true);
             anim.SetBool("isWalking", false);
             anim.SetBool("isAttacking", false);
+            CancelInvoke();
+            skeletonBody.StopCoroutine("Claw");
         }
     }
 

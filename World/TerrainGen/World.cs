@@ -139,18 +139,18 @@ public class World : MonoBehaviour {
 
     public void SetBlockEdit(float x, float y, float z, Block block)
     {
-        Chunk chunk = GetChunk((int)x, (int)y, (int)z);
+        Chunk chunk = GetChunk((int)Mathf.Floor(x), (int)Mathf.Floor(y), (int)Mathf.Floor(z));
 
         if (chunk != null)
         {
-            chunk.SetBlock((int)((x - chunk.pos.x)*4), (int)((y - chunk.pos.y)*4), (int)((z - chunk.pos.z) * 4), block);
+            chunk.SetBlock((int)Mathf.Round((x - chunk.pos.x)*4), (int)Mathf.Round((y - chunk.pos.y)*4), (int)Mathf.Round((z - chunk.pos.z) * 4), block);
             chunk.update = true;
-            UpdateIfEqual((int)((x - chunk.pos.x)*4), 0, new WorldPos((int)x - 1, (int)y, (int)z));
-            UpdateIfEqual((int)((x - chunk.pos.x) * 4), Chunk.chunkSize - 1, new WorldPos((int)x + 1, (int)y, (int)z));
-            UpdateIfEqual((int)((y - chunk.pos.y) * 4), 0, new WorldPos((int)x, (int)y - 1, (int)z));
-            UpdateIfEqual((int)((y - chunk.pos.y) * 4), Chunk.chunkSize - 1, new WorldPos((int)x, (int)y + 1, (int)z));
-            UpdateIfEqual((int)((z - chunk.pos.z)*4), 0, new WorldPos((int)x, (int)y, (int)z - 1));
-            UpdateIfEqual((int)((z - chunk.pos.z)*4), Chunk.chunkSize - 1, new WorldPos((int)x, (int)y, (int)z + 1));
+            UpdateIfEqual((int)Mathf.Round((x - chunk.pos.x)*4), 0, new WorldPos((int)x - 1, (int)y, (int)z));
+            UpdateIfEqual((int)Mathf.Round((x - chunk.pos.x) * 4), Chunk.chunkSize - 1, new WorldPos((int)x + 1, (int)y, (int)z));
+            UpdateIfEqual((int)Mathf.Round((y - chunk.pos.y) * 4), 0, new WorldPos((int)x, (int)y - 1, (int)z));
+            UpdateIfEqual((int)Mathf.Round((y - chunk.pos.y) * 4), Chunk.chunkSize - 1, new WorldPos((int)x, (int)y + 1, (int)z));
+            UpdateIfEqual((int)Mathf.Round((z - chunk.pos.z)*4), 0, new WorldPos((int)x, (int)y, (int)z - 1));
+            UpdateIfEqual((int)Mathf.Round((z - chunk.pos.z)*4), Chunk.chunkSize - 1, new WorldPos((int)x, (int)y, (int)z + 1));
         }
     }
 

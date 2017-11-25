@@ -59,9 +59,16 @@ public class StaticBuildingSystem : MonoBehaviour {
 
     public void CycleCurrentBuilding()
     {
-        if (i >= (objects.Count-1)) { i = 0; }
-        i++;
-        ChangeCurrentBuilding(i);
+        if (i >= (objects.Count - 1))
+        {
+            i = 0;
+            ChangeCurrentBuilding(i);
+        }
+        else
+        {
+            i++;
+            ChangeCurrentBuilding(i);
+        }
     }
 
     public void ChangeCurrentBuilding(int cur)

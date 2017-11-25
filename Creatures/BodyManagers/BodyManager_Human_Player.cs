@@ -28,6 +28,11 @@ public class BodyManager_Human_Player : BodyManager {
     public Item_Weapon lHandWeapon;
     public Item_Ammo currentAmmo;
     public GameObject currentAmmoPrefab;
+    public Item_Weapon_Fist fist;
+
+    public AudioSource audioSource;
+    public AudioClip swing;
+    public PlayerAudio_Manager playerAudioManager;
 
     public Item rHandItem, lHandItem;
     //carried items
@@ -227,24 +232,22 @@ public class BodyManager_Human_Player : BodyManager {
         //bodyStatus.weaponsStatus = raised
     }
 
-    public Dictionary<WeaponType, string> mainAttackDict = new Dictionary<WeaponType, string>
+    public Dictionary<WeaponType, Tuple<string,RPGStatType>> mainAttackDict = new Dictionary<WeaponType, Tuple<string, RPGStatType>>
     {
-        { WeaponType.Axe_1H, "AxeChop" }, { WeaponType.Axe_2H, "AxeChop" }, { WeaponType.Arm, "RightPunch" }, { WeaponType.Bow, "FireBow" },
-        { WeaponType.Pick, "PickSwing" }
+        { WeaponType.Axe_1H, new Tuple<string,RPGStatType>("AxeChop",RPGStatType.Axe)}, { WeaponType.Axe_2H, new Tuple<string,RPGStatType>("AxeChop",RPGStatType.Axe) },
+        { WeaponType.Arm, new Tuple<string,RPGStatType>("RightPunch",RPGStatType.ArmStrike) }, { WeaponType.Bow, new Tuple<string,RPGStatType>("FireBow",RPGStatType.Bow) },
+        { WeaponType.Pick, new Tuple<string,RPGStatType>("PickSwing",RPGStatType.Pick) }
     };
        
     public void MainAttack()
     {
         if (attacking) { return; }
+        audioSource.PlayOneShot(playerAudioManager.swing);
         collisionList.Clear();
-
-        Invoke(mainAttackDict[rHandWeapon.weaponType], 0);
-    }
-
-    void RightPunch()
-    {
-        rHandCollider.isTrigger = true;
-        anim.SetTrigger("AxeChop"); //punch trigger
+        if (rHandWeapon == null)
+            Invoke("RightPunch", 0);
+        else
+            Invoke(mainAttackDict[rHandWeapon.weaponType].first, 0);
     }
 
     private IEnumerator WeaponSwing()
@@ -253,19 +256,88 @@ public class BodyManager_Human_Player : BodyManager {
         yield return new WaitForSeconds(0.5f);
         if (collisionList.Count > 0)
         {
-            int cut = rHandWeapon.baseCut * (1 + (stats.GetStat(RPGStatType.Axe).StatValue / 10));
-            int blunt = rHandWeapon.itemWeight * stats.GetStat(RPGStatType.Dexterity).StatValue * stats.GetStat(RPGStatType.Strength).StatValue;
+            print("collision");
+            print(collisionList[0].transform.tag);
+            int blunt = rHandWeapon.baseBlunt + rHandWeapon.itemWeight * stats.GetStat(RPGStatType.Dexterity).StatValue * stats.GetStat(RPGStatType.Strength).StatValue;
+            int cut = rHandWeapon.baseCut * (1 + (stats.GetStat(mainAttackDict[rHandWeapon.weaponType].second).StatValue / 10));
+            int pierce = rHandWeapon.basePierce * (1 + (stats.GetStat(mainAttackDict[rHandWeapon.weaponType].second).StatValue / 10));
+
             if (collisionList[0].transform.root.tag == "Tree")
             {
                 print(collisionList[0].transform.root.GetComponent<Tree>().health);
                 collisionList[0].transform.root.GetComponent<Tree>().health -= (cut * blunt + 10);
                 print(collisionList[0].transform.root.GetComponent<Tree>().health);
+            }
+            else if (collisionList[0].transform.tag == "BodyPart")
+            {
+                print(1);
 
+                BodyPartColliderScript bp = collisionList[0].GetComponent<BodyPartColliderScript>();
+                int[] z = new int[] { 0, 0, 0 }; int[] o = new int[] { blunt, cut, pierce };
+                z = bp.parentBody.SendArmorNumbers(bp.bodyPartType);
+                bp.parentBody.stats.GetStat<RPGBodyPart>(bp.bodyPartType).StatCurrentValue -= ((pierce / z[0]) + (blunt / z[1]));
+                print(2);
+                print(o[0] + ","+ o[1] + "," + o[2]);
+                print(0);
+                AttackResolution(bp, bp.parentBody.stats, stats.GetStat<RPGSkill>(mainAttackDict[rHandWeapon.weaponType].second), z, o);
+                print(4);
             }
         }
         print("turning off trigger");
         rHandWeapon.collList[0].isTrigger = false;
+        rHandCollider.isTrigger = false;
     }
+
+    void AttackResolution(BodyPartColliderScript bp, CreatureStats targetStats, RPGSkill attackSkill, int[] d, int[] o)
+    {
+        float dodgeChance = 0.1f * (targetStats.GetStat(RPGStatType.Dodge).StatValue * 3 + (targetStats.GetStat(RPGStatType.Agility).StatValue)) / (1 + 3 * bp.parentBody.encumbrance);
+        float deflectChance = 0.1f * targetStats.GetStat(RPGStatType.Deflect).StatValue * 3 + targetStats.GetStat(RPGStatType.Agility).StatValue + targetStats.GetStat(RPGStatType.Strength).StatValue + d[2] * targetStats.GetStat(RPGStatType.Armor).StatValue;
+        float absorbChance = 0.1f * targetStats.GetStat(RPGStatType.Absorb).StatValue * 3 + targetStats.GetStat(RPGStatType.Agility).StatValue + 2 * targetStats.GetStat(RPGStatType.Strength).StatValue + d[2] * targetStats.GetStat(RPGStatType.Armor).StatValue + Mathf.Log(targetStats.GetStat(RPGStatType.Weight).StatValue);
+        float hitChance = 10f * attackSkill.StatValue * 5 + stats.GetStat(RPGStatType.Agility).StatValue + stats.GetStat(RPGStatType.Strength).StatValue;
+        float criticalChance = 0.01f * attackSkill.StatValue * attackSkill.StatValue + stats.GetStat(RPGStatType.Agility).StatValue + stats.GetStat(RPGStatType.Strength).StatValue;
+        float sum = dodgeChance + deflectChance + absorbChance + hitChance + criticalChance;
+        //dodgeChance = dodgeChance / sum;
+        //deflectChance = deflectChance / sum;
+        //absorbChance = absorbChance / sum;
+        //hitChance = hitChance / sum;
+        //criticalChance = criticalChance / sum;
+        float roll = UnityEngine.Random.Range(0, sum);
+        print(roll + " / " + sum);
+        print(dodgeChance + " , " + deflectChance + " , " + absorbChance + " , " + hitChance);
+
+        if (roll < dodgeChance) { bp.parentBody.Dodge(); print("dodge"); return; }
+        else if (roll < (dodgeChance + deflectChance)) { bp.parentBody.Deflect(); print("deflect"); return; }
+        else if (roll < (dodgeChance + deflectChance + absorbChance)) { bp.parentBody.Absorb(); print("absorb"); return; }
+        else if (roll < (dodgeChance + deflectChance + absorbChance + hitChance))
+        {
+            print(bp.name);
+            print("hit");
+            //bp.parentBody.stats.GetStat<RPGBodyPart>(bp.bodyPartType).StatCurrentValue -= ((o[0] / d[0]) + ( o[1] / d[1]) + (o[2] / d[2]));
+            bp.parentBody.stats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue -= (int)(bp.parentBody.stats.GetStat<RPGBodyPart>(bp.bodyPartType).damageModifer * ((o[0] / d[0]) + (o[1] / d[1]) + (o[2] / d[2])));
+            print(bp.parentBody.stats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue);
+            print((int)(bp.parentBody.stats.GetStat<RPGBodyPart>(bp.bodyPartType).damageModifer * ((o[0] / d[0]) + (o[1] / d[1]) + (o[2] / d[2]))));
+
+            return;
+        }
+        else
+        {
+            print(bp.parentBody.stats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue);
+            bp.parentBody.stats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue -= 4 * (int)(bp.parentBody.stats.GetStat<RPGBodyPart>(bp.bodyPartType).damageModifer * ((o[0] / d[0]) + (o[1] / d[1]) + (o[2] / d[2])));
+        }
+        print(bp.parentBody.stats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue);
+        collisionList.Clear();
+        //defense: defense skills, armor, encumbrance, stamina, energy, agility, strength, toughness
+    }
+
+    void RightPunch()
+    {
+        print("punch");
+        rHandWeapon = fist;
+        rHandCollider.isTrigger = true;
+        anim.SetTrigger("AxeChop"); //punch trigger
+        StartCoroutine(WeaponSwing());
+    }
+
     void AxeChop()
     {
         print("chop");
@@ -274,8 +346,6 @@ public class BodyManager_Human_Player : BodyManager {
         anim.SetTrigger("AxeChop");
         StartCoroutine(WeaponSwing());
         //yield return new WaitForSeconds(anim.GetCurrentAnimatorClipInfo.length);
-
-
     }
 
     void PickSwing()
@@ -292,6 +362,8 @@ public class BodyManager_Human_Player : BodyManager {
                 int pierce = rHandWeapon.basePierce * (1 + (stats.GetStat(RPGStatType.Pick).StatValue / 10));
                 int blunt = (rHandWeapon.baseBlunt * 5 + rHandWeapon.itemWeight) * stats.GetStat(RPGStatType.Dexterity).StatValue * stats.GetStat(RPGStatType.Strength).StatValue;
                 Block block = EditTerrain.GetBlock(hit);
+                if (block is BlockAir)
+                    print("air");
                 print(EditTerrain.GetBlockPos(hit).x + "," + EditTerrain.GetBlockPos(hit).y + "," + EditTerrain.GetBlockPos(hit).z);
                 if (block is BlockGrass)
                 {
@@ -300,8 +372,9 @@ public class BodyManager_Human_Player : BodyManager {
                     return;
                 }
 
-                if (block is Block)
+                else if (block is Block)
                 {
+                    audioSource.PlayOneShot(playerAudioManager.metalOnStone);
                     EditTerrain.HitBlock(hit, pierce * blunt);
                     print(pierce * blunt);
                 }
@@ -326,46 +399,7 @@ public class BodyManager_Human_Player : BodyManager {
         }
     }
 
-    void AttackResolution(BodyPartColliderScript bp, CreatureStats targetStats, RPGSkill attackSkill, int[] d, int[] o)
-    {
-        float dodgeChance = (targetStats.GetStat(RPGStatType.Dodge).StatValue *3 +  (targetStats.GetStat(RPGStatType.Agility).StatValue)) / (1 + 3 * bp.parentBody.encumbrance);
-        float deflectChance = targetStats.GetStat(RPGStatType.Deflect).StatValue *3 +  targetStats.GetStat(RPGStatType.Agility).StatValue + targetStats.GetStat(RPGStatType.Strength).StatValue + d[2] * targetStats.GetStat(RPGStatType.Armor).StatValue;
-        float absorbChance = targetStats.GetStat(RPGStatType.Absorb).StatValue * 3 + targetStats.GetStat(RPGStatType.Agility).StatValue  + 2 * targetStats.GetStat(RPGStatType.Strength).StatValue + d[2] * targetStats.GetStat(RPGStatType.Armor).StatValue + Mathf.Log(targetStats.GetStat(RPGStatType.Weight).StatValue);
-        float hitChance = attackSkill.StatValue * 5 + stats.GetStat(RPGStatType.Agility).StatValue + stats.GetStat(RPGStatType.Strength).StatValue;
-        float criticalChance = 0.001f * attackSkill.StatValue * attackSkill.StatValue + stats.GetStat(RPGStatType.Agility).StatValue + stats.GetStat(RPGStatType.Strength).StatValue;
-        float sum = dodgeChance + deflectChance + absorbChance + hitChance + criticalChance;
-        //dodgeChance = dodgeChance / sum;
-        //deflectChance = deflectChance / sum;
-        //absorbChance = absorbChance / sum;
-        //hitChance = hitChance / sum;
-        //criticalChance = criticalChance / sum;
-        float roll = UnityEngine.Random.Range(0, sum);
-        print(roll + " / " + sum);
-        print(dodgeChance + " , " + deflectChance + " , " + absorbChance + " , " + hitChance);
-
-        if ( roll < dodgeChance) { bp.parentBody.Dodge(); print("dodge"); return; }
-        else if ( roll < (dodgeChance + deflectChance)) { bp.parentBody.Deflect(); print("deflect"); return; }
-        else if (roll < (dodgeChance + deflectChance + absorbChance)) { bp.parentBody.Absorb(); print("absorb"); return; }
-        else if (roll < (dodgeChance + deflectChance + absorbChance + hitChance))
-        {
-            print(bp.name);
-            print("hit");
-            //bp.parentBody.stats.GetStat<RPGBodyPart>(bp.bodyPartType).StatCurrentValue -= ((o[0] / d[0]) + ( o[1] / d[1]) + (o[2] / d[2]));
-            bp.parentBody.stats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue -=(int)(bp.parentBody.stats.GetStat<RPGBodyPart>(bp.bodyPartType).damageModifer * ((o[0] / d[0]) + (o[1] / d[1]) + (o[2] / d[2])));
-            print(bp.parentBody.stats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue);
-            print((int)(bp.parentBody.stats.GetStat<RPGBodyPart>(bp.bodyPartType).damageModifer * ((o[0] / d[0]) + (o[1] / d[1]) + (o[2] / d[2]))));
-
-            return;
-        }
-        else
-        {
-            print(bp.parentBody.stats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue);
-            bp.parentBody.stats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue -= 4 * (int)(bp.parentBody.stats.GetStat<RPGBodyPart>(bp.bodyPartType).damageModifer * ((o[0] / d[0]) + (o[1] / d[1]) + (o[2] / d[2])));
-        }
-        print(bp.parentBody.stats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue);
-        collisionList.Clear();
-        //defense: defense skills, armor, encumbrance, stamina, energy, agility, strength, toughness
-    }
+  
 
 
 
@@ -1101,7 +1135,7 @@ public class BodyManager_Human_Player : BodyManager {
             {
                 for(int i = 0; i < body.butcheringReturns.Count; i++)
                 {
-                    body.baseInventory.AddItem(body.butcheringReturns[i].GetComponent<Item>());
+                    body.inventory.AddItem(body.butcheringReturns[i].GetComponent<Item>());
                     body.butchered = true;
                     print("finished butchering");
                 }

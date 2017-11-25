@@ -246,9 +246,9 @@ MonoBehaviour:
   matDict: {fileID: 0}
   weightPerItem: 30
   numItems: 1
-  baseBlunt: 1
-  baseCut: 1
-  basePierce: 1
+  baseBlunt: 0
+  baseCut: 0
+  basePierce: 15
   itemPrefab: {fileID: 1269256580492742}
   attackCollider: {fileID: 65942132294530418}
   projectile: {fileID: 114284950644044436}

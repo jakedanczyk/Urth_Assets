@@ -373,10 +373,11 @@ MonoBehaviour:
   itemUIelement: {fileID: 1108885006677192}
   itemUIElementScript: {fileID: 114743040387965176}
   matDict: {fileID: 0}
-  baseBlunt: 3
+  baseBlunt: 40
   baseCut: 0
-  basePierce: 5
+  basePierce: 40
   butcheringAid: 0
+  wielded: 0
   weaponType: 7
   gripAdjust: {x: 0, y: 0, z: 0}
   gripOrientation: {x: 0, y: 0, z: 0}

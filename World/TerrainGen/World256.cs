@@ -73,9 +73,9 @@ public class World256 : MonoBehaviour {
     public Chunk256 GetChunk256(int x, int y, int z)
     {
         WorldPos pos = new WorldPos();
-        pos.x = Mathf.FloorToInt(x / 4096) * 4096;
-        pos.y = Mathf.FloorToInt(y / 4096) * 4096;
-        pos.z = Mathf.FloorToInt(z / 4096) * 4096;
+        pos.x = Mathf.FloorToInt(x / 4096f) * 4096;
+        pos.y = Mathf.FloorToInt(y / 4096f) * 4096;
+        pos.z = Mathf.FloorToInt(z / 4096f) * 4096;
 
         Chunk256 containerChunk256 = null;
 
@@ -86,9 +86,9 @@ public class World256 : MonoBehaviour {
 
     public Block256 GetBlock256(int x, int y, int z)
     {
-        x = Mathf.FloorToInt(x / 256) * 256;
-        y = Mathf.FloorToInt(y / 256) * 256;
-        z = Mathf.FloorToInt(z / 256) * 256;
+        //x = Mathf.FloorToInt(x / 256) * 256;
+        //y = Mathf.FloorToInt(y / 256) * 256;
+        //z = Mathf.FloorToInt(z / 256) * 256;
         Chunk256 containerChunk256 = GetChunk256(x, y, z);
 
         if (containerChunk256 != null)
