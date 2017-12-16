@@ -229,7 +229,10 @@ public class LoadChunk64s : MonoBehaviour
 					new Vector3(playerTransform.position.x, playerTransform.position.y, playerTransform.position.z));
 
                 if (distance > 8000 || (distance < 1446 && v < 1 && playerControls.aboveDetailedChunk))
+                {
                     chunk64sToDelete.Add(chunk64.Key);
+                    //print("deleting chunk64, " + distance);
+                }
             }
 
             foreach (var chunk64 in chunk64sToDelete)

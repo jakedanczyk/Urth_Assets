@@ -36,7 +36,7 @@ public class World : MonoBehaviour {
 
         var terrainGen = new TerrainGen();
         newChunk = terrainGen.ChunkGen(newChunk);
-        if (newChunk.airCount == 6144) { newChunk.gameObject.SetActive(false); }
+        //if (newChunk.airCount == 6144) { newChunk.gameObject.SetActive(false); }
         newChunk.SetBlocksUnmodified();
 
         for (int i = 0; i < newChunk.treeList.Count; i++)

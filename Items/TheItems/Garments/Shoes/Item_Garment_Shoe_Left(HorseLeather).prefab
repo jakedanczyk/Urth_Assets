@@ -444,7 +444,7 @@ GameObject:
   - component: {fileID: 114421920637250794}
   m_Layer: 0
   m_Name: Item_Garment_Shoe_Left(HorseLeather)
-  m_TagString: Untagged
+  m_TagString: Item
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

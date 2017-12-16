@@ -31,7 +31,7 @@ public class World64 : MonoBehaviour {
         var terrainGen = new TerrainGen();
         newChunk64 = terrainGen.Chunk64Gen(newChunk64);
         newChunk64.SetBlock64sUnmodified();
-        if (newChunk64.airCount == 6144) { newChunk64.gameObject.SetActive(false); }
+        //if (newChunk64.airCount == 6144) { newChunk64.gameObject.SetActive(false); }
 
         //for(int i = 0; i < newChunk.treeList.Count; i++)
         //{

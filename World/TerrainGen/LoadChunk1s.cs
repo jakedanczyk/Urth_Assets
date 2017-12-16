@@ -187,7 +187,10 @@ public class LoadChunk1s : MonoBehaviour
 					new Vector3(playerTransform.position.x, .5f * playerTransform.position.y, playerTransform.position.z));
 
                 if (distance > 96 || (distance < 14 && v < 1 && playerControls.aboveDetailedChunk))
+                { 
                     chunk1sToDelete.Add(chunk1.Key);
+                    //print("deleting chunk1, " + distance);
+                }
             }
 
             foreach (var chunk1 in chunk1sToDelete)

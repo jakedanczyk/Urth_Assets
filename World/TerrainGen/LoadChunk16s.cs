@@ -230,8 +230,11 @@ public class LoadChunk16s : MonoBehaviour
 					new Vector3(chunk16.Value.pos.x, 2*chunk16.Value.pos.y, chunk16.Value.pos.z),
 					new Vector3(playerTransform.position.x, 2* playerTransform.position.y, playerTransform.position.z));
 
-                if (distance > 2200 || (distance < 250 && v < 1 && playerControls.aboveDetailedChunk))
+                if (distance > 4456 || (distance < 250 && v < 1 && playerControls.aboveDetailedChunk))
+                {
                     chunk16sToDelete.Add(chunk16.Key);
+                    print("deleting chunk16, " + distance);
+                }
             }
 
             foreach (var chunk16 in chunk16sToDelete)

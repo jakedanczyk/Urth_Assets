@@ -183,12 +183,14 @@ public class LoadChunk4s : MonoBehaviour
             foreach (var chunk4 in world4.chunk4s)
             {
                 float distance = Vector3.Distance(
-					new Vector3(chunk4.Value.pos.x, .5f * chunk4.Value.pos.y, chunk4.Value.pos.z),
-					new Vector3(playerTransform.position.x, .5f * playerTransform.position.y, playerTransform.position.z));
+                    new Vector3(chunk4.Value.pos.x, .5f * chunk4.Value.pos.y, chunk4.Value.pos.z),
+                    new Vector3(playerTransform.position.x, .5f * playerTransform.position.y, playerTransform.position.z));
 
                 if (distance > 512 || (distance < 64 && v < 1 && playerControls.aboveDetailedChunk))
-
+                {
                     chunk4sToDelete.Add(chunk4.Key);
+                    //print("deleting chunk4, " + distance);
+                }
             }
 
             foreach (var chunk4 in chunk4sToDelete)

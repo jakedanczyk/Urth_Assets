@@ -233,7 +233,10 @@ public class LoadChunk256s : MonoBehaviour
 					new Vector3(playerTransform.position.x, playerTransform.position.y, playerTransform.position.z));
 
                 if (distance > 500000 || (distance < 4096 && v < 1 && playerControls.aboveDetailedChunk))
+                {
                     chunk256sToDelete.Add(chunk256.Key);
+                    //print("deleting chunk256, " + distance);
+                }
             }
 
             foreach (var chunk256 in chunk256sToDelete)

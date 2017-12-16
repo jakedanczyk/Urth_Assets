@@ -25,6 +25,7 @@ public class StaticBuildingSystem : MonoBehaviour {
     void Start()
     {
         ChangeCurrentBuilding(0);
+        currentPreview.position += Vector3.down * 100;
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
     }

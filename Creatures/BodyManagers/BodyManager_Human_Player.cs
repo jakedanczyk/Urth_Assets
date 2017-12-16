@@ -63,7 +63,7 @@ public class BodyManager_Human_Player : BodyManager {
         currentWeather = weatherSystem.currentWeather;
         anim = GetComponentInChildren<Animator>();
         gait = 0;
-        speed = 5F + 5 * gait;
+        speed = 1.25F + 1.25f * gait;
         stamina = maxStamina = stats.GetStat(RPGStatType.Endurance).StatValue*10;
         heartRate = stats.GetStat(RPGStatType.RestingHeartRate).StatValue;
         UpdateWeatherProtection();
@@ -73,11 +73,22 @@ public class BodyManager_Human_Player : BodyManager {
         InvokeRepeating("Encumbrance", 8f, 6f);
         InvokeRepeating("CalorieBurn", 9f, 6f);
         InvokeRepeating("Hydration", 10f, 6f);
-        InvokeRepeating("SleepDebt", 11f, 72f);
+        InvokeRepeating("SleepDebt", 11f, 2f);
         InvokeRepeating("StaminaUpdate", 9.5f, 6f);
         var health = stats.GetStat<RPGVital>(RPGStatType.Health);
         health.OnCurrentValueChange += OnStatValueChange;
-
+        sleepMod.OnValueChange += SleepOnValueChange;
+        stats.GetStat<RPGAttribute>(RPGStatType.Strength).AddModifier(sleepMod);
+        stats.GetStat<RPGAttribute>(RPGStatType.Agility).AddModifier(sleepMod);
+        stats.GetStat<RPGAttribute>(RPGStatType.Attunement).AddModifier(sleepMod);
+        stats.GetStat<RPGAttribute>(RPGStatType.Dexterity).AddModifier(sleepMod);
+        stats.GetStat<RPGAttribute>(RPGStatType.Dodge).AddModifier(sleepMod);
+        stats.GetStat<RPGAttribute>(RPGStatType.Endurance).AddModifier(sleepMod);
+        stats.GetStat<RPGAttribute>(RPGStatType.Intelligence).AddModifier(sleepMod);
+        stats.GetStat<RPGAttribute>(RPGStatType.Perception).AddModifier(sleepMod);
+        stats.GetStat<RPGAttribute>(RPGStatType.Wisdom).AddModifier(sleepMod);
+        stats.GetStat<RPGAttribute>(RPGStatType.Willpower).AddModifier(sleepMod);
+        stats.GetStat<RPGAttribute>(RPGStatType.Stamina).AddModifier(sleepMod);
     }
 
     private void Update()
@@ -90,7 +101,7 @@ public class BodyManager_Human_Player : BodyManager {
         if (inTask)
         {
             controls.enabled = false;
-            if (Input.GetKeyDown(KeyCode.Space)) { StopTasks(); controls.enabled = true; }
+            if (Input.GetKeyDown(KeyCode.W)) { StopTasks(); controls.enabled = true; }
         }
     }
 
@@ -715,7 +726,7 @@ public class BodyManager_Human_Player : BodyManager {
     {
         if (gait < 3) { gait++; }
         else gait = 0;
-        speed = 5F + 5 * gait;
+        speed = 1.25F + 1.25F * gait;
     }
 
     float lastHeartCheckTime = 0;
@@ -752,7 +763,7 @@ public class BodyManager_Human_Player : BodyManager {
         ReadWeather();
         float heatProduction = 0.005f * stats.GetStat(RPGStatType.Weight).StatValue * heartRate * heartRate / (stats.GetStat(RPGStatType.RestingHeartRate).StatValue * stats.GetStat(RPGStatType.RestingHeartRate).StatValue);
         float heatLoss = ((coreTemp - localTemperature) * (.1f+humidity) + localTemperature * localTemperature * humidity) * stats.GetStat(RPGStatType.Height).StatValue / totalInsulation;
-        print(coreTemp + ", " + localTemperature + ", " + heartRate);
+        //print(coreTemp + ", " + localTemperature + ", " + heartRate);
         //float coolingFactor = coreTemp * (0.000001f * (coreTemp - localTemperature + 10 - (5*heartRate/60)));
         //float heatingFactor = coreTemp * (0.000001f * (coreTemp - localTemperature + 5 - (5 * heartRate / 60)));
         //if (localTemperature < 15)
@@ -910,11 +921,29 @@ public class BodyManager_Human_Player : BodyManager {
     }
 
     public float sleepDebt = 1f; // hours sleep debt
+    RPGStatModTotalPercent sleepMod = new RPGStatModTotalPercent(0);
     void SleepDebt()
     {
-        sleepDebt += .01f * (worldTime.totalGameSeconds - sleepTime) / 72; // .01 if invoke period is 72
+        float now = worldTime.totalGameSeconds;
+        sleepDebt += ((now - sleepTime) - (3*sleepLength))/ 7200; // .01 if invoke period is 72
+        sleepTime = now;
+        float sleepModValue = (Mathf.Min(0,(6 - sleepDebt)) + Mathf.Min(0, (8 - sleepDebt)) * 0.5f * sleepDebt)/80f;
+        sleepMod.Value = sleepModValue;
     }
 
+    private void SleepOnValueChange(object mod, System.EventArgs args)
+    {
+        //Debug.Log("On Value Changed Called For Modifier: " + mod.GetType().ToString());
+        stats.GetStat<RPGAttribute>(RPGStatType.Strength).UpdateModifiers();
+        stats.GetStat<RPGAttribute>(RPGStatType.Agility).UpdateModifiers();
+        stats.GetStat<RPGAttribute>(RPGStatType.Attunement).UpdateModifiers();
+        stats.GetStat<RPGAttribute>(RPGStatType.Dexterity).UpdateModifiers();
+        stats.GetStat<RPGAttribute>(RPGStatType.Endurance).UpdateModifiers();
+        stats.GetStat<RPGAttribute>(RPGStatType.Intelligence).UpdateModifiers();
+        stats.GetStat<RPGAttribute>(RPGStatType.Perception).UpdateModifiers();
+        stats.GetStat<RPGAttribute>(RPGStatType.Willpower).UpdateModifiers();
+        stats.GetStat<RPGAttribute>(RPGStatType.Stamina).UpdateModifiers();
+    }
     public float oxygenConsumptionRate = 0; // ml per min
     public float oxygenSupplyRate = 0;
     public float stamina,maxStamina;
@@ -1160,6 +1189,27 @@ public class BodyManager_Human_Player : BodyManager {
 
     }
 
+    bool isSleeping;
+    float sleepStartTime, sleepLength;
+    public void Sleep()
+    {
+        anim.SetBool("isLayingDown", true);
+        print("sleep");
+        sleepStartTime = worldTime.totalGameSeconds;
+        inTask = true;
+        isSleeping = true;
+
+    }
+
+    public void StopSleep()
+    {
+        anim.SetBool("isLayingDown", false);
+        sleepLength = worldTime.totalGameSeconds - sleepStartTime;
+        StopTasks();
+        controls.enabled = true;
+        isSleeping = false;
+    }
+
     public override void ProcessThisBody()
     {
         throw new NotImplementedException();
@@ -1218,6 +1268,13 @@ public class BodyManager_Human_Player : BodyManager {
             stats.GetStat<RPGSkill>(RPGStatType.FireMaking).GainXP((int)xpGain);
             isStartingFire = false;
             anim.SetBool("isStartingFire", false);
+            return;
+        }
+        if (isSleeping)
+        {
+            isSleeping = false;
+            anim.SetBool("isLayingDown", false);
+            sleepLength = worldTime.totalGameSeconds - sleepStartTime;
             return;
         }
         StopAllCoroutines();

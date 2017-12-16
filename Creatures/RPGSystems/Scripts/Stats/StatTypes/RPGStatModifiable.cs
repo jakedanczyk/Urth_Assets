@@ -89,7 +89,6 @@ public class RPGStatModifiable : RPGStat, IStatModifiable, IStatValueChange {
         foreach(var group in orderGroups) {
             float sum = 0, max = 0;
             foreach(var mod in group) {
-                Debug.Log(mod.Order);
                 if(mod.Stacks == false) {
                     if(mod.Value > max) {
                         max = mod.Value;
@@ -101,7 +100,7 @@ public class RPGStatModifiable : RPGStat, IStatModifiable, IStatValueChange {
 
             _statModValue += group.First().ApplyModifier(
                 StatBaseValue + _statModValue, 
-                sum > max ? sum : max);
+                sum);
         }
         TriggerValueChange();
     }

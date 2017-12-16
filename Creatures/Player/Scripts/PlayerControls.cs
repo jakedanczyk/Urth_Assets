@@ -37,6 +37,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         GameObject characterSystem;
 
         public GameObject outfittingUI;
+        public GameObject actionUI;
 
         public PlayerInventory inventory;
         public Inventory playerInventory;
@@ -45,7 +46,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public bool inventoryActive, lootActive;
         public LootInventoryFocusPanel lootPanelScript;
 
-
+        public ModelViewer modelViewUI;
         public GameObject butcheringUI;
         public GameObject lootingUI;
         public RectTransform lootPanel;
@@ -299,7 +300,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
                                 inventoryUIPanel.SetActive(true);
                                 print(hitBody.lootInventory.name);
                                 lootPanelScript.attachedInventory = hitBody.lootInventory;
-                                m_AudioSource.PlayOneShot(playerAudioManager.openInventory);
                             }
                         }
                         else if (hit.collider.gameObject.tag == "Water")
@@ -544,7 +544,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
                             float x = vessel.content;
                             vessel.Fill(-500);
                             x = x - vessel.content;
-                            player_bodyManager.hydration += (100 * x / playerStats.GetStat<RPGAttribute>(RPGStatType.Weight).StatValue);                            
+                            player_bodyManager.hydration += (100 * x / playerStats.GetStat<RPGAttribute>(RPGStatType.Weight).StatValue);
+                            m_AudioSource.PlayOneShot(playerAudioManager.drink);
                         }
 
                         if (inventory.selectedItem is Item_TerrainBlock)
@@ -721,12 +722,34 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     showInventory = false;
                     playerCrafting.isCrafting = false;
                     m_AudioSource.PlayOneShot(playerAudioManager.openInventory);
+                    Cursor.lockState = CursorLockMode.Locked;
+
                 }
                 else
                 {
                     inventoryUIPanel.SetActive(true);
                     showInventory = true;
                     m_AudioSource.PlayOneShot(playerAudioManager.openInventory);
+                    Cursor.lockState = CursorLockMode.None;
+
+                }
+            }
+
+            if(Input.GetKeyDown(KeyCode.L))
+            {
+                if (actionUI.activeSelf)
+                {
+                    //actionUI.GetComponent<ActionUIScript>().panelActive = false;
+                    actionUI.SetActive(false);
+                    //Destroy(outfittingUI.GetComponent<OutfitUIScript>());
+                    return;
+                }
+                if (!actionUI.activeSelf)
+                {
+                    //actionUI.GetComponent<ActionUIScript>().panelActive = true;
+                    actionUI.SetActive(true);
+                    //outfittingUI.AddComponent<OutfitUIScript>();
+                    return;
                 }
             }
 

@@ -31,7 +31,7 @@ public class World16 : MonoBehaviour {
         var terrainGen = new TerrainGen();
         newChunk16 = terrainGen.Chunk16Gen(newChunk16);
         newChunk16.SetBlock16sUnmodified();
-        if (newChunk16.airCount == 6144) { newChunk16.gameObject.SetActive(false); }
+        //if (newChunk16.airCount == 6144) { newChunk16.gameObject.SetActive(false); }
 
         //for(int i = 0; i < newChunk.treeList.Count; i++)
         //{

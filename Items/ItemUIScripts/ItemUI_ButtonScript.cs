@@ -38,11 +38,11 @@ public    Button thisButton;
 
     void SelectOnClick()
     {
-        parentInventory.selectedItem = parentItem;
+        parentInventory.SelectItem(parentItem);
     }
 
     public void OnSelect(BaseEventData eventData)
     {
-        parentInventory.selectedItem = parentItem;
+        parentInventory.SelectItem(parentItem);
     }
 }

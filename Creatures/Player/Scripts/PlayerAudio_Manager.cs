@@ -10,4 +10,5 @@ public class PlayerAudio_Manager : MonoBehaviour {
     public AudioClip draw;
     public AudioClip sheathe;
     public AudioClip swing,equip;
+    public AudioClip drink;
 }

@@ -31,7 +31,7 @@ public class World256 : MonoBehaviour {
         var terrainGen = new TerrainGen();
         newChunk256 = terrainGen.Chunk256Gen(newChunk256);
         newChunk256.SetBlock256sUnmodified();
-        if (newChunk256.airCount == 6144) { newChunk256.gameObject.SetActive(false); }
+        //if (newChunk256.airCount == 6144) { newChunk256.gameObject.SetActive(false); }
 
         //for(int i = 0; i < newChunk.treeList.Count; i++)
         //{

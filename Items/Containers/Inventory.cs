@@ -12,6 +12,7 @@ public class Inventory : MonoBehaviour {
     public float contentsWeight;
     public List<Item_WaterVessel> waterVessels;
     public List<Item> waterVesselItems;
+    public ModelViewer modelViewUI;
 
     // Use this for initialization
     void Start () {
@@ -98,6 +99,22 @@ public class Inventory : MonoBehaviour {
     public float SumWeight()
     {
         return contentsWeight = inventoryContents.Select(c => c.itemWeight).ToList().Sum();
+    }
+
+    public void SelectItem(Item clickedItem)
+    {
+        if (clickedItem != selectedItem)
+        {
+            selectedItem = clickedItem;
+            if (modelViewUI != null)
+            {
+                GameObject model = Instantiate(clickedItem.itemModel);
+                modelViewUI.ChangeModel(model);
+                model.transform.SetParent(modelViewUI.gameObject.transform);
+                model.transform.localPosition = Vector3.zero;
+                //model.transform.localScale = Vector3.one * 10;
+            }
+        }
     }
 
 }
