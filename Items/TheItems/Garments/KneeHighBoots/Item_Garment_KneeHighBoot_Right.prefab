@@ -656,9 +656,10 @@ GameObject:
   - component: {fileID: 114963064849232016}
   - component: {fileID: 54826712915633482}
   - component: {fileID: 65094174672791016}
+  - component: {fileID: 114905196148188168}
   m_Layer: 0
   m_Name: Item_Garment_KneeHighBoot_Right
-  m_TagString: Untagged
+  m_TagString: Item
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -963,6 +964,7 @@ GameObject:
   - component: {fileID: 114662065176286620}
   - component: {fileID: 114684928611815468}
   - component: {fileID: 114275800021360590}
+  - component: {fileID: 114519032605730834}
   m_Layer: 5
   m_Name: ItemUI_Element
   m_TagString: Untagged
@@ -4536,6 +4538,22 @@ MonoBehaviour:
   originalMesh: {fileID: 0}
   originalBindposes: []
   runtimeMorphPath: MORPH3D/Wood_Elf_Scout/EWBoots_Right/EWBoots_right_LOD2
+--- !u!114 &114519032605730834
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1403878517194678}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: 51fb6235-69b2-4f20-b8f9-14528edeb37e
+  StoreAllComponents: 1
+  Components: []
 --- !u!114 &114662065176286620
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4666,6 +4684,22 @@ MonoBehaviour:
   originalMesh: {fileID: 0}
   originalBindposes: []
   runtimeMorphPath: MORPH3D/Wood_Elf_Scout/EWBoots_Right/EWBoots_right_LOD0
+--- !u!114 &114905196148188168
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1300901926236440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: 3803384f-6f58-470d-a5ab-e5ebdb16f17b
+  StoreAllComponents: 1
+  Components: []
 --- !u!114 &114963064849232016
 MonoBehaviour:
   m_ObjectHideFlags: 1

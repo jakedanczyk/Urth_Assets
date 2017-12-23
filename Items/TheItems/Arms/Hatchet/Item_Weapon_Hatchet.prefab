@@ -90,6 +90,7 @@ GameObject:
   - component: {fileID: 136344025581491702}
   - component: {fileID: 54140910826355258}
   - component: {fileID: 64490192934227194}
+  - component: {fileID: 114018796804773576}
   m_Layer: 0
   m_Name: Item_Weapon_Hatchet
   m_TagString: Item
@@ -110,6 +111,7 @@ GameObject:
   - component: {fileID: 114559740944621612}
   - component: {fileID: 114169086892964834}
   - component: {fileID: 114298932068010772}
+  - component: {fileID: 114400066113921310}
   m_Layer: 5
   m_Name: ItemUI_Element
   m_TagString: Untagged
@@ -258,6 +260,22 @@ MeshCollider:
   m_InflateMesh: 0
   m_SkinWidth: 0.01
   m_Mesh: {fileID: 4300000, guid: 107b1a41e1a9a9747aa253ab813868cc, type: 3}
+--- !u!114 &114018796804773576
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1594849308791040}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: 34d4dc25-59af-48ff-954d-b8cf2152166d
+  StoreAllComponents: 1
+  Components: []
 --- !u!114 &114142484723386690
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -339,6 +357,22 @@ MonoBehaviour:
   m_PreferredHeight: 30
   m_FlexibleWidth: 1
   m_FlexibleHeight: -1
+--- !u!114 &114400066113921310
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1829509274420712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: dd3f4216-d6e2-4969-9ee6-f4498ae98b12
+  StoreAllComponents: 1
+  Components: []
 --- !u!114 &114492722475151508
 MonoBehaviour:
   m_ObjectHideFlags: 1

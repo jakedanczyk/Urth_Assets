@@ -206,6 +206,7 @@ GameObject:
   - component: {fileID: 114850094450404074}
   - component: {fileID: 114062599325279210}
   - component: {fileID: 114109039396150734}
+  - component: {fileID: 114894618699047454}
   m_Layer: 5
   m_Name: ItemUI_Element
   m_TagString: Untagged
@@ -256,6 +257,7 @@ GameObject:
   - component: {fileID: 136816493330262242}
   - component: {fileID: 136721655390919514}
   - component: {fileID: 65433450333947598}
+  - component: {fileID: 114451030634178572}
   m_Layer: 0
   m_Name: Item_Garment_Trousers(Horse Leather)
   m_TagString: Item
@@ -1297,6 +1299,22 @@ MonoBehaviour:
   originalMesh: {fileID: 0}
   originalBindposes: []
   runtimeMorphPath: MORPH3D/Wood_Elf_Scout/G2MEWPants/EWPants_LOD3
+--- !u!114 &114451030634178572
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1254978913479558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: 2dfc7178-ee55-4d11-b0ac-f0edc5d7d467
+  StoreAllComponents: 1
+  Components: []
 --- !u!114 &114560460478370506
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1433,6 +1451,22 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
+--- !u!114 &114894618699047454
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1211754125316240}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: fa4f5968-c4e0-4598-834c-5af8ac331a36
+  StoreAllComponents: 1
+  Components: []
 --- !u!114 &114950885396290082
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -2,23 +2,21 @@
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class InventoryFocusPanel : MonoBehaviour, IPointerDownHandler
+public class InventoryFocusPanel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
 
-    private RectTransform panel;
+    public RectTransform panel;
     public UnityStandardAssets.Characters.FirstPerson.PlayerControls playerControls;
     public PlayerInventory attachedInventory;
-    void Awake()
-    {
-        panel = GetComponent<RectTransform>();
-    }
 
     public void OnPointerDown(PointerEventData data)
     {
-        print("clicked");
         panel.SetAsLastSibling();
-        playerControls.lootActive = false;
-        playerControls.inventoryActive = true;
+        playerControls.SetInventoryActive();
     }
-
+    public void OnPointerUp(PointerEventData data)
+    {
+        panel.SetAsLastSibling();
+        playerControls.SetInventoryActive();
+    }
 }

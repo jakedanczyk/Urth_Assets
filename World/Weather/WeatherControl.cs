@@ -10,6 +10,7 @@ public class WeatherControl : MonoBehaviour {
     public List<Weather> weathers;
     public List<GameObject> weatherFX;
     public List<Material> skyboxMaterials;
+    public BodyManager_Human_Player player_bodyManager;
 
     public int weatherDice;
 
@@ -45,6 +46,7 @@ public class WeatherControl : MonoBehaviour {
     void Start ()
     {
         currentWeatherFX = Instantiate(currentWeather.weatherFX,player.transform);
+        player_bodyManager.weatherFX = currentWeatherFX;
         schedule.Add(weathers[Random.Range(0, 4)]);
         schedule.Add(weathers[Random.Range(0, 4)]);
         schedule.Add(weathers[Random.Range(0, 4)]);
@@ -93,6 +95,11 @@ public class WeatherControl : MonoBehaviour {
         }
 	}
 
+    private void OnDeserialized()
+    {
+        currentWeatherFX = player_bodyManager.weatherFX;
+    }
+
     public float Temperature
     {
         get { return localTemperature; }
@@ -104,6 +111,7 @@ public class WeatherControl : MonoBehaviour {
         currentWeather = schedule[0];
         Destroy(currentWeatherFX);
         currentWeatherFX = Instantiate(currentWeather.weatherFX, player.transform);
+        player_bodyManager.weatherFX = currentWeatherFX;
         currentStart =(int) time.totalGameSeconds;
         currentDuration = durations[0];
         precipRate = currentWeather.precipRate;

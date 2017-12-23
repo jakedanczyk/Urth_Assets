@@ -24,8 +24,8 @@ public class Item_Weapon_Hatchet : Item_Weapon {
     // Use this for initialization
     void Start ()
     {
-        gripAdjust = new Vector3(-.35f, .3f, 0);
-        gripOrientation = new Vector3(98.36f, 104.03f, 25f);
+        gripAdjust = new Vector3(.11f, -.02f, 0.09f);
+        gripOrientation = new Vector3(106.2f, 104.03f, -5.08f);
         primaryMaterialType = component_axeHead.primaryMaterialType;
         //attackList.Add(new Item_Attack("Hammer", 3, 0, 3));
         //print(attackList[1].attackName);

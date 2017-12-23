@@ -42,6 +42,7 @@ GameObject:
   - component: {fileID: 114599370401732622}
   - component: {fileID: 65755363085614682}
   - component: {fileID: 114284950644044436}
+  - component: {fileID: 114470467517205684}
   m_Layer: 0
   m_Name: Item_Ammo_Arrow
   m_TagString: Item
@@ -79,6 +80,7 @@ GameObject:
   - component: {fileID: 114914249694670988}
   - component: {fileID: 114735936498625782}
   - component: {fileID: 114664716295918002}
+  - component: {fileID: 114492805427103260}
   m_Layer: 5
   m_Name: ItemUI_Element
   m_TagString: Untagged
@@ -218,6 +220,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shooter: {fileID: 0}
   ammo: {fileID: 114599370401732622}
+--- !u!114 &114470467517205684
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1269256580492742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: 3c06ed11-7183-453c-9b34-01140629f14e
+  StoreAllComponents: 1
+  Components: []
+--- !u!114 &114492805427103260
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1665446642509166}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: 6773d4e8-49f3-432d-9b7a-bdb7b28747b6
+  StoreAllComponents: 1
+  Components: []
 --- !u!114 &114599370401732622
 MonoBehaviour:
   m_ObjectHideFlags: 1

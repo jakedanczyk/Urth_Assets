@@ -14,7 +14,7 @@ public class JumpAndIdle : MonoBehaviour {
 	
 	//private LegAnimator legA;
 	private AlignmentTracker align;
-	private CharacterMotor cm;
+	private LCharacterMotor cm;
 	
 	private bool grounded;
 	private bool waiting = false;
@@ -25,7 +25,7 @@ public class JumpAndIdle : MonoBehaviour {
 	void Start () {
 		//legA = GetComponent(typeof(LegAnimator)) as LegAnimator;
 		align = GetComponent(typeof(AlignmentTracker)) as AlignmentTracker;
-		cm = GetComponent(typeof(CharacterMotor)) as CharacterMotor;
+		cm = GetComponent(typeof(LCharacterMotor)) as LCharacterMotor;
 		grounded = false;
 		
 		// Only use jumping if the jumping animation has ben set

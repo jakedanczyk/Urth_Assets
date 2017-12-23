@@ -21,7 +21,7 @@ public class Follower : MonoBehaviour {
 		Vector3 directionVector = targetVector.normalized * speed;
 		
 		// Apply direction
-		CharacterMotor motor = GetComponent(typeof(CharacterMotor)) as CharacterMotor;
+		LCharacterMotor motor = GetComponent(typeof(LCharacterMotor)) as LCharacterMotor;
 		motor.desiredMovementDirection = directionVector;
 		motor.desiredFacingDirection = targetVector;
 	}

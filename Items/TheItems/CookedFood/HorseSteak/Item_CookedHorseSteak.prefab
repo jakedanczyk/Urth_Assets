@@ -53,9 +53,10 @@ GameObject:
   m_Component:
   - component: {fileID: 4445915642387158}
   - component: {fileID: 114005810858932428}
+  - component: {fileID: 114180289700459602}
   m_Layer: 0
   m_Name: Item_CookedHorseSteak
-  m_TagString: Untagged
+  m_TagString: Item
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -73,6 +74,7 @@ GameObject:
   - component: {fileID: 114954025821501952}
   - component: {fileID: 114080617986147052}
   - component: {fileID: 114238185300807344}
+  - component: {fileID: 114548400343638508}
   m_Layer: 5
   m_Name: ItemUI_Element
   m_TagString: Untagged
@@ -209,6 +211,22 @@ MonoBehaviour:
   parentItem: {fileID: 114005810858932428}
   parentInventory: {fileID: 0}
   thisButton: {fileID: 114954025821501952}
+--- !u!114 &114180289700459602
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1484419253835776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: 99ebad8f-c418-4794-b628-31ec52d56fbf
+  StoreAllComponents: 1
+  Components: []
 --- !u!114 &114215533868580276
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -282,6 +300,22 @@ MonoBehaviour:
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0
+--- !u!114 &114548400343638508
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1555662120345094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: 37214ef3-b698-4cd9-aaff-5d27ee91b430
+  StoreAllComponents: 1
+  Components: []
 --- !u!114 &114637636846363522
 MonoBehaviour:
   m_ObjectHideFlags: 1

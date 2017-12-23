@@ -24,6 +24,7 @@ GameObject:
   - component: {fileID: 114281824716986974}
   - component: {fileID: 114682776404168638}
   - component: {fileID: 114001576041193570}
+  - component: {fileID: 114225990031414976}
   m_Layer: 5
   m_Name: ItemUI_ItemButton
   m_TagString: Untagged
@@ -61,6 +62,7 @@ GameObject:
   - component: {fileID: 65665415128799980}
   - component: {fileID: 114782546073252542}
   - component: {fileID: 54176047710346586}
+  - component: {fileID: 114997571333442936}
   m_Layer: 0
   m_Name: Item_TwoPaceLog_Object
   m_TagString: Item
@@ -195,6 +197,22 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: Button
+--- !u!114 &114225990031414976
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1245370140970992}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: a3a927e0-63fe-445d-bdd8-3ce04d5953d7
+  StoreAllComponents: 1
+  Components: []
 --- !u!114 &114281824716986974
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -318,6 +336,22 @@ MonoBehaviour:
   itemUIelement: {fileID: 1245370140970992}
   itemUIElementScript: {fileID: 114001576041193570}
   matDict: {fileID: 0}
+--- !u!114 &114997571333442936
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1798351192641440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: 57842366-cfb2-4c54-b3e0-a7e60cb7c618
+  StoreAllComponents: 1
+  Components: []
 --- !u!222 &222196574959468650
 CanvasRenderer:
   m_ObjectHideFlags: 1

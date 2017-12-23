@@ -24,6 +24,7 @@ GameObject:
   - component: {fileID: 114585927110279856}
   - component: {fileID: 114880607966565250}
   - component: {fileID: 114168303656835126}
+  - component: {fileID: 114962847810215092}
   m_Layer: 5
   m_Name: ItemUI_Element
   m_TagString: Untagged
@@ -58,6 +59,7 @@ GameObject:
   - component: {fileID: 65713682311460568}
   - component: {fileID: 54817798283785422}
   - component: {fileID: 114937577337673218}
+  - component: {fileID: 114631387845006118}
   m_Layer: 0
   m_Name: Item_HorseHide
   m_TagString: Item
@@ -285,6 +287,22 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
+--- !u!114 &114631387845006118
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1665869370570962}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: e87055fd-61f1-42ff-afc5-b4d5cc76897e
+  StoreAllComponents: 1
+  Components: []
 --- !u!114 &114635830172945628
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -385,6 +403,22 @@ MonoBehaviour:
   itemUIelement: {fileID: 1525071074807084}
   itemUIElementScript: {fileID: 114880607966565250}
   matDict: {fileID: 0}
+--- !u!114 &114962847810215092
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1525071074807084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: c0061a18-ad72-4daa-8c0b-5eb081bbf644
+  StoreAllComponents: 1
+  Components: []
 --- !u!222 &222313276610106704
 CanvasRenderer:
   m_ObjectHideFlags: 1

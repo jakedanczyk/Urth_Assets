@@ -3,7 +3,9 @@ using UnityEngine.UI;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
+[Serializable]
 public class Inventory : MonoBehaviour {
     public List<Item> inventoryContents;
     public RectTransform inventoryUIPanel;

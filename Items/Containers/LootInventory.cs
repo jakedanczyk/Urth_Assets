@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class LootInventory : Inventory {
 
-	public new void RebuildUIPanel()
+	public void RebuildUIPanel(UnityStandardAssets.Characters.FirstPerson.PlayerControls playerControls)
     {
         int childs = inventoryUIPanel.childCount;
         List<Item> temp = new List<Item>();
@@ -24,6 +24,10 @@ public class LootInventory : Inventory {
             print(item.itemName);
             DropItem(aItem);
             AddItem(aItem);
+            LootInventoryFocusPanel lifp = item.itemUIelement.AddComponent<LootInventoryFocusPanel>();
+            lifp.attachedInventory = this;
+            lifp.panel = this.inventoryUIPanel;
+            lifp.playerControls = GetComponent<UnityStandardAssets.Characters.FirstPerson.PlayerControls>();
             //item.itemUIElementScript.parentInventory = this;
 
             //Instantiate(item.itemUIelement, inventoryUIPanel.transform);
@@ -37,6 +41,7 @@ public class LootInventory : Inventory {
         newItem.itemUIelement.GetComponent<RectTransform>().localRotation = Quaternion.identity;
         newItem.itemUIelement.GetComponent<RectTransform>().localScale = Vector3.one;
         newItem.itemUIElementScript.parentInventory = this;
+
         newItem.loose = false;
         newItem.gameObject.SetActive(false);
         inventoryContents.Add(newItem);

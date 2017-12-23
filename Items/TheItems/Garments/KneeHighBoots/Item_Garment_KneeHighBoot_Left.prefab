@@ -97,9 +97,10 @@ GameObject:
   - component: {fileID: 114472015302639072}
   - component: {fileID: 54134258518725372}
   - component: {fileID: 65476079775850912}
+  - component: {fileID: 114009629414477096}
   m_Layer: 0
   m_Name: Item_Garment_KneeHighBoot_Left
-  m_TagString: Untagged
+  m_TagString: Item
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -434,6 +435,7 @@ GameObject:
   - component: {fileID: 114427188667655622}
   - component: {fileID: 114061884537967640}
   - component: {fileID: 114963893302339246}
+  - component: {fileID: 114466810245252934}
   m_Layer: 5
   m_Name: ItemUI_Element
   m_TagString: Untagged
@@ -4367,6 +4369,22 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.38, y: 1.69, z: 1.06}
   m_Center: {x: -0.48, y: 0.84, z: 0.15}
+--- !u!114 &114009629414477096
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1065116432446410}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: 9864af04-d044-4712-b6a4-16a600a93d3e
+  StoreAllComponents: 1
+  Components: []
 --- !u!114 &114061884537967640
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4524,6 +4542,22 @@ MonoBehaviour:
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0
+--- !u!114 &114466810245252934
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1201150917113132}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: 3d11afc2-f54e-404c-99f3-8e2cd0730dea
+  StoreAllComponents: 1
+  Components: []
 --- !u!114 &114472015302639072
 MonoBehaviour:
   m_ObjectHideFlags: 1

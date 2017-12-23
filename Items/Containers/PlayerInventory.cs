@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
-using System.Collections;
+using System;
 using System.Collections.Generic;
 
+[Serializable]
 public class PlayerInventory : Inventory
 {
 
@@ -44,6 +45,10 @@ public class PlayerInventory : Inventory
         newItem.itemUIelement.GetComponent<RectTransform>().localRotation = Quaternion.identity;
         newItem.itemUIelement.GetComponent<RectTransform>().localScale = Vector3.one;
         newItem.itemUIElementScript.parentInventory = this;
+        InventoryFocusPanel ifp = newItem.itemUIelement.AddComponent<InventoryFocusPanel>();
+        ifp.attachedInventory = this;
+        ifp.panel = this.inventoryUIPanel;
+        ifp.playerControls = GetComponent<UnityStandardAssets.Characters.FirstPerson.PlayerControls>();
         newItem.loose = false;
         newItem.gameObject.SetActive(false);
         inventoryContents.Add(newItem);
@@ -61,6 +66,8 @@ public class PlayerInventory : Inventory
         inventoryContents.Remove(newItem);
         newItem.itemUIelement.transform.SetParent(newItem.transform);
         newItem.itemUIElementScript.parentInventory = null;
+        Destroy(newItem.itemUIelement.GetComponent<InventoryFocusPanel>());
+        Destroy(newItem.itemUIelement.GetComponent<LootInventoryFocusPanel>());
         contentsWeight -= newItem.itemWeight;
         if (newItem.GetType().IsAssignableFrom(typeof(Item_WaterVessel)))
         {

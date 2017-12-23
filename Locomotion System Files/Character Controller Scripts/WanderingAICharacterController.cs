@@ -6,7 +6,7 @@ public class WanderingAICharacterController : MonoBehaviour {
 	public bool onlyWalkForward;
 	public float idleThreshold = 0.1f;
 	
-	private CharacterMotor motor;
+	private LCharacterMotor motor;
 	private float moveDirection = 0;
 	private float faceDirection = 0;
 	private float acceleration;
@@ -16,7 +16,7 @@ public class WanderingAICharacterController : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-		motor = GetComponent(typeof(CharacterMotor)) as CharacterMotor;
+		motor = GetComponent(typeof(LCharacterMotor)) as LCharacterMotor;
 	}
 	
 	// Update is called once per frame

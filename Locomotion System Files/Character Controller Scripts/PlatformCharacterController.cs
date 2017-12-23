@@ -3,7 +3,7 @@ using System.Collections;
 
 public class PlatformCharacterController : MonoBehaviour {
 	
-	private CharacterMotor motor;
+	private LCharacterMotor motor;
 	
 	public float walkMultiplier = 0.5f;
 	public bool defaultIsWalk = false;
@@ -12,7 +12,7 @@ public class PlatformCharacterController : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-		motor = GetComponent(typeof(CharacterMotor)) as CharacterMotor;
+		motor = GetComponent(typeof(LCharacterMotor)) as LCharacterMotor;
 		if (motor==null) Debug.Log("Motor is null!!");
 	}
 	

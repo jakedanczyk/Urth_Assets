@@ -598,7 +598,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8dd6c38ff6a35344c83f71696f442bbe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  panel: {fileID: 224595218674991948}
+  parentPanel: {fileID: 224595218674991948}
   playerControls: {fileID: 0}
 --- !u!114 &114531912573782374
 MonoBehaviour:

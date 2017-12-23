@@ -23,6 +23,7 @@ GameObject:
   - component: {fileID: 12059311757039328}
   - component: {fileID: 26682498413159694}
   - component: {fileID: 114458768391623928}
+  - component: {fileID: 114183333666066212}
   m_Layer: 0
   m_Name: CalmHeavySnow
   m_TagString: Untagged
@@ -142,6 +143,22 @@ ParticleRenderer:
     x Tile: 1
     y Tile: 1
     cycles: 1
+--- !u!114 &114183333666066212
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1396155096622800}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: 0f977ed4-5dc7-42bc-ae6c-2d26bdee0a32
+  StoreAllComponents: 1
+  Components: []
 --- !u!114 &114458768391623928
 MonoBehaviour:
   m_ObjectHideFlags: 1

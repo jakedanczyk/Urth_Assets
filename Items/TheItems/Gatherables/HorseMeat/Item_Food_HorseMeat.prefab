@@ -22,6 +22,7 @@ GameObject:
   - component: {fileID: 114345319823257310}
   - component: {fileID: 64704656874896680}
   - component: {fileID: 54139143705309922}
+  - component: {fileID: 114036893372238930}
   m_Layer: 0
   m_Name: Item_Food_HorseMeat
   m_TagString: Item
@@ -92,6 +93,7 @@ GameObject:
   - component: {fileID: 114592320260823976}
   - component: {fileID: 114492982973871978}
   - component: {fileID: 114770721161814536}
+  - component: {fileID: 114329312968737660}
   m_Layer: 5
   m_Name: ItemUI_Element
   m_TagString: Untagged
@@ -195,6 +197,38 @@ MeshCollider:
   m_InflateMesh: 0
   m_SkinWidth: 0.01
   m_Mesh: {fileID: 4300002, guid: 0979666f1ef471c43b9cbd5edc0b0987, type: 3}
+--- !u!114 &114036893372238930
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1310211468554602}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: 1c98b7c4-454d-4684-a5d8-61ceeff9bb6e
+  StoreAllComponents: 1
+  Components: []
+--- !u!114 &114329312968737660
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1887545723682106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: d37af922-7fef-470a-aeed-72d7a5ebfe0f
+  StoreAllComponents: 1
+  Components: []
 --- !u!114 &114345319823257310
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using System.IO;
 
 public class PauseScript : MonoBehaviour {
 
@@ -11,13 +12,40 @@ public class PauseScript : MonoBehaviour {
     bool muted;
     [SerializeField]
     Text mutetext;
+    public Text helptext;
+
+    FileInfo theSourceFile = null;
+    StringReader reader = null;
+
+    public GameObject helpPage;
 
     	// Use this for initialization
 	void Start () {
         EscapeMenu = GameObject.Find("EscapeMenu");
         EscapeMenu.SetActive(false);
-        paused = true;
-	}
+        paused = false;
+
+        TextAsset helpdata = (TextAsset)Resources.Load("help", typeof(TextAsset));
+        // puzdata.text is a string containing the whole file. To read it line-by-line:
+
+        helptext.text = "";
+        reader = new StringReader(helpdata.text);
+        if (reader == null)
+        {
+            Debug.Log("puzzles.txt not found or not readable");
+        }
+        else
+        {
+            bool looping = true;
+            while (looping)
+            {
+                string txt = reader.ReadLine();
+                if (txt == null)
+                    looping = false;
+                helptext.text = helptext.text + txt + "\n";   
+            }
+        }
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -106,17 +134,26 @@ public class PauseScript : MonoBehaviour {
     public void Resume()
     { paused = false; escapeMenuActive = false; }
 
-    public void MainMenu()
-    { Application.LoadLevel(1); }
-
     public void Save()
     { PlayerPrefs.SetInt("currentscenesave", SceneManager.GetActiveScene().buildIndex); }
+
+    public void Save2()
+    { SaveManager.Save(); Debug.Log(Application.persistentDataPath); }
 
     public void Load()
     { SceneManager.LoadScene(PlayerPrefs.GetInt("currentscenesave")); }
 
+    public void Load2()
+    { SaveManager.Load(); Debug.Log(Application.persistentDataPath); }
+
     public void Mute()
     { muted = !muted; }
+
+    public void Help()
+    { helpPage.SetActive(!helpPage.activeSelf); }
+
+    public void MainMenu()
+    { SceneManager.LoadScene(1); }
 
     public void Quit()
     { Application.Quit(); }

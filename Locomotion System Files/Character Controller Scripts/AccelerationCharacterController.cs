@@ -3,7 +3,7 @@ using System.Collections;
 
 public class AccelerationCharacterController : MonoBehaviour {
 	
-	private CharacterMotor motor;
+	private LCharacterMotor motor;
 	
 	public float sensitivityX = 15F;
 	public float sensitivityY = 15F;
@@ -16,7 +16,7 @@ public class AccelerationCharacterController : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-		motor = GetComponent(typeof(CharacterMotor)) as CharacterMotor;
+		motor = GetComponent(typeof(LCharacterMotor)) as LCharacterMotor;
 		if (motor==null) Debug.Log("Motor is null!!");
 		
 		originalRotation = transform.localRotation;

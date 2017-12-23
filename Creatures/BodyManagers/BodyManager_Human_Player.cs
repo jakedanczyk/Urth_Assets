@@ -7,6 +7,7 @@ using UnityStandardAssets.Characters.FirstPerson;
 using MORPH3D;
 using System.Threading;
 
+[System.Serializable]
 public class BodyManager_Human_Player : BodyManager {
 
     public BodyManager_Human_Player thisManager;
@@ -40,7 +41,7 @@ public class BodyManager_Human_Player : BodyManager {
     public Inventory lHandGrasp;
     public Inventory pockets;
     public Inventory[] bags;
-    public M3DCharacterManager mcs;
+    public M3DCharacterManager mcs, mcsUI;
     public List<Item_WaterVessel> waterVessels;
     public new PlayerInventory baseInventory;
 
@@ -48,6 +49,8 @@ public class BodyManager_Human_Player : BodyManager {
     public bool inTask;
 
     public bool gathering, treeFelling, treeProcessing;
+    public String chararacterName, race;
+    public GameObject weatherFX;
 
     //attach points... special slots for weapons and equipment. each boot, small of back, weapons belt, strap, back sling, etc...
     private void Awake()
@@ -59,14 +62,6 @@ public class BodyManager_Human_Player : BodyManager {
 
     void Start()
     {
-        weatherSystem = (WeatherControl)FindObjectOfType(typeof(WeatherControl));
-        currentWeather = weatherSystem.currentWeather;
-        anim = GetComponentInChildren<Animator>();
-        gait = 0;
-        speed = 1.25F + 1.25f * gait;
-        stamina = maxStamina = stats.GetStat(RPGStatType.Endurance).StatValue*10;
-        heartRate = stats.GetStat(RPGStatType.RestingHeartRate).StatValue;
-        UpdateWeatherProtection();
         InvokeRepeating("UpdateHeartRate", 6f, 6f);
         InvokeRepeating("ReadWeather", 1.5f, 300f);
         InvokeRepeating("UpdateCoreTemp", 7f, 6f);
@@ -75,6 +70,18 @@ public class BodyManager_Human_Player : BodyManager {
         InvokeRepeating("Hydration", 10f, 6f);
         InvokeRepeating("SleepDebt", 11f, 2f);
         InvokeRepeating("StaminaUpdate", 9.5f, 6f);
+        weatherSystem = (WeatherControl)FindObjectOfType(typeof(WeatherControl));
+        currentWeather = weatherSystem.currentWeather;
+
+        if (LevelSerializer.IsDeserializing) return;
+
+
+        anim = GetComponentInChildren<Animator>();
+        gait = 0;
+        speed = 1.25F + 1.25f * gait;
+        stamina = maxStamina = stats.GetStat(RPGStatType.Endurance).StatValue*10;
+        heartRate = stats.GetStat(RPGStatType.RestingHeartRate).StatValue;
+        UpdateWeatherProtection();        
         var health = stats.GetStat<RPGVital>(RPGStatType.Health);
         health.OnCurrentValueChange += OnStatValueChange;
         sleepMod.OnValueChange += SleepOnValueChange;
@@ -133,7 +140,7 @@ public class BodyManager_Human_Player : BodyManager {
         if (!aWeapon.wielded)
             return;
         aWeapon.wielded = false;
-        Debug.LogWarning("Sheate weapon: " + aWeapon.itemName);
+        Debug.LogWarning("Sheathe weapon: " + aWeapon.itemName);
         aWeapon.GetComponent<Rigidbody>().isKinematic = false;
         aWeapon.GetComponent<Rigidbody>().useGravity = true;
         aWeapon.gameObject.SetActive(false);
@@ -178,11 +185,12 @@ public class BodyManager_Human_Player : BodyManager {
             meleeWeaponDrawn = true;
             rHandWeapon = drawnWeapon;
             drawnWeapon.gameObject.transform.SetParent(rHandTransform, false);
-            drawnWeapon.gameObject.transform.position = rHandTransform.position;
+            //drawnWeapon.gameObject.transform.position = rHandTransform.position;
+            drawnWeapon.gameObject.transform.localPosition = Vector3.zero;
         }
-        drawnWeapon.gameObject.transform.localRotation.Equals(0);
-        drawnWeapon.gameObject.transform.Rotate(drawnWeapon.gripOrientation);
-        drawnWeapon.gameObject.transform.Translate(drawnWeapon.gripAdjust);
+        drawnWeapon.gameObject.transform.localRotation = Quaternion.Euler(drawnWeapon.gripOrientation);
+        //drawnWeapon.gameObject.transform.localRotation.Equals(drawnWeapon.gripOrientation);
+        drawnWeapon.gameObject.transform.localPosition = drawnWeapon.gripAdjust;
         anim.SetBool("ArmsRaised", true);
     }
 
@@ -243,6 +251,7 @@ public class BodyManager_Human_Player : BodyManager {
         //bodyStatus.weaponsStatus = raised
     }
 
+    [DoNotSerialize]
     public Dictionary<WeaponType, Tuple<string,RPGStatType>> mainAttackDict = new Dictionary<WeaponType, Tuple<string, RPGStatType>>
     {
         { WeaponType.Axe_1H, new Tuple<string,RPGStatType>("AxeChop",RPGStatType.Axe)}, { WeaponType.Axe_2H, new Tuple<string,RPGStatType>("AxeChop",RPGStatType.Axe) },
@@ -522,6 +531,7 @@ public class BodyManager_Human_Player : BodyManager {
             if (newWearable.hasModel)
             {
                 mcs.SetClothingVisibility(newWearable.modelID, true);
+                mcsUI.SetClothingVisibility(newWearable.modelID, true);
             }
         }
     }
@@ -542,6 +552,7 @@ public class BodyManager_Human_Player : BodyManager {
         if (thisWearable.hasModel)
         {
             mcs.SetClothingVisibility(thisWearable.modelID, false);
+            mcsUI.SetClothingVisibility(thisWearable.modelID, false);
         }
         outfit.Remove(thisWearable);
         thisWearable.equipped = false;
@@ -755,7 +766,7 @@ public class BodyManager_Human_Player : BodyManager {
     public float totalInsulation = 0;
     public float totalWaterCover = 0;
     public float totalWindCover = 0;
-
+    [SerializeField]
     float lastTempCheckTime = 0;
 
     void UpdateCoreTemp()
@@ -898,6 +909,7 @@ public class BodyManager_Human_Player : BodyManager {
 
     public float calories = 2000f;
     public float calorieBurn = 0;
+    [SerializeField]
     float calorieTime,hydrationTime,sleepTime;
     void CalorieBurn()
     {
@@ -908,6 +920,7 @@ public class BodyManager_Human_Player : BodyManager {
     }
 
     public bool shivering;
+    [SerializeField]
     float waterContent;
     public float hydration = 66f; // body water %
     void Hydration()
@@ -921,13 +934,14 @@ public class BodyManager_Human_Player : BodyManager {
     }
 
     public float sleepDebt = 1f; // hours sleep debt
+    [SerializeField]
     RPGStatModTotalPercent sleepMod = new RPGStatModTotalPercent(0);
     void SleepDebt()
     {
         float now = worldTime.totalGameSeconds;
         sleepDebt += ((now - sleepTime) - (3*sleepLength))/ 7200; // .01 if invoke period is 72
         sleepTime = now;
-        float sleepModValue = (Mathf.Min(0,(6 - sleepDebt)) + Mathf.Min(0, (8 - sleepDebt)) * 0.5f * sleepDebt)/80f;
+        float sleepModValue = Mathf.Max(-100,(Mathf.Min(0,(6 - sleepDebt)) + Mathf.Min(0, (8 - sleepDebt)) * 0.5f * sleepDebt)/80f);
         sleepMod.Value = sleepModValue;
     }
 
@@ -1052,7 +1066,9 @@ public class BodyManager_Human_Player : BodyManager {
     //fire making
 
     public float fireStartingTime;
+    [SerializeField]
     float xpGain;
+    [SerializeField]
     bool isStartingFire;
     public void StartFire(Fire aFire, float methodFactor)
     {

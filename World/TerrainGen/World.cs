@@ -64,7 +64,7 @@ public class World : MonoBehaviour {
             GameObject newHorse = Instantiate(horsePrefab);
             newHorse.transform.position = newChunk.horseList[0];
         }
-        Serialization.Load(newChunk);
+        SerializationA.Load(newChunk);
         if (newChunk.hasWater)
         {
             GameObject newWater = Instantiate(waterPrefab);
@@ -79,7 +79,7 @@ public class World : MonoBehaviour {
         Chunk chunk = null;
         if (chunks.TryGetValue(new WorldPos(x, y, z), out chunk))
         {
-            Serialization.SaveChunk(chunk);
+            SerializationA.SaveChunk(chunk);
             Object.Destroy(chunk.gameObject);
             chunks.Remove(new WorldPos(x, y, z));
         }

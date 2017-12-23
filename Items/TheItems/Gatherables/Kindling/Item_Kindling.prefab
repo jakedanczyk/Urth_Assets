@@ -24,6 +24,7 @@ GameObject:
   - component: {fileID: 114926344019696640}
   - component: {fileID: 114323943703624660}
   - component: {fileID: 114671614743441004}
+  - component: {fileID: 114766959589834748}
   m_Layer: 5
   m_Name: ItemUI_ItemButton
   m_TagString: Untagged
@@ -42,9 +43,10 @@ GameObject:
   - component: {fileID: 33714173484611194}
   - component: {fileID: 23914846579920950}
   - component: {fileID: 114231030266811016}
+  - component: {fileID: 114904337076538380}
   m_Layer: 0
   m_Name: Item_Kindling
-  m_TagString: Untagged
+  m_TagString: Item
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -144,6 +146,7 @@ MonoBehaviour:
   componentItems: []
   itemUIelement: {fileID: 1003131637617424}
   itemUIElementScript: {fileID: 114671614743441004}
+  matDict: {fileID: 0}
 --- !u!114 &114274654459986264
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -236,6 +239,38 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: Button
+--- !u!114 &114766959589834748
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1003131637617424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: 0dbc468c-83b7-4bfc-97fc-e543248d35af
+  StoreAllComponents: 1
+  Components: []
+--- !u!114 &114904337076538380
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1161705961822022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: 6c85ec2c-33ac-46b5-a018-534fa4b0ad9a
+  StoreAllComponents: 1
+  Components: []
 --- !u!114 &114926344019696640
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -344,6 +344,7 @@ GameObject:
   - component: {fileID: 114311554873610292}
   - component: {fileID: 54147554248416102}
   - component: {fileID: 65567701036383522}
+  - component: {fileID: 114601570751312016}
   m_Layer: 0
   m_Name: Item_Garment_Tunic(Leather)
   m_TagString: Item
@@ -655,6 +656,7 @@ GameObject:
   - component: {fileID: 114559091517574378}
   - component: {fileID: 114084546910242364}
   - component: {fileID: 114170159648547054}
+  - component: {fileID: 114676703814741696}
   m_Layer: 5
   m_Name: ItemUI_Element
   m_TagString: Untagged
@@ -1617,6 +1619,38 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
+--- !u!114 &114601570751312016
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1465037183934664}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: efbace73-0e5a-4e1a-8c21-ef96b39c9859
+  StoreAllComponents: 1
+  Components: []
+--- !u!114 &114676703814741696
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1831495369552204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: fbd19337-9c79-4683-9b96-46b0adbaae9a
+  StoreAllComponents: 1
+  Components: []
 --- !u!114 &114737258831223814
 MonoBehaviour:
   m_ObjectHideFlags: 1

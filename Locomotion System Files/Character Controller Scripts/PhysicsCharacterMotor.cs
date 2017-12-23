@@ -3,7 +3,7 @@ using System.Collections;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(CapsuleCollider))]
-public class PhysicsCharacterMotor : CharacterMotor {
+public class PhysicsCharacterMotor : LCharacterMotor {
 	
 	public float maxRotationSpeed = 270;
 	public bool useCentricGravity = false;

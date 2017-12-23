@@ -54,6 +54,7 @@ GameObject:
   - component: {fileID: 4000010951414950}
   - component: {fileID: 114132499504219588}
   - component: {fileID: 82990492845985586}
+  - component: {fileID: 114654114396001146}
   m_Layer: 0
   m_Name: Rain 1
   m_TagString: Untagged
@@ -88,6 +89,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4000010611232814}
   - component: {fileID: 114000013093675156}
+  - component: {fileID: 114878960439585156}
   m_Layer: 0
   m_Name: CalmRainPrefab
   m_TagString: Untagged
@@ -328,6 +330,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f76aad5d5b2fe8548999d63ec3c0a089, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &114654114396001146
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000012123054622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: 0836d7c1-a3f5-40ec-9312-a2f36d490249
+  StoreAllComponents: 1
+  Components: []
+--- !u!114 &114878960439585156
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000013311981902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: 0d22a723-7dcf-48e4-a0c4-ff81d7a5e817
+  StoreAllComponents: 1
+  Components: []
 --- !u!182 &182000014017373802
 WindZone:
   m_ObjectHideFlags: 1

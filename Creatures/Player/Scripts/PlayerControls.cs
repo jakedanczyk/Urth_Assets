@@ -5,7 +5,8 @@ using UnityStandardAssets.Utility;
 using Random = UnityEngine.Random;
 
 namespace UnityStandardAssets.Characters.FirstPerson
-{ 
+{
+    [System.Serializable]
     [RequireComponent(typeof(CharacterController))]
     public class PlayerControls : MonoBehaviour
     {
@@ -36,7 +37,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         GameObject craftSystem;
         GameObject characterSystem;
 
-        public GameObject outfittingUI;
+        public GameObject characterUI;
         public GameObject actionUI;
 
         public PlayerInventory inventory;
@@ -46,7 +47,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public bool inventoryActive, lootActive;
         public LootInventoryFocusPanel lootPanelScript;
 
-        public ModelViewer modelViewUI;
+        public GameObject modelViewUI;
         public GameObject butcheringUI;
         public GameObject lootingUI;
         public RectTransform lootPanel;
@@ -294,7 +295,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                                 print(hitBody.name);
                                 lootInventory = hitBody.lootInventory;
                                 lootInventory.inventoryUIPanel = lootPanel;
-                                lootInventory.RebuildUIPanel();
+                                lootInventory.RebuildUIPanel(this);
                                 lootingUI.SetActive(true);
                                 showInventory = true;
                                 inventoryUIPanel.SetActive(true);
@@ -327,7 +328,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                             //butcheringUI.gameObject.SetActive(true);
                             lootInventory = fire.fireLoot;
                             lootInventory.inventoryUIPanel = firePanel;
-                            lootInventory.RebuildUIPanel();
+                            lootInventory.RebuildUIPanel(this);
                             showInventory = true;
                             lootPanelScript.attachedInventory = fire.fireLoot;
                         }
@@ -714,6 +715,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 if (showInventory)
                 {
+                    modelViewUI.SetActive(false);
                     player_bodyManager.baseInventory.selectedItem = null;
                     inventoryUIPanel.SetActive(false);
                     lootInventory = null;
@@ -727,6 +729,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 }
                 else
                 {
+                    modelViewUI.SetActive(true);
                     inventoryUIPanel.SetActive(true);
                     showInventory = true;
                     m_AudioSource.PlayOneShot(playerAudioManager.openInventory);
@@ -755,18 +758,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             if (Input.GetKeyDown(KeyCode.O))
             {
-                if (outfittingUI.activeSelf)
+                if (characterUI.activeSelf)
                 {
-                    outfittingUI.GetComponent<OutfittingUIScript>().panelActive = false;
-                    outfittingUI.SetActive(false);
-                    //Destroy(outfittingUI.GetComponent<OutfitUIScript>());
+                    characterUI.SetActive(false);
                     return;
                 }
-                if (!outfittingUI.activeSelf)
+                if (!characterUI.activeSelf)
                 {
-                    outfittingUI.GetComponent<OutfittingUIScript>().panelActive = true;
-                    outfittingUI.SetActive(true);
-                    //outfittingUI.AddComponent<OutfitUIScript>();
+                    characterUI.SetActive(true);
                     return;
                 }
             }
@@ -1073,6 +1072,34 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             get { return m_JumpSpeed; }
             set { m_JumpSpeed = value; }
+        }
+
+        public ModelViewer modelViewer;
+        
+        public void SetLootActive()
+        {
+            if (lootInventory.selectedItem != null)
+            {
+                GameObject model = Instantiate(lootInventory.selectedItem.itemModel);
+                modelViewer.ChangeModel(model);
+                model.transform.SetParent(modelViewUI.gameObject.transform);
+                model.transform.localPosition = Vector3.zero;
+            }
+            lootActive = true;
+            inventoryActive = false;
+        }
+
+        public void SetInventoryActive()
+        {
+            if (inventory.selectedItem != null)
+            {
+                GameObject model = Instantiate(inventory.selectedItem.itemModel);
+                modelViewer.ChangeModel(model);
+                model.transform.SetParent(modelViewUI.gameObject.transform);
+                model.transform.localPosition = Vector3.zero;
+            }
+            inventoryActive = true;
+            lootActive = false;
         }
     }
 }

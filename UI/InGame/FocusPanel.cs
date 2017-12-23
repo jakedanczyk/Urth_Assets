@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class FocusPanel : MonoBehaviour, IPointerDownHandler
+public class FocusPanel : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
 
     public RectTransform parentPanel;
@@ -12,5 +12,8 @@ public class FocusPanel : MonoBehaviour, IPointerDownHandler
     {
         parentPanel.SetAsLastSibling();
     }
-
+    public void OnPointerUp(PointerEventData data)
+    {
+        parentPanel.SetAsLastSibling();
+    }
 }

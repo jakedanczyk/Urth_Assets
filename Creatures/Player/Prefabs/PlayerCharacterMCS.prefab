@@ -1622,7 +1622,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1000014003950074
 GameObject:
   m_ObjectHideFlags: 1
@@ -3302,6 +3302,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mutetext: {fileID: 114000012470576306}
+  helptext: {fileID: 0}
+  helpPage: {fileID: 0}
 --- !u!114 &114000010348721504
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4416,6 +4418,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   world: {fileID: 0}
+  treePrefab: {fileID: 0}
+  playerTransform: {fileID: 0}
+  dist: 0
 --- !u!114 &114000010644123356
 MonoBehaviour:
   m_ObjectHideFlags: 1

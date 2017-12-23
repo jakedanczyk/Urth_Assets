@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 
 [RequireComponent(typeof(CharacterController))]
-public class NormalCharacterMotor : CharacterMotor {
+public class NormalCharacterMotor : LCharacterMotor {
 	
 	public float maxRotationSpeed = 270;
 	

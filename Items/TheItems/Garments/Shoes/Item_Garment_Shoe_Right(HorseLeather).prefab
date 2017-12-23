@@ -686,6 +686,7 @@ GameObject:
   - component: {fileID: 114803375546592604}
   - component: {fileID: 114099365267043054}
   - component: {fileID: 114478605376047478}
+  - component: {fileID: 114167456325682636}
   m_Layer: 5
   m_Name: ItemUI_Element
   m_TagString: Untagged
@@ -1713,6 +1714,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4516299293387968}
   - component: {fileID: 114884679016328662}
+  - component: {fileID: 114042758099111796}
   m_Layer: 0
   m_Name: Item_Garment_Shoe_Right(HorseLeather)
   m_TagString: Item
@@ -4365,6 +4367,22 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114042758099111796
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1705841030715726}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: 7436dd50-5bb1-452b-8618-014865768703
+  StoreAllComponents: 1
+  Components: []
 --- !u!114 &114099365267043054
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4379,6 +4397,22 @@ MonoBehaviour:
   parentItem: {fileID: 114884679016328662}
   parentInventory: {fileID: 0}
   thisButton: {fileID: 114803375546592604}
+--- !u!114 &114167456325682636
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1351286698641310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: 18e3e364-1a57-47c1-b30a-46e305dfd373
+  StoreAllComponents: 1
+  Components: []
 --- !u!114 &114352039094813678
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -24,6 +24,7 @@ GameObject:
   - component: {fileID: 114263786924029444}
   - component: {fileID: 114743040387965176}
   - component: {fileID: 114720717962022350}
+  - component: {fileID: 114596097231365978}
   m_Layer: 5
   m_Name: ItemUI_Element
   m_TagString: Untagged
@@ -61,6 +62,7 @@ GameObject:
   - component: {fileID: 54486382445900618}
   - component: {fileID: 135209492671800340}
   - component: {fileID: 135133969263904748}
+  - component: {fileID: 114256543793733408}
   m_Layer: 0
   m_Name: Item_Weapon_PickMattock
   m_TagString: Item
@@ -235,6 +237,22 @@ MonoBehaviour:
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0
+--- !u!114 &114256543793733408
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1413549548508706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: 62db870e-28f2-4a96-8e51-3cf1e0cb1894
+  StoreAllComponents: 1
+  Components: []
 --- !u!114 &114263786924029444
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -347,6 +365,22 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: "\u25BC"
+--- !u!114 &114596097231365978
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1108885006677192}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: 5c48354d-9906-4702-8bf4-44d135b9b320
+  StoreAllComponents: 1
+  Components: []
 --- !u!114 &114690809965475646
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -422,7 +456,7 @@ SphereCollider:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1413549548508706}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 8

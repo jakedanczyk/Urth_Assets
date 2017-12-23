@@ -206,6 +206,7 @@ GameObject:
   - component: {fileID: 114850094450404074}
   - component: {fileID: 114062599325279210}
   - component: {fileID: 114109039396150734}
+  - component: {fileID: 114144909620817282}
   m_Layer: 5
   m_Name: ItemUI_Element
   m_TagString: Untagged
@@ -256,9 +257,10 @@ GameObject:
   - component: {fileID: 136816493330262242}
   - component: {fileID: 136721655390919514}
   - component: {fileID: 65433450333947598}
+  - component: {fileID: 114528704766767564}
   m_Layer: 0
   m_Name: Item_Garment_Trousers(Iron Chain)
-  m_TagString: Untagged
+  m_TagString: Item
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1229,6 +1231,22 @@ MonoBehaviour:
   m_PreferredHeight: 30
   m_FlexibleWidth: 1
   m_FlexibleHeight: -1
+--- !u!114 &114144909620817282
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1211754125316240}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: 2e925b32-7523-4d7b-8d32-79b79e97688a
+  StoreAllComponents: 1
+  Components: []
 --- !u!114 &114154435619934976
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1297,6 +1315,22 @@ MonoBehaviour:
   originalMesh: {fileID: 0}
   originalBindposes: []
   runtimeMorphPath: MORPH3D/Wood_Elf_Scout/G2MEWPants/EWPants_LOD3
+--- !u!114 &114528704766767564
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1254978913479558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 
+  classId: 17bcac4a-2d44-4c50-ba0f-edc006ad35a6
+  StoreAllComponents: 1
+  Components: []
 --- !u!114 &114560460478370506
 MonoBehaviour:
   m_ObjectHideFlags: 1
