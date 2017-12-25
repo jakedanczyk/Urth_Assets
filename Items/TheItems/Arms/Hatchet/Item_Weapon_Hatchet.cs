@@ -10,17 +10,6 @@ public class Item_Weapon_Hatchet : Item_Weapon {
 
     public Collider edgeCollider;
 
-    //public List<Item> componentNeeds = new List<Item> { Item_HatchetHead, Item_ShortHaft}
-
-    void Awake()
-    {
-
-        //attackList.Add(new Item_Attack("Chop", 3, 0, 3));
-        //print(attackList[0].attackName);
-        //governingSkill = RPGStatType.Axe;
-    }
-
-
     // Use this for initialization
     void Start ()
     {
@@ -31,11 +20,6 @@ public class Item_Weapon_Hatchet : Item_Weapon {
         //print(attackList[1].attackName);
 
     }
-
-    // Update is called once per frame
-    void Update () {
-		
-	}
 
     void Chop() 
     {

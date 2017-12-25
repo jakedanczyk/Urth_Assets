@@ -95,8 +95,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1269256580492742}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 20, y: 20, z: 20}
+  m_LocalPosition: {x: 2594.76, y: 5170.093, z: -1487.073}
+  m_LocalScale: {x: 2.2, y: 2.2, z: 2.2}
   m_Children:
   - {fileID: 224320753700350518}
   m_Father: {fileID: 0}
@@ -162,7 +162,7 @@ BoxCollider:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1269256580492742}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 3aeb7dadc0c69d54d9e5777e9d5631f1, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -178,7 +178,7 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.005, y: 0.02, z: 0.005}
+  m_Size: {x: 0.02, y: 0.04, z: 0.02}
   m_Center: {x: 0, y: 0.28, z: 0}
 --- !u!114 &114155734756799842
 MonoBehaviour:
@@ -232,7 +232,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsDeserializing: 0
-  _id: 
+  _id: 8a762b55-31ce-4d28-9688-fc5aff4578e6
   classId: 3c06ed11-7183-453c-9b34-01140629f14e
   StoreAllComponents: 1
   Components: []
@@ -248,7 +248,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsDeserializing: 0
-  _id: 
+  _id: 2d12a31a-9f91-42d0-a369-d58d81eafc70
   classId: 6773d4e8-49f3-432d-9b7a-bdb7b28747b6
   StoreAllComponents: 1
   Components: []
@@ -279,7 +279,7 @@ MonoBehaviour:
   itemUIElementScript: {fileID: 114735936498625782}
   matDict: {fileID: 0}
   weightPerItem: 30
-  numItems: 1
+  numItems: 30
   baseBlunt: 0
   baseCut: 0
   basePierce: 15

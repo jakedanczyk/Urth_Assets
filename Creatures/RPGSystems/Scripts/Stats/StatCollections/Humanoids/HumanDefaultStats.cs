@@ -162,22 +162,25 @@ public class HumanDefaultStats : CreatureStats
         stamina.StatName = "Stamina";
         stamina.StatBaseValue = 1000;
         stamina.AddLinker(new RPGStatLinkerLinear(CreateOrGetStat<RPGAttribute>(RPGStatType.Endurance), 15f, -200f));
+        stamina.AddLinker(new RPGStatLinkerLinear(CreateOrGetStat<RPGAttribute>(RPGStatType.Willpower), 5f, -200f));
+        stamina.AddLinker(new RPGStatLinkerLinear(CreateOrGetStat<RPGAttribute>(RPGStatType.Toughness), 3f, -200f));
         stamina.UpdateLinkers();
         stamina.SetCurrentValueToMax();
 
         var jumpHeight = CreateOrGetStat<RPGDerived>(RPGStatType.JumpHeight);
         jumpHeight.StatName = "Jump Height";
-        jumpHeight.StatBaseValue = 20;
-        jumpHeight.AddLinker(new RPGStatLinkerLinear(CreateOrGetStat<RPGAttribute>(RPGStatType.Agility), .01f, -200f));
+        jumpHeight.StatBaseValue = 35;
+        jumpHeight.AddLinker(new RPGStatLinkerLinear(CreateOrGetStat<RPGAttribute>(RPGStatType.Agility), .005f, -200f));
+        jumpHeight.AddLinker(new RPGStatLinkerLinear(CreateOrGetStat<RPGAttribute>(RPGStatType.Strength), .005f, -200f));
         jumpHeight.UpdateLinkers();
         jumpHeight.SetCurrentValueToMax();
 
         var attackSpeed = CreateOrGetStat<RPGDerived>(RPGStatType.AttackSpeed);
         attackSpeed.StatName = "Attack Speed";
         attackSpeed.StatBaseValue = 10;
-        jumpHeight.AddLinker(new RPGStatLinkerLinear(CreateOrGetStat<RPGAttribute>(RPGStatType.Agility), .01f, -200f));
-        jumpHeight.UpdateLinkers();
-        jumpHeight.SetCurrentValueToMax();
+        attackSpeed.AddLinker(new RPGStatLinkerLinear(CreateOrGetStat<RPGAttribute>(RPGStatType.Agility), .01f, -200f));
+        attackSpeed.UpdateLinkers();
+        attackSpeed.SetCurrentValueToMax();
 
         var restingHeartRate = CreateOrGetStat<RPGDerived>(RPGStatType.RestingHeartRate);
         restingHeartRate.StatName = "Resting Heart Rate";
@@ -354,6 +357,7 @@ public class HumanDefaultStats : CreatureStats
         head.bodyPartType = BodyPartType.Head;
         head.protection = new int[] { 1, 1, 1, 1, 1, 1 };
         head.damageModifer = 2.5f;
+        head.SetCurrentValueToMax();
 
         var neck = CreateOrGetStat<RPGBodyPart>(RPGStatType.Neck);
         neck.StatName = "Neck";
@@ -361,104 +365,124 @@ public class HumanDefaultStats : CreatureStats
         neck.bodyPartType = BodyPartType.Neck;
         neck.protection = new int[] { 1, 1, 1, 1, 1, 1 };
         neck.damageModifer = 1.75f;
+        neck.SetCurrentValueToMax();
 
         var chest = CreateOrGetStat<RPGBodyPart>(RPGStatType.Chest);
         chest.StatName = "Chest";
         chest.StatBaseValue = 100;
         chest.protection = new int[] { 1, 1, 1, 1, 1, 1 };
+        chest.SetCurrentValueToMax();
 
         var stomach = CreateOrGetStat<RPGBodyPart>(RPGStatType.Stomach);
         stomach.StatName = "Stomach";
         stomach.StatBaseValue = 100;
         stomach.protection = new int[] { 1, 1, 1, 1, 1, 1 };
+        stomach.SetCurrentValueToMax();
 
         var pelvis = CreateOrGetStat<RPGBodyPart>(RPGStatType.Pelvis);
         pelvis.StatName = "Pelvis";
         pelvis.StatBaseValue = 100;
         pelvis.protection = new int[] { 1, 1, 1, 1, 1, 1 };
+        pelvis.SetCurrentValueToMax();
 
         var upperBack = CreateOrGetStat<RPGBodyPart>(RPGStatType.UpperBack);
         upperBack.StatName = "Upper Back";
         upperBack.StatBaseValue = 100;
         upperBack.protection = new int[] { 1, 1, 1, 1, 1, 1 };
+        upperBack.SetCurrentValueToMax();
 
         var lowerBack = CreateOrGetStat<RPGBodyPart>(RPGStatType.LowerBack);
         lowerBack.StatName = "Lower Back";
         lowerBack.StatBaseValue = 100;
         lowerBack.protection = new int[] { 1, 1, 1, 1, 1, 1 };
+        lowerBack.SetCurrentValueToMax();
 
         var leftShoulder = CreateOrGetStat<RPGBodyPart>(RPGStatType.LeftShoulder);
         leftShoulder.StatName = "Left Shoulder";
         leftShoulder.StatBaseValue = 100;
         leftShoulder.protection = new int[] { 1, 1, 1, 1, 1, 1 };
+        leftShoulder.SetCurrentValueToMax();
 
         var rightShoulder = CreateOrGetStat<RPGBodyPart>(RPGStatType.RightShoulder);
         rightShoulder.StatName = "Right Shoulder";
         rightShoulder.StatBaseValue = 100;
         rightShoulder.protection = new int[] { 1, 1, 1, 1, 1, 1 };
+        rightShoulder.SetCurrentValueToMax();
 
         var leftUpperArm = CreateOrGetStat<RPGBodyPart>(RPGStatType.LeftUpperArm);
         leftUpperArm.StatName = "Left Upper Arm";
         leftUpperArm.StatBaseValue = 100;
         leftUpperArm.protection = new int[] { 1, 1, 1, 1, 1, 1 };
+        leftUpperArm.SetCurrentValueToMax();
 
         var rightUpperArm = CreateOrGetStat<RPGBodyPart>(RPGStatType.RightUpperArm);
         rightUpperArm.StatName = "Right Upper Arm";
         rightUpperArm.StatBaseValue = 100;
         rightUpperArm.protection = new int[] { 1, 1, 1, 1, 1, 1 };
+        rightUpperArm.SetCurrentValueToMax();
 
         var leftForearm = CreateOrGetStat<RPGBodyPart>(RPGStatType.LeftForearm);
         leftForearm.StatName = "Left Forearm";
         leftForearm.StatBaseValue = 100;
         leftForearm.protection = new int[] { 1, 1, 1, 1, 1, 1 };
+        leftForearm.SetCurrentValueToMax();
 
         var rightForearm = CreateOrGetStat<RPGBodyPart>(RPGStatType.RightForearm);
         rightForearm.StatName = "Right Forearm";
         rightForearm.StatBaseValue = 100;
         rightForearm.protection = new int[] { 1, 1, 1, 1, 1, 1 };
+        rightForearm.SetCurrentValueToMax();
 
         var leftHand = CreateOrGetStat<RPGBodyPart>(RPGStatType.LeftHand);
         leftHand.StatName = "Left Hand";
         leftHand.StatBaseValue = 100;
         leftHand.protection = new int[] { 1, 1, 1, 1, 1, 1 };
         leftHand.damageModifer = .5f;
+        leftHand.SetCurrentValueToMax();
 
         var rightHand = CreateOrGetStat<RPGBodyPart>(RPGStatType.RightHand);
         rightHand.StatName = "Right Hand";
         rightHand.StatBaseValue = 100;
         rightHand.protection = new int[] { 1, 1, 1, 1, 1, 1 };
         rightHand.damageModifer = .5f;
+        rightHand.SetCurrentValueToMax();
 
         var leftThigh = CreateOrGetStat<RPGBodyPart>(RPGStatType.LeftThigh);
         leftThigh.StatName = "Left Thigh";
         leftThigh.StatBaseValue = 100;
         leftThigh.protection = new int[] { 1, 1, 1, 1, 1, 1 };
+        leftThigh.SetCurrentValueToMax();
 
         var rightThigh = CreateOrGetStat<RPGBodyPart>(RPGStatType.RightThigh);
         rightThigh.StatName = "Right Thigh";
         rightThigh.StatBaseValue = 100;
         rightThigh.protection = new int[] { 1, 1, 1, 1, 1, 1 };
+        rightThigh.SetCurrentValueToMax();
 
         var leftCalf = CreateOrGetStat<RPGBodyPart>(RPGStatType.LeftCalf);
         leftCalf.StatName = "Left Calf";
         leftCalf.StatBaseValue = 100;
         leftCalf.protection = new int[] { 1, 1, 1, 1, 1, 1 };
+        leftCalf.SetCurrentValueToMax();
 
         var rightCalf = CreateOrGetStat<RPGBodyPart>(RPGStatType.RightCalf);
         rightCalf.StatName = "Right Calf";
         rightCalf.StatBaseValue = 100;
         rightCalf.protection = new int[] { 1, 1, 1, 1, 1, 1 };
+        rightCalf.SetCurrentValueToMax();
 
         var leftFoot = CreateOrGetStat<RPGBodyPart>(RPGStatType.LeftFoot);
         leftFoot.StatName = "Left Foot";
         leftFoot.StatBaseValue = 100;
         leftFoot.protection = new int[] { 1, 1, 1, 1, 1, 1 };
         leftFoot.damageModifer = .5f;
+        leftFoot.SetCurrentValueToMax();
 
         var rightFoot = CreateOrGetStat<RPGBodyPart>(RPGStatType.RightFoot);
         rightFoot.StatName = "Right Foot";
         rightFoot.StatBaseValue = 100;
         rightFoot.protection = new int[] { 1, 1, 1, 1, 1, 1 };
         rightFoot.damageModifer = .5f;
+        rightFoot.SetCurrentValueToMax();
     }
 }

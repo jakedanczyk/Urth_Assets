@@ -127,6 +127,7 @@ public class RPGSkill : RPGStatModifiable, IStatScalable, IStatLinkable
         {
             _xp = _xp - StatBaseValue * 500;
             StatBaseValue = StatBaseValue + 1;
+            Debug.Log(this.StatName + " stat level up! " + this.StatBaseValue);
         }
     }
 }

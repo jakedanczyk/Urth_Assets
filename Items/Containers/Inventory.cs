@@ -8,7 +8,7 @@ using System;
 [Serializable]
 public class Inventory : MonoBehaviour {
     public List<Item> inventoryContents;
-    public RectTransform inventoryUIPanel;
+    public RectTransform inventoryUIPanel, itemsPanel;
     public Button selectedButton;
     public Item selectedItem;
     public float contentsWeight;
@@ -28,11 +28,11 @@ public class Inventory : MonoBehaviour {
 
     public void RebuildUIPanel()
     {
-        int childs = inventoryUIPanel.childCount;
+        int childs = itemsPanel.childCount;
         List<Item> temp = new List<Item>();
         temp.AddRange(inventoryContents);
-        //for(int i = childs-1; i>=0; i--) { GameObject.Destroy(inventoryUIPanel.transform.GetChild(i).gameObject); }
-        foreach(Item item in temp)
+        //for(int i = childs-1; i>=0; i--) { GameObject.Destroy(itemsPanel.transform.GetChild(i).gameObject); }
+        foreach (Item item in temp)
         {
             Item aItem = item;
             print(item.itemName);
@@ -40,13 +40,13 @@ public class Inventory : MonoBehaviour {
             AddItem(aItem);
             //item.itemUIElementScript.parentInventory = this;
 
-            //Instantiate(item.itemUIelement, inventoryUIPanel.transform);
+            //Instantiate(item.itemUIelement, itemsPanel.transform);
         }
     }
 
     public void AddItem(Item newItem)
     {
-        newItem.itemUIelement.transform.SetParent(inventoryUIPanel);
+        newItem.itemUIelement.transform.SetParent(itemsPanel);
         newItem.itemUIelement.GetComponent<RectTransform>().localPosition = Vector3.zero;
         newItem.itemUIelement.GetComponent<RectTransform>().localRotation = Quaternion.identity;
         newItem.itemUIelement.GetComponent<RectTransform>().localScale = Vector3.one;
@@ -91,7 +91,7 @@ public class Inventory : MonoBehaviour {
     public void TransferItem(Item newItem, Inventory newInventory)
     {
         inventoryContents.Remove(newItem);
-        newItem.itemUIelement.transform.SetParent(newInventory.inventoryUIPanel);
+        newItem.itemUIelement.transform.SetParent(newInventory.itemsPanel);
         contentsWeight -= newItem.itemWeight;
         newInventory.inventoryContents.Add(newItem);
         newItem.itemUIElementScript.parentInventory = newInventory;

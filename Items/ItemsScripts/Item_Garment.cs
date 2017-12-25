@@ -9,6 +9,8 @@ public class Item_Garment : Item {
     public bool hasModel;
     public string modelID;
     public bool equipped;
+    public Material material;
+    public Texture texture;
 
     void Wear(BodyManager_Human bodyManager)
     {

@@ -11,19 +11,22 @@ public class Projectile : MonoBehaviour {
 
     private void OnTriggerEnter(Collider other)
     {
-        print("missile collision");
-        print(other.transform.tag);
+        if (other.transform.tag == "Terrain")
+        {
+
+            this.gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+            this.gameObject.GetComponent<Rigidbody>().isKinematic = true;
+        }
         if (other.transform.tag == "BodyPart")
         {
-            print("body hit");
+            this.gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+            this.gameObject.GetComponent<Rigidbody>().isKinematic = true;
+            this.gameObject.SetParent(other.gameObject);
             BodyPartColliderScript hitBodyPart = other.GetComponent<BodyPartColliderScript>();
-            print(0);
             int[] d = new int[] { 0, 0, 0 };
             d = hitBodyPart.parentBody.SendArmorNumbers(hitBodyPart.bodyPartType);
-            print(1);
 
             int[] o = new int[] { ammo.baseBlunt, ammo.baseCut, ammo.basePierce };
-            print(2);
 
             AttackResolution(hitBodyPart, hitBodyPart.parentBody.stats, d, o);
         }
@@ -66,7 +69,7 @@ public class Projectile : MonoBehaviour {
             bp.parentBody.stats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue -= (int)(bp.parentBody.stats.GetStat<RPGBodyPart>(bp.bodyPartType).damageModifer * ((o[0] / d[0]) + (o[1] / d[1]) + (o[2] / d[2])));
             print(bp.parentBody.stats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue);
             print((int)(bp.parentBody.stats.GetStat<RPGBodyPart>(bp.bodyPartType).damageModifer * ((o[0] / d[0]) + (o[1] / d[1]) + (o[2] / d[2]))));
-
+            shooter.stats.GetStat<RPGSkill>(RPGStatType.Bow).GainXP(10);
             return;
         }
         else

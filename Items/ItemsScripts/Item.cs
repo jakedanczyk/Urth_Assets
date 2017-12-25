@@ -25,10 +25,6 @@ public class Item : MonoBehaviour {
     public ItemMaterialsDictionary matDict;
 
     public void Awake()
-    { 
-    }
-
-    public void Start()
     {
         if (itemUIelement == null)
         {

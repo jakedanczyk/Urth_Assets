@@ -15,7 +15,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
         //public RPGCreature player;
         public RPGStatCollection playerStats;
         public RPGStat jump;
-        public float f1;
         public bool crouching, autoMove, aboveDetailedChunk;
         public Rigidbody m_Rigidbody;
         public Animator anim;
@@ -127,8 +126,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             characterController = GetComponent<CharacterController>();
             playerStats = GetComponent<HumanDefaultStats>();
             jump = playerStats.GetStat<RPGDerived>(RPGStatType.JumpHeight);
-            f1 = (float)(jump.StatValue);
-            m_JumpSpeed = (float)(jump.StatValue);
+            m_JumpSpeed = (float)(jump.StatValue)/10f;
             m_CharacterController = GetComponent<CharacterController>();
             m_Camera = Camera.main;
             m_OriginalCameraPosition = m_Camera.transform.localPosition;
@@ -142,6 +140,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_CharacterControllerHeight = m_CharacterController.height;
             m_CharacterControllerCenter = m_CharacterController.center;
             inventory = player_bodyManager.baseInventory;
+            InvokeRepeating("SetJump", 1.1f, 1.1f);
         }
 
         public Vector3 lastPosition;
@@ -150,7 +149,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
         // Update is called once per frame
         private void Update()
         {
-
             RaycastHit ground;
             if (Physics.Raycast(this.transform.position, Vector3.down, out ground, 512f, mask1))
             {
@@ -294,7 +292,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                                 BodyManager hitBody = hit.collider.gameObject.GetComponentInParent<BodyManager>();
                                 print(hitBody.name);
                                 lootInventory = hitBody.lootInventory;
-                                lootInventory.inventoryUIPanel = lootPanel;
+                                lootInventory.itemsPanel = lootPanel;
                                 lootInventory.RebuildUIPanel(this);
                                 lootingUI.SetActive(true);
                                 showInventory = true;
@@ -388,12 +386,16 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 anim.SetBool("isRunning", true);
                 anim.SetBool("isSprinting", true);
                 player_bodyManager.sprinting = true;
+                player_bodyManager.SprintTime = Time.time;
             }
             if (Input.GetKeyUp(KeyCode.LeftShift))
             {
                 anim.SetBool("isRunning", false);
                 anim.SetBool("isSprinting", false);
                 player_bodyManager.sprinting = false;
+                float sprintTime = Time.time - player_bodyManager.SprintTime;
+                playerStats.GetStat<RPGAttribute>(RPGStatType.Strength).TrainingValue += (int)(sprintTime / 3f);
+                playerStats.GetStat<RPGAttribute>(RPGStatType.Speed).TrainingValue += (int)(sprintTime);
             }
 
             if (Input.GetKeyDown(KeyCode.C))
@@ -426,6 +428,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 StartCoroutine(m_JumpBob.DoBobCycle());
                 PlayLandingSound();
+                if(m_MoveDir.y < -7.6f)
+                {
+                    playerStats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue += (int)((m_MoveDir.y + 7.6f) * 10);
+                }
                 m_MoveDir.y = 0f;
                 m_Jumping = false;
             }
@@ -828,6 +834,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     PlayJumpSound();
                     m_Jump = false;
                     m_Jumping = true;
+                    playerStats.GetStat<RPGAttribute>(RPGStatType.Agility).TrainingValue += 5;
+                    playerStats.GetStat<RPGAttribute>(RPGStatType.Strength).TrainingValue += 1;
                 }
             }
             else
@@ -1100,6 +1108,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
             inventoryActive = true;
             lootActive = false;
+        }
+
+        void SetJump()
+        {
+            jump = playerStats.GetStat<RPGDerived>(RPGStatType.JumpHeight);
+            m_JumpSpeed = (float)(jump.StatValue)/10;
         }
     }
 }

@@ -60,6 +60,8 @@ public class BodyManager_Human_Player : BodyManager {
 
     public int test;
 
+    private float sprintTime;
+
     void Start()
     {
         InvokeRepeating("UpdateHeartRate", 6f, 6f);
@@ -89,11 +91,9 @@ public class BodyManager_Human_Player : BodyManager {
         stats.GetStat<RPGAttribute>(RPGStatType.Agility).AddModifier(sleepMod);
         stats.GetStat<RPGAttribute>(RPGStatType.Attunement).AddModifier(sleepMod);
         stats.GetStat<RPGAttribute>(RPGStatType.Dexterity).AddModifier(sleepMod);
-        stats.GetStat<RPGAttribute>(RPGStatType.Dodge).AddModifier(sleepMod);
         stats.GetStat<RPGAttribute>(RPGStatType.Endurance).AddModifier(sleepMod);
         stats.GetStat<RPGAttribute>(RPGStatType.Intelligence).AddModifier(sleepMod);
         stats.GetStat<RPGAttribute>(RPGStatType.Perception).AddModifier(sleepMod);
-        stats.GetStat<RPGAttribute>(RPGStatType.Wisdom).AddModifier(sleepMod);
         stats.GetStat<RPGAttribute>(RPGStatType.Willpower).AddModifier(sleepMod);
         stats.GetStat<RPGAttribute>(RPGStatType.Stamina).AddModifier(sleepMod);
     }
@@ -336,7 +336,7 @@ public class BodyManager_Human_Player : BodyManager {
             bp.parentBody.stats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue -= (int)(bp.parentBody.stats.GetStat<RPGBodyPart>(bp.bodyPartType).damageModifer * ((o[0] / d[0]) + (o[1] / d[1]) + (o[2] / d[2])));
             print(bp.parentBody.stats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue);
             print((int)(bp.parentBody.stats.GetStat<RPGBodyPart>(bp.bodyPartType).damageModifer * ((o[0] / d[0]) + (o[1] / d[1]) + (o[2] / d[2]))));
-
+            attackSkill.GainXP(10);
             return;
         }
         else
@@ -379,6 +379,11 @@ public class BodyManager_Human_Player : BodyManager {
 
             if (hit.transform.gameObject.layer == 19)
             {
+                stats.GetStat<RPGSkill>(RPGStatType.Mining).GainXP(10);
+                stats.GetStat<RPGAttribute>(RPGStatType.Strength).TrainingValue += 10;
+                stats.GetStat<RPGAttribute>(RPGStatType.Toughness).TrainingValue += 10;
+                stats.GetStat<RPGAttribute>(RPGStatType.Endurance).TrainingValue += 10;
+                stats.GetStat<RPGAttribute>(RPGStatType.Dexterity).TrainingValue += 10;
                 int pierce = rHandWeapon.basePierce * (1 + (stats.GetStat(RPGStatType.Pick).StatValue / 10));
                 int blunt = (rHandWeapon.baseBlunt * 5 + rHandWeapon.itemWeight) * stats.GetStat(RPGStatType.Dexterity).StatValue * stats.GetStat(RPGStatType.Strength).StatValue;
                 Block block = EditTerrain.GetBlock(hit);
@@ -481,8 +486,11 @@ public class BodyManager_Human_Player : BodyManager {
             GameObject clone;
             clone = Instantiate(currentAmmoPrefab, aimPoint) as GameObject;
             Item_Ammo_Arrow thisArrow = clone.GetComponent<Item_Ammo_Arrow>();
+            clone.SetActive(true);
+            clone.transform.parent = null;
             clone.transform.position = aimPoint.position;
-            clone.GetComponent<Rigidbody>().velocity = camTransform.TransformDirection(Vector3.forward * 50);
+            clone.GetComponent<Rigidbody>().AddForce(aimPoint.TransformDirection(Vector3.forward * 2000));
+            //clone.GetComponent<Rigidbody>().velocity = aimPoint.TransformDirection(Vector3.forward * 50);
             thisArrow.projectile.shooter = thisManager;
             thisArrow.attackCollider.isTrigger = true;
             thisArrow.numItems = 1;
@@ -530,6 +538,7 @@ public class BodyManager_Human_Player : BodyManager {
             UpdateWeatherProtection();
             if (newWearable.hasModel)
             {
+                newWearable.material.SetTexture("_MainTex", newWearable.texture);
                 mcs.SetClothingVisibility(newWearable.modelID, true);
                 mcsUI.SetClothingVisibility(newWearable.modelID, true);
             }
@@ -732,6 +741,12 @@ public class BodyManager_Human_Player : BodyManager {
     public int gait;
     public int[] gaits = new int[] { 0, 1, 2, 3 }; //0=slow walk, 1=walk, 2=jog, 3=run
     public float speed;
+
+    public float SprintTime
+    {
+        get { return sprintTime; }
+        set { sprintTime = value; }
+    }
 
     public void NextGait()
     {
@@ -941,8 +956,8 @@ public class BodyManager_Human_Player : BodyManager {
         float now = worldTime.totalGameSeconds;
         sleepDebt += ((now - sleepTime) - (3*sleepLength))/ 7200; // .01 if invoke period is 72
         sleepTime = now;
-        float sleepModValue = Mathf.Max(-100,(Mathf.Min(0,(6 - sleepDebt)) + Mathf.Min(0, (8 - sleepDebt)) * 0.5f * sleepDebt)/80f);
-        sleepMod.Value = sleepModValue;
+        float sleepModValue = Mathf.Max(-1,(Mathf.Min(0,(16 - sleepDebt)) + Mathf.Min(0, (24 - sleepDebt)) * sleepDebt)/400f);
+        sleepMod.Value = sleepModValue < 100 ? sleepModValue : 100;
     }
 
     private void SleepOnValueChange(object mod, System.EventArgs args)
@@ -1011,6 +1026,10 @@ public class BodyManager_Human_Player : BodyManager {
             {
                 aTree.Fall();
                 stats.GetStat<RPGSkill>(RPGStatType.WoodWorking).GainXP((int)(treeDamage));
+                stats.GetStat<RPGAttribute>(RPGStatType.Toughness).TrainingValue += 10;
+                stats.GetStat<RPGAttribute>(RPGStatType.Strength).TrainingValue += 10;
+                stats.GetStat<RPGAttribute>(RPGStatType.Endurance).TrainingValue += 10;
+                stats.GetStat<RPGAttribute>(RPGStatType.Dexterity).TrainingValue += 10;
                 treeFelling = inTask =  false;
                 anim.SetBool("inTask", false);
                 anim.SetBool("isFallingTree", false);
@@ -1034,6 +1053,10 @@ public class BodyManager_Human_Player : BodyManager {
             {
                 aTree.TurnToWoodPile();
                 stats.GetStat<RPGSkill>(RPGStatType.WoodWorking).GainXP((int)(treeDamage));
+                stats.GetStat<RPGAttribute>(RPGStatType.Toughness).TrainingValue += 10;
+                stats.GetStat<RPGAttribute>(RPGStatType.Strength).TrainingValue += 10;
+                stats.GetStat<RPGAttribute>(RPGStatType.Endurance).TrainingValue += 10;
+                stats.GetStat<RPGAttribute>(RPGStatType.Dexterity).TrainingValue += 10;
                 treeProcessing = inTask = false;
                 anim.SetBool("inTask", false);
                 anim.SetBool("isFallingTree", false);
