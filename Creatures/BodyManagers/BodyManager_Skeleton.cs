@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using UnityStandardAssets.Characters.ThirdPerson;
+using UnityEngine.AI;
 
 public class BodyManager_Skeleton : BodyManager {
 
@@ -11,6 +12,8 @@ public class BodyManager_Skeleton : BodyManager {
     public Item_Weapon rHandWeapon;
     public Item_Weapon lHandWeapon;
     public Item_Ammo currentAmmo;
+
+    public NavMeshAgent navMeshAgent;
 
     public AICharacterControl aiControl;
     public Chase chaseScript;
@@ -26,9 +29,12 @@ public class BodyManager_Skeleton : BodyManager {
 
     void Start()
     {
+        if (LevelSerializer.IsDeserializing) return;
+
         attacking = guardRaised = sneaking = false;
         var health = stats.GetStat<RPGVital>(RPGStatType.Health);
         health.OnCurrentValueChange += OnStatValueChange;
+        navMeshAgent = GetComponent<NavMeshAgent>();
         anim = GetComponentInChildren<Animator>();
         stamina = maxStamina = stats.GetStat(RPGStatType.Endurance).StatValue * 10;
     }
@@ -375,5 +381,10 @@ public class BodyManager_Skeleton : BodyManager {
     public override void ProcessThisBody()
     {
         throw new NotImplementedException();
+    }
+
+    void OnDeserialized()
+    {
+        navMeshAgent.enabled = true;
     }
 }

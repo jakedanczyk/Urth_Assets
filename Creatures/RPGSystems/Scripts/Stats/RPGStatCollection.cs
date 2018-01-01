@@ -26,6 +26,8 @@ public class RPGStatCollection : MonoBehaviour {
     /// Initializes the RPGStats class
     /// </summary>
     private void Awake() {
+        //if (LevelSerializer.IsDeserializing) return;
+
         ConfigureStats();
     }
 

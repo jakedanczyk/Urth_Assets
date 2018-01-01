@@ -7,8 +7,10 @@ using UnityStandardAssets.Characters.FirstPerson;
 using MORPH3D;
 using System.Threading;
 
-[System.Serializable]
+//[System.Serializable]
 public class BodyManager_Human_Player : BodyManager {
+
+    public static GameObject playerObject;
 
     public BodyManager_Human_Player thisManager;
     public PlayerControls controls;
@@ -50,7 +52,8 @@ public class BodyManager_Human_Player : BodyManager {
 
     public bool gathering, treeFelling, treeProcessing;
     public String chararacterName, race;
-    public GameObject weatherFX;
+    //[SerializeField]
+    //public GameObject weatherFX;
 
     //attach points... special slots for weapons and equipment. each boot, small of back, weapons belt, strap, back sling, etc...
     private void Awake()
@@ -64,6 +67,11 @@ public class BodyManager_Human_Player : BodyManager {
 
     void Start()
     {
+        playerObject = this.gameObject;
+        weatherSystem = WeatherControl.manager.GetComponent<WeatherControl>();
+        currentWeather = weatherSystem.currentWeather;
+        speed = 1.25F + 1.25f * gait;
+
         InvokeRepeating("UpdateHeartRate", 6f, 6f);
         InvokeRepeating("ReadWeather", 1.5f, 300f);
         InvokeRepeating("UpdateCoreTemp", 7f, 6f);
@@ -72,20 +80,6 @@ public class BodyManager_Human_Player : BodyManager {
         InvokeRepeating("Hydration", 10f, 6f);
         InvokeRepeating("SleepDebt", 11f, 2f);
         InvokeRepeating("StaminaUpdate", 9.5f, 6f);
-        weatherSystem = (WeatherControl)FindObjectOfType(typeof(WeatherControl));
-        currentWeather = weatherSystem.currentWeather;
-
-        if (LevelSerializer.IsDeserializing) return;
-
-
-        anim = GetComponentInChildren<Animator>();
-        gait = 0;
-        speed = 1.25F + 1.25f * gait;
-        stamina = maxStamina = stats.GetStat(RPGStatType.Endurance).StatValue*10;
-        heartRate = stats.GetStat(RPGStatType.RestingHeartRate).StatValue;
-        UpdateWeatherProtection();        
-        var health = stats.GetStat<RPGVital>(RPGStatType.Health);
-        health.OnCurrentValueChange += OnStatValueChange;
         sleepMod.OnValueChange += SleepOnValueChange;
         stats.GetStat<RPGAttribute>(RPGStatType.Strength).AddModifier(sleepMod);
         stats.GetStat<RPGAttribute>(RPGStatType.Agility).AddModifier(sleepMod);
@@ -96,6 +90,17 @@ public class BodyManager_Human_Player : BodyManager {
         stats.GetStat<RPGAttribute>(RPGStatType.Perception).AddModifier(sleepMod);
         stats.GetStat<RPGAttribute>(RPGStatType.Willpower).AddModifier(sleepMod);
         stats.GetStat<RPGAttribute>(RPGStatType.Stamina).AddModifier(sleepMod);
+
+        if (LevelSerializer.IsDeserializing) return;
+
+
+        anim = GetComponentInChildren<Animator>();
+        gait = 0;
+        stamina = maxStamina = stats.GetStat(RPGStatType.Endurance).StatValue*10;
+        heartRate = stats.GetStat(RPGStatType.RestingHeartRate).StatValue;
+        UpdateWeatherProtection();        
+        var health = stats.GetStat<RPGVital>(RPGStatType.Health);
+        health.OnCurrentValueChange += OnStatValueChange;
     }
 
     private void Update()
@@ -488,7 +493,7 @@ public class BodyManager_Human_Player : BodyManager {
             Item_Ammo_Arrow thisArrow = clone.GetComponent<Item_Ammo_Arrow>();
             clone.SetActive(true);
             clone.transform.parent = null;
-            clone.transform.position = aimPoint.position;
+            clone.transform.position = new Vector3(aimPoint.position.x + .14f, aimPoint.position.y - 0.04f, aimPoint.position.z + .177f);
             clone.GetComponent<Rigidbody>().AddForce(aimPoint.TransformDirection(Vector3.forward * 2000));
             //clone.GetComponent<Rigidbody>().velocity = aimPoint.TransformDirection(Vector3.forward * 50);
             thisArrow.projectile.shooter = thisManager;
@@ -884,25 +889,25 @@ public class BodyManager_Human_Player : BodyManager {
     }
 
     int printPos = 375;
-    void OnGUI()
-    {
+    //void OnGUI()
+    //{
 
-        GUI.Label(new Rect(0, 400, 500, 500), "Core Temp: " + coreTemp);
-        GUI.Label(new Rect(0, 425, 500, 500), "Local Temp: " + localTemperature);
-        GUI.Label(new Rect(0, 450, 500, 500), "Heart Rate: " + heartRate);
-        GUI.Label(new Rect(0, 475, 500, 500), "Hydration: " + hydration + "%");
-        GUI.Label(new Rect(0, 500, 500, 500), "Sleep Debt: " + sleepDebt + " hrs");
-        GUI.Label(new Rect(0, 525, 500, 500), "Calories: " + calories);
-        GUI.Label(new Rect(0, 550, 500, 500), "Encumbrance: " + encumbrance + "%");
-        GUI.Label(new Rect(0, 575, 500, 500), "Stamina Max: " + maxStamina);
-        GUI.Label(new Rect(0, 600, 500, 500), "Stamina: " + stamina);
+    //    GUI.Label(new Rect(0, 400, 500, 500), "Core Temp: " + coreTemp);
+    //    GUI.Label(new Rect(0, 425, 500, 500), "Local Temp: " + localTemperature);
+    //    GUI.Label(new Rect(0, 450, 500, 500), "Heart Rate: " + heartRate);
+    //    GUI.Label(new Rect(0, 475, 500, 500), "Hydration: " + hydration + "%");
+    //    GUI.Label(new Rect(0, 500, 500, 500), "Sleep Debt: " + sleepDebt + " hrs");
+    //    GUI.Label(new Rect(0, 525, 500, 500), "Calories: " + calories);
+    //    GUI.Label(new Rect(0, 550, 500, 500), "Encumbrance: " + encumbrance + "%");
+    //    GUI.Label(new Rect(0, 575, 500, 500), "Stamina Max: " + maxStamina);
+    //    GUI.Label(new Rect(0, 600, 500, 500), "Stamina: " + stamina);
 
-        for (int j = 0; j < outfit.Count; j++)
-        {
-            GUI.Label(new Rect(1100, printPos, 500, 500), outfit[j].itemName);
-            printPos = printPos + 25;
-        }
-    }
+    //    for (int j = 0; j < outfit.Count; j++)
+    //    {
+    //        GUI.Label(new Rect(1100, printPos, 500, 500), outfit[j].itemName);
+    //        printPos = printPos + 25;
+    //    }
+    //}
 
     public void ReadWeather()
     {

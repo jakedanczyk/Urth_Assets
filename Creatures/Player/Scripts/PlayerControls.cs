@@ -6,10 +6,13 @@ using Random = UnityEngine.Random;
 
 namespace UnityStandardAssets.Characters.FirstPerson
 {
-    [System.Serializable]
+    //[System.Serializable]
+    [SerializeAll]
     [RequireComponent(typeof(CharacterController))]
     public class PlayerControls : MonoBehaviour
     {
+        public static GameObject playerControlsGameObject;
+
         public World thisWorld;
         public BodyManager_Human_Player player_bodyManager;
         //public RPGCreature player;
@@ -19,7 +22,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public Rigidbody m_Rigidbody;
         public Animator anim;
         public GameObject shoulderGirdle;
-        public GameObject inventoryUIPanel, craftingUI, fireUIPanel;
+        public GameObject craftingUI, fireUIPanel;
         public GameObject playerObject;
         public Transform playerTransform;
 
@@ -48,8 +51,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         public GameObject modelViewUI;
         public GameObject butcheringUI;
-        public GameObject lootingUI;
+        public RectTransform lootingUI;
         public RectTransform lootPanel;
+        public RectTransform inventoryUIPanel;
         public RectTransform firePanel;
         public StartFireButtonScript fireButton;
 
@@ -70,7 +74,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         [SerializeField]
         public float m_GravityMultiplier;
         [SerializeField]
-        private MouseLook m_MouseLook;
+        public MouseLook m_MouseLook;
         [SerializeField]
         private bool m_UseFovKick;
         [SerializeField]
@@ -97,7 +101,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private Vector3 m_MoveDir = Vector3.zero;
         public CharacterController m_CharacterController;
         private CollisionFlags m_CollisionFlags;
-        private bool m_PreviouslyGrounded;
+        public bool m_PreviouslyGrounded;
         private Vector3 m_OriginalCameraPosition;
         private float m_StepCycle;
         private float m_NextStep;
@@ -108,6 +112,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         public bool e_down;
         Camera m_Camera;
+        public Collider cameraBubble;
 
         CharacterController characterController;
         public StaticBuildingSystem buildingSystem;
@@ -122,9 +127,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
         // Use this for initialization
         private void Start()
         {
+            playerControlsGameObject = this.gameObject;
+            m_AudioSource = GetComponent<AudioSource>();
+            if (LevelSerializer.IsDeserializing) return;
+
             m_Camera = Camera.main.GetComponent<Camera>();
             characterController = GetComponent<CharacterController>();
-            playerStats = GetComponent<HumanDefaultStats>();
             jump = playerStats.GetStat<RPGDerived>(RPGStatType.JumpHeight);
             m_JumpSpeed = (float)(jump.StatValue)/10f;
             m_CharacterController = GetComponent<CharacterController>();
@@ -135,20 +143,23 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_StepCycle = 0f;
             m_NextStep = m_StepCycle / 2f;
             m_Jumping = false;
-            m_AudioSource = GetComponent<AudioSource>();
             m_MouseLook.Init(transform, m_Camera.transform);
             m_CharacterControllerHeight = m_CharacterController.height;
             m_CharacterControllerCenter = m_CharacterController.center;
             inventory = player_bodyManager.baseInventory;
-            InvokeRepeating("SetJump", 1.1f, 1.1f);
+            InvokeRepeating("SetJumpSpeed", 1.1f, 1.1f);
         }
 
         public Vector3 lastPosition;
         bool check;
-
+        int fallingCount;
+        float fallTime,fallSpeed;
+        public int requiredFallTime;
         // Update is called once per frame
         private void Update()
         {
+            if (LevelSerializer.IsDeserializing) return;
+
             RaycastHit ground;
             if (Physics.Raycast(this.transform.position, Vector3.down, out ground, 512f, mask1))
             {
@@ -172,6 +183,18 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 m_Jump = CrossPlatformInputManager.GetButtonDown("Jump");
             }
+
+            fallingCount = (m_CharacterController.isGrounded) ? 0 : fallingCount + 1;
+            if(fallingCount > 0)
+            {
+                fallSpeed = m_MoveDir.y;
+            }
+            if(fallSpeed < -7.6f && fallingCount == 0)
+            {
+                playerStats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue += (int)((fallSpeed + 7.6f) * 10);
+                fallSpeed = 0;
+            }
+
 
             if (!showInventory)
             {
@@ -286,17 +309,17 @@ namespace UnityStandardAssets.Characters.FirstPerson
                             print(parentBody.tag);
                             if (parentBody.gameObject.tag == "DeadCreature")
                             {
-                                inventoryUIPanel.SetActive(true);
+                                inventoryUIPanel.gameObject.SetActive(true);
                                 lootingUI.gameObject.SetActive(true);
                                 //butcheringUI.gameObject.SetActive(true);
                                 BodyManager hitBody = hit.collider.gameObject.GetComponentInParent<BodyManager>();
                                 print(hitBody.name);
                                 lootInventory = hitBody.lootInventory;
-                                lootInventory.itemsPanel = lootPanel;
-                                lootInventory.RebuildUIPanel(this);
-                                lootingUI.SetActive(true);
+                                hitBody.lootInventory.playerControls = this;
+                                hitBody.lootInventory.itemsPanel = lootPanel;
+                                hitBody.lootInventory.inventoryUIPanel = lootingUI;
+                                hitBody.lootInventory.RebuildUIPanel(this);
                                 showInventory = true;
-                                inventoryUIPanel.SetActive(true);
                                 print(hitBody.lootInventory.name);
                                 lootPanelScript.attachedInventory = hitBody.lootInventory;
                             }
@@ -427,11 +450,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
             if (!m_PreviouslyGrounded && m_CharacterController.isGrounded)
             {
                 StartCoroutine(m_JumpBob.DoBobCycle());
-                PlayLandingSound();
-                if(m_MoveDir.y < -7.6f)
-                {
-                    playerStats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue += (int)((m_MoveDir.y + 7.6f) * 10);
-                }
                 m_MoveDir.y = 0f;
                 m_Jumping = false;
             }
@@ -569,11 +587,19 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     }
                     if (Input.GetKeyDown(KeyCode.T))
                     {
-                        if (inventory.selectedItem == null || !lootingUI.activeSelf)
+                        if (inventory.selectedItem == null || !lootingUI.gameObject.activeSelf)
                             return;
                         Item anItem = inventory.selectedItem;
                         player_bodyManager.DropItem(inventory.selectedItem);
                         lootInventory.AddItem(anItem);
+                        anItem.itemUIElementScript.panel = (RectTransform)lootInventory.inventoryUIPanel;
+                        anItem.itemUIElementScript.playerControls = this;
+                        Destroy(anItem.itemUIelement.GetComponent<InventoryFocusPanel>());
+
+                        //LootInventoryFocusPanel lifp = anItem.itemUIelement.AddComponent<LootInventoryFocusPanel>();
+                        //lifp.attachedInventory = lootInventory;
+                        //lifp.panel = (RectTransform)lootInventory.inventoryUIPanel;
+                        //lifp.playerControls = this;
                         lootInventory.selectedItem = null;
                         inventory.selectedItem = null;
                     }
@@ -689,9 +715,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
                             setBlock = setItem.block;
                             buildingBlock = setItem;
                         }
+                        Destroy(lootInventory.selectedItem.itemUIelement.GetComponent<LootInventoryFocusPanel>());
                         lootInventory.RemoveItem(lootInventory.selectedItem);
                         player_bodyManager.PickupItem(lootInventory.selectedItem);
-                        lootInventory.selectedItem = null;
                         terrainMode = false;
                     }
                     if (Input.GetKeyDown(KeyCode.R))
@@ -702,6 +728,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                         lootInventory.selectedItem.gameObject.SetActive(true);
                         lootInventory.selectedItem.transform.position = this.transform.position;
                         lootInventory.selectedItem.transform.parent = null;
+                        Destroy(lootInventory.selectedItem.itemUIelement.GetComponent<LootInventoryFocusPanel>());
                         lootInventory.RemoveItem(lootInventory.selectedItem);
                         lootInventory.selectedItem = null;
 
@@ -710,8 +737,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     {
                         if (lootInventory.selectedItem == null)
                             return;
+                        Item anItem = lootInventory.selectedItem;
+                        Destroy(anItem.itemUIelement.GetComponent<LootInventoryFocusPanel>());
                         lootInventory.RemoveItem(lootInventory.selectedItem);
                         player_bodyManager.PickupItem(lootInventory.selectedItem);
+                        InventoryFocusPanel ifp = anItem.itemUIelement.AddComponent<InventoryFocusPanel>();
+                        ifp.attachedInventory = inventory;
+                        ifp.panel = (RectTransform)inventory.inventoryUIPanel;
+                        ifp.playerControls = this;
                         lootInventory.selectedItem = null;
                     }
                 }
@@ -723,9 +756,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 {
                     modelViewUI.SetActive(false);
                     player_bodyManager.baseInventory.selectedItem = null;
-                    inventoryUIPanel.SetActive(false);
+                    inventoryUIPanel.gameObject.SetActive(false);
                     lootInventory = null;
-                    lootingUI.SetActive(false);
+                    lootingUI.gameObject.SetActive(false);
                     fireUIPanel.SetActive(false);
                     showInventory = false;
                     playerCrafting.isCrafting = false;
@@ -736,7 +769,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 else
                 {
                     modelViewUI.SetActive(true);
-                    inventoryUIPanel.SetActive(true);
+                    inventoryUIPanel.gameObject.SetActive(true);
                     showInventory = true;
                     m_AudioSource.PlayOneShot(playerAudioManager.openInventory);
                     Cursor.lockState = CursorLockMode.None;
@@ -855,6 +888,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private void LateUpdate()
         {
+            m_Camera = Camera.main.GetComponent<Camera>();
+
             shoulderGirdle.transform.Rotate(m_Camera.transform.rotation.eulerAngles.x, 0, 0);
         }
 
@@ -1110,10 +1145,21 @@ namespace UnityStandardAssets.Characters.FirstPerson
             lootActive = false;
         }
 
-        void SetJump()
+        void SetJumpSpeed()
         {
             jump = playerStats.GetStat<RPGDerived>(RPGStatType.JumpHeight);
             m_JumpSpeed = (float)(jump.StatValue)/10;
+        }
+
+        public void RevertCam()
+        {
+
+        }
+
+        void OnDeserialized()
+        {
+            m_FovKick.Setup(m_Camera);
+            m_MouseLook.Init(transform, m_Camera.transform);
         }
     }
 }

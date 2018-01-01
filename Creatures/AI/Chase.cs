@@ -13,6 +13,8 @@ public class Chase : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        if (LevelSerializer.IsDeserializing) return;
+
         player = GameObject.Find("PlayerObject").transform;
         playerBody = player.GetComponent<BodyManager>();
         anim = GetComponent<Animator>();
@@ -71,5 +73,11 @@ public class Chase : MonoBehaviour {
         print(664);
 
         skeletonBody.MainAttack();
+    }
+
+    void OnDeserialize()
+    {
+        player = GameObject.Find("PlayerObject").transform;
+        playerBody = player.GetComponent<BodyManager>();
     }
 }

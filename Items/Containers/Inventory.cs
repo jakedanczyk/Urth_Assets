@@ -20,11 +20,6 @@ public class Inventory : MonoBehaviour {
     void Start () {
         SumWeight();
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
 
     public void RebuildUIPanel()
     {
@@ -51,6 +46,7 @@ public class Inventory : MonoBehaviour {
         newItem.itemUIelement.GetComponent<RectTransform>().localRotation = Quaternion.identity;
         newItem.itemUIelement.GetComponent<RectTransform>().localScale = Vector3.one;
         newItem.itemUIElementScript.parentInventory = this;
+        newItem.itemUIElementScript.panel = inventoryUIPanel;
         newItem.loose = false;
         newItem.gameObject.SetActive(false);
         inventoryContents.Add(newItem);

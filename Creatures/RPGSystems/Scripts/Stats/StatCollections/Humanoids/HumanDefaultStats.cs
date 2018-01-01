@@ -1,16 +1,20 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[SerializeAll]
 public class HumanDefaultStats : CreatureStats
 {
     protected override void ConfigureStats()
     {
-    //attributes
+        //attributes
         //physical
-        var agility = CreateOrGetStat<RPGAttribute>(RPGStatType.Agility);
-        agility.StatName = "Agility";
-        agility.StatBaseValue = 200;
-        agility.Aptitude = 100;
+        if (GetStat<RPGAttribute>(RPGStatType.Agility) == null)
+        {
+            var agility = CreateOrGetStat<RPGAttribute>(RPGStatType.Agility);
+            agility.StatName = "Agility";
+            agility.StatBaseValue = 200;
+            agility.Aptitude = 100;
+        }
 
         var dexterity = CreateOrGetStat<RPGAttribute>(RPGStatType.Dexterity);
         dexterity.StatName = "Dexterity";

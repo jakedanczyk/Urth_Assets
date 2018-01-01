@@ -3,6 +3,7 @@ using System.Collections;
 
 public class DetectHit : MonoBehaviour {
 
+    [SerializeField]
     Animator anim;
 
     void OnTriggerEnter(Collider other)
@@ -14,10 +15,5 @@ public class DetectHit : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         anim = GetComponent<Animator>();
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
 	}
 }

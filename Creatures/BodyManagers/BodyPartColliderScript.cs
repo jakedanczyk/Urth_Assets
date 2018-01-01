@@ -10,6 +10,7 @@ public class BodyPartColliderScript : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        if (LevelSerializer.IsDeserializing) return;
         parentBody = GetComponentInParent<BodyManager>();
 	}
 	

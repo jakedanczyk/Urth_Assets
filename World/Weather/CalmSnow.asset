@@ -16,4 +16,4 @@ MonoBehaviour:
   globalTemperature: -3
   windSpeed: 0
   precipRate: 0
-  weatherFX: {fileID: 1396155096622800, guid: c7f721b806fdf724a8598e913b0520ac, type: 2}
+  weatherFX: {fileID: 1190884417351162, guid: d2bd4d823ac517f41bf00cf1622081c6, type: 2}

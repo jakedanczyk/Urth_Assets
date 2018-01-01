@@ -24,12 +24,13 @@ namespace DigitalRuby.RainMaker
         [Range(0.0f, 1.0f)]
         public float RainIntensity;
 
+        [SerializeField]
         [Tooltip("Rain particle system")]
         public ParticleSystem RainFallParticleSystem;
-
+        [SerializeField]
         [Tooltip("Particles system for when rain hits something")]
         public ParticleSystem RainExplosionParticleSystem;
-
+        [SerializeField]
         [Tooltip("Particle system to use for rain mist")]
         public ParticleSystem RainMistParticleSystem;
 
@@ -199,6 +200,7 @@ namespace DigitalRuby.RainMaker
         {
 
 #if DEBUG
+            if (LevelSerializer.IsDeserializing) return;
 
             if (RainFallParticleSystem == null)
             {

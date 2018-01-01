@@ -15,6 +15,7 @@ public class Thermometer : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
     {
+        if (LevelSerializer.IsDeserializing) return;
         temperature = 0;
         for(int i = 0; i < heatRadiators.Count; i++)
         {

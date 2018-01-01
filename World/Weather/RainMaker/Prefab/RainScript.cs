@@ -33,6 +33,7 @@ namespace DigitalRuby.RainMaker
 
         protected override void Start()
         {
+            if (LevelSerializer.IsDeserializing) return;
             base.Start();
         }
 
@@ -41,6 +42,19 @@ namespace DigitalRuby.RainMaker
             base.Update();
 
             UpdateRain();
+        }
+
+        void OnDeserialized()
+        {
+             
+            GameObject num1 = Resources.Load("RainFallParticleSystem") as GameObject;
+            RainFallParticleSystem = Instantiate(num1, this.transform).GetComponent<ParticleSystem>();
+            GameObject num2 = Resources.Load("RainExplosionParticleSystem") as GameObject;
+            RainExplosionParticleSystem = Instantiate(num2,this.transform).GetComponent<ParticleSystem>();
+            GameObject num3 = Resources.Load("RainWindZone") as GameObject;
+            WindZone = Instantiate(num3, this.transform).GetComponent<WindZone>();
+            GameObject num4 = Resources.Load("RainFallParticleSystem") as GameObject;
+            RainMistParticleSystem = Instantiate(num4, this.transform).GetComponent<ParticleSystem>();
         }
     }
 }

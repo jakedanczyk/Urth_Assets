@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
+[SerializeAll]
 public class Weather : ScriptableObject {
 
     public int weatherID;

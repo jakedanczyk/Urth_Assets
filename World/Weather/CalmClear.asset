@@ -13,6 +13,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weatherID: 0
   weatherName: CalmClearCool
-  areaTemperature: 2
+  globalTemperature: 0
   windSpeed: 0
-  weatherFX: {fileID: 1385709549569958, guid: 00971a5b0bed3b545a6a2c81eab55f59, type: 2}
+  precipRate: 0
+  weatherFX: {fileID: 1134058910017724, guid: 9b2adbc84460e7947a1c72391a154efe, type: 2}
