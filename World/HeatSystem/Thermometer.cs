@@ -24,7 +24,7 @@ public class Thermometer : MonoBehaviour {
         }
         float altitude = this.transform.position.y;
         print("thermo " + temperature);
-        temperature += weatherSystem.currentWeather.globalTemperature - (.0064f * (altitude - 2000)) + heatZones.Sum(temp => temp.temperatureDifference);
+        temperature += weatherSystem.weathers[weatherSystem.schedule[0]].globalTemperature - (.0064f * (altitude - 2000)) + heatZones.Sum(temp => temp.temperatureDifference);
         InvokeRepeating("ReadTemp", 6, 6);
 	}
 	
@@ -42,6 +42,6 @@ public class Thermometer : MonoBehaviour {
             temperature = Mathf.Max(heatRadiators[i].power / (dist * dist), heatRadiators[i].coreTemp);
         }
         float altitude = this.transform.position.y;
-        return temperature += weatherSystem.currentWeather.globalTemperature - (.0064f * (altitude - 2000)) + heatZones.Sum(temp => temp.temperatureDifference);
+        return temperature += weatherSystem.weathers[weatherSystem.schedule[0]].globalTemperature - (.0064f * (altitude - 2000)) + heatZones.Sum(temp => temp.temperatureDifference);
     }
 }

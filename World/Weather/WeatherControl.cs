@@ -5,7 +5,6 @@ using UnityStandardAssets.Characters.FirstPerson;
 
 //[System.Serializable]
 public class WeatherControl : MonoBehaviour {
-    [SerializeField]
     public static GameObject manager;
 
     [SerializeField]
@@ -22,7 +21,7 @@ public class WeatherControl : MonoBehaviour {
     public Light sun;
     public Light moon;
     public GameObject player;
-    public Weather currentWeather;
+    public int currentWeatherIndex;
     public GameObject currentWeatherFX;
     public int currentDuration, currentStart;
     public WorldTime time;
@@ -33,7 +32,7 @@ public class WeatherControl : MonoBehaviour {
     public float precipRate, windSpeed;
     public bool night, dawn, day, dusk;
 
-    public List<Weather> schedule;
+    public List<int> schedule;
     public List<int> durations;
 
     private void Awake()
@@ -42,19 +41,21 @@ public class WeatherControl : MonoBehaviour {
 
         if (LevelSerializer.IsDeserializing) return;
 
-        weatherDice = Random.Range(0, 4);
+        currentWeatherIndex = Random.Range(0, 4);
 
-        currentWeather = Instantiate(weathers[weatherDice]);
         currentStart = 0;
         currentDuration = 300 + Random.Range(0, 36000);
-        precipRate = currentWeather.precipRate;
-        windSpeed = currentWeather.windSpeed;
+        precipRate = weathers[currentWeatherIndex].precipRate;
+        windSpeed = weathers[currentWeatherIndex].windSpeed;
     }
 
     // Use this for initialization
     void Start ()
     {
+        player = BodyManager_Human_Player.playerObject;
         if (LevelSerializer.IsDeserializing) return;
+        if (currentWeatherFX == null)
+            currentWeatherFX = Instantiate<GameObject>(weathers[currentWeatherIndex].weatherFX, player.transform);
 
         //{
         //    if (currentWeatherFX != null)
@@ -70,13 +71,13 @@ public class WeatherControl : MonoBehaviour {
         //    currentWeatherFX = Instantiate(currentWeather.weatherFX, player.transform);
         //    return;
         //}
-        currentWeatherFX = Instantiate<GameObject>(currentWeather.weatherFX, player.transform);
-        schedule.Add(weathers[Random.Range(0, 4)]);
-        schedule.Add(weathers[Random.Range(0, 4)]);
-        schedule.Add(weathers[Random.Range(0, 4)]);
-        schedule.Add(weathers[Random.Range(0, 4)]);
-        schedule.Add(weathers[Random.Range(0, 4)]);
-        schedule.Add(weathers[Random.Range(0, 4)]);
+
+        schedule.Add(Random.Range(0, 4));
+        schedule.Add(Random.Range(0, 4));
+        schedule.Add(Random.Range(0, 4));
+        schedule.Add(Random.Range(0, 4));
+        schedule.Add(Random.Range(0, 4));
+        schedule.Add(Random.Range(0, 4));
         durations.Add(300 + Random.Range(0, 36000));
         durations.Add(300 + Random.Range(0, 36000));
         durations.Add(300 + Random.Range(0, 36000));
@@ -88,10 +89,8 @@ public class WeatherControl : MonoBehaviour {
     // Update is called once per frame
     void Update () {
         if (LevelSerializer.IsDeserializing) return;
-        if(currentWeather == null)
-            currentWeather = Instantiate(schedule[0]);
         if(currentWeatherFX == null)
-            currentWeatherFX = Instantiate<GameObject>(currentWeather.weatherFX, player.transform);
+            currentWeatherFX = Instantiate<GameObject>(weathers[currentWeatherIndex].weatherFX, player.transform);
         dayHour = time.hours % 24;
         UpdateSun();
         UpdateMoon();
@@ -119,8 +118,8 @@ public class WeatherControl : MonoBehaviour {
         else if (!shelterCheck.roof && !shelterCheck.walls && !currentWeatherFX.activeSelf)
         {
             currentWeatherFX.SetActive(true);
-            precipRate = currentWeather.precipRate;
-            windSpeed = currentWeather.windSpeed;
+            precipRate = weathers[schedule[0]].precipRate;
+            windSpeed = weathers[schedule[0]].windSpeed;
         }
 	}
 
@@ -132,17 +131,17 @@ public class WeatherControl : MonoBehaviour {
 
     void NextWeather()
     {
-        currentWeather = Instantiate(schedule[0]);
-        player_bodyManager.currentWeather = currentWeather;
-        Destroy(currentWeatherFX);
-        currentWeatherFX = Instantiate<GameObject>(currentWeather.weatherFX, player.transform);
+        if(currentWeatherFX != null)
+            Destroy(currentWeatherFX);
+        currentWeatherIndex = schedule[0];
+        currentWeatherFX = Instantiate<GameObject>(weathers[schedule[0]].weatherFX, player.transform);
         currentStart =(int) time.totalGameSeconds;
         currentDuration = durations[0];
-        precipRate = currentWeather.precipRate;
-        windSpeed = currentWeather.windSpeed;
+        precipRate = weathers[schedule[0]].precipRate;
+        windSpeed = weathers[schedule[0]].windSpeed;
         schedule.RemoveAt(0);
         durations.RemoveAt(0);
-        schedule.Add(weathers[Random.Range(0, 4)]);
+        schedule.Add(Random.Range(0, 4));
         durations.Add(300 + Random.Range(0, 36000));
     }
 
@@ -196,4 +195,9 @@ public class WeatherControl : MonoBehaviour {
     void OvercastDawn() { }
 
     void StormDawn() { }
+
+    void OnDeserialize()
+    {
+        currentWeatherFX = Instantiate<GameObject>(weathers[currentWeatherIndex].weatherFX, player.transform);
+    }
 }

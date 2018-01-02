@@ -20,12 +20,12 @@ public class VitalStats : MonoBehaviour {
 	void Start () {
 
         coreTemp = coreTempBase;
-        currentWeather = weatherSystem.currentWeather;
+        currentWeather = weatherSystem.weathers[weatherSystem.schedule[0]];
     }
 
     // Update is called once per frame
     void Update () {
-        currentWeather = weatherSystem.currentWeather;
+        currentWeather = weatherSystem.weathers[weatherSystem.schedule[0]];
 
         LocalTemperature();
         CoreTemp();

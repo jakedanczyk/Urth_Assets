@@ -53,7 +53,7 @@ public class BodyManager_Human : BodyManager {
     void Start()
     {
         weatherSystem = (WeatherControl)FindObjectOfType(typeof(WeatherControl));
-        currentWeather = weatherSystem.currentWeather;
+        currentWeather = weatherSystem.weathers[weatherSystem.schedule[0]];
         anim = GetComponentInChildren<Animator>();
         gait = 3;
         stamina = maxStamina = stats.GetStat(RPGStatType.Endurance).StatValue*10;
@@ -716,9 +716,9 @@ public class BodyManager_Human : BodyManager {
         float altitude = this.transform.position.y;
         localTemperature = thermometer.temperature;
         if (shelterCheck.roof) { precipRate = 0; }
-        else { precipRate = weatherSystem.currentWeather.precipRate; }
+        else { precipRate = weatherSystem.weathers[weatherSystem.schedule[0]].precipRate; }
         if (shelterCheck.walls) { windSpeed = 0; }
-        else { windSpeed = weatherSystem.currentWeather.windSpeed; }
+        else { windSpeed = weatherSystem.weathers[weatherSystem.schedule[0]].windSpeed; }
     }
 
     //public float encumbrance = 0; //percent 

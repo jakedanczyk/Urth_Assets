@@ -16,7 +16,6 @@ public class BodyManager_Human_Player : BodyManager {
     public PlayerControls controls;
     public WorldTime worldTime;
     StaticBuildingSystem buildingSystem;
-    public Weather currentWeather;
     public WeatherControl weatherSystem;
     public Transform camTransform;
     public RectTransform outfittingUI;
@@ -58,6 +57,7 @@ public class BodyManager_Human_Player : BodyManager {
     //attach points... special slots for weapons and equipment. each boot, small of back, weapons belt, strap, back sling, etc...
     private void Awake()
     {
+        playerObject = this.gameObject;
         //mcs = GetComponent<M3DCharacterManager>();
     }
 
@@ -67,9 +67,7 @@ public class BodyManager_Human_Player : BodyManager {
 
     void Start()
     {
-        playerObject = this.gameObject;
         weatherSystem = WeatherControl.manager.GetComponent<WeatherControl>();
-        currentWeather = weatherSystem.currentWeather;
         speed = 1.25F + 1.25f * gait;
 
         InvokeRepeating("UpdateHeartRate", 6f, 6f);
@@ -914,9 +912,9 @@ public class BodyManager_Human_Player : BodyManager {
         float altitude = this.transform.position.y;
         localTemperature = thermometer.temperature;
         if (shelterCheck.roof) { precipRate = 0; }
-        else { precipRate = weatherSystem.currentWeather.precipRate; }
+        else { precipRate = weatherSystem.weathers[weatherSystem.schedule[0]].precipRate; }
         if (shelterCheck.walls) { windSpeed = 0; }
-        else { windSpeed = weatherSystem.currentWeather.windSpeed; }
+        else { windSpeed = weatherSystem.weathers[weatherSystem.schedule[0]].windSpeed; }
     }
 
     //public float encumbrance = 0; //percent 

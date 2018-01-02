@@ -10,12 +10,6 @@ public class BodyPartColliderScript : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        if (LevelSerializer.IsDeserializing) return;
         parentBody = GetComponentInParent<BodyManager>();
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
 	}
 }
