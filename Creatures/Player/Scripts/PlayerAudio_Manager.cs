@@ -9,6 +9,6 @@ public class PlayerAudio_Manager : MonoBehaviour {
     public AudioClip metalOnStone;
     public AudioClip draw;
     public AudioClip sheathe;
-    public AudioClip swing,equip;
+    public AudioClip swing,equip,hitBody;
     public AudioClip drink;
 }

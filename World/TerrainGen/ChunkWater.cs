@@ -12,9 +12,4 @@ public class ChunkWater : MonoBehaviour {
         fluidFilter = gameObject.GetComponent<MeshFilter>();
         coll = gameObject.GetComponent<MeshCollider>();
     }
-
-    // Update is called once per frame
-    void Update () {
-		
-	}
 }

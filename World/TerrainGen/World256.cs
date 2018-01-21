@@ -4,11 +4,18 @@ using System.Collections.Generic;
 
 public class World256 : MonoBehaviour {
 
+    public static GameObject worldGameObject;
+
     public Dictionary<WorldPos, Chunk256> chunk256s = new Dictionary<WorldPos, Chunk256>();
     public GameObject chunk256Prefab;
 
 
     public string worldName = "world256";
+
+    public void Awake()
+    {
+        worldGameObject = this.gameObject;
+    }
 
     public void CreateChunk256(int x, int y, int z)
     {
@@ -117,6 +124,7 @@ public class World256 : MonoBehaviour {
                                 Mathf.FloorToInt((y - chunk256.pos.y) / 256),
                                 Mathf.FloorToInt((z - chunk256.pos.z) / 256),block256);
             chunk256.update = true;
+            chunk256.UpdateChunk256();
             UpdateIfEqual(Mathf.FloorToInt((x - chunk256.pos.x) / 256) * 256, 0, new WorldPos(Mathf.FloorToInt(x / 256) * 256 - 256, Mathf.FloorToInt(y / 256) * 256, Mathf.FloorToInt(z / 256) * 256));
             UpdateIfEqual(Mathf.FloorToInt((x - chunk256.pos.x) / 256) * 256, 16 - 1, new WorldPos(Mathf.FloorToInt(x / 256) * 256 + 256, Mathf.FloorToInt(y / 256) * 256, Mathf.FloorToInt(z / 256) * 256));
             UpdateIfEqual(Mathf.FloorToInt((y - chunk256.pos.y) / 256) * 256, 0, new WorldPos(Mathf.FloorToInt(x / 256) * 256, Mathf.FloorToInt(y / 256) * 256 - 256, Mathf.FloorToInt(z / 256) * 256));
@@ -132,7 +140,10 @@ public class World256 : MonoBehaviour {
         {
             Chunk256 chunk256 = GetChunk256(pos.x, pos.y, pos.z);
             if (chunk256 != null)
+            {
                 chunk256.update = true;
+                chunk256.UpdateChunk256();
+            }
         }
     }
 }

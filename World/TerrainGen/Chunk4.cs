@@ -19,6 +19,8 @@ public class Chunk4 : MonoBehaviour
     public static int chunk4Size = 16;
     public bool update = false;
     public bool rendered;
+    public bool isSubChunked = false;
+    public List<Chunk1> subChunkList = new List<Chunk1>();
 
     MeshFilter filter;
     MeshCollider coll;
@@ -33,14 +35,14 @@ public class Chunk4 : MonoBehaviour
     }
 
     //Update is called once per frame
-    void Update()
-    {
-        if (update)
-        {
-            update = false;
-            UpdateChunk4();
-        }
-    }
+    //void Update()
+    //{
+    //    if (update)
+    //    {
+    //        update = false;
+    //        UpdateChunk4();
+    //    }
+    //}
 
 	public Block4 GetBlock4(int x, int y, int z)
 	{
@@ -78,7 +80,7 @@ public class Chunk4 : MonoBehaviour
     }
 
     // Updates the chunk4 based on its contents
-    void UpdateChunk4()
+    public void UpdateChunk4()
     {
         rendered = true;
         MeshData meshData = new MeshData();
@@ -117,4 +119,19 @@ public class Chunk4 : MonoBehaviour
         coll.sharedMesh = mesh;
     }
 
+    public void ConvertDown()
+    {
+        if (isSubChunked)
+        {
+            foreach (Chunk1 chunk in subChunkList)
+            {
+                chunk.gameObject.GetComponent<MeshRenderer>().enabled = true;
+                chunk.gameObject.layer = 17;
+            }
+            this.gameObject.GetComponent<MeshRenderer>().enabled = false;
+            this.gameObject.layer = 14;
+        }
+        else
+            LoadChunk1s.terrainLoadManager.GetComponent<LoadChunk1s>().ReplaceChunk4(this, pos);
+    }
 }

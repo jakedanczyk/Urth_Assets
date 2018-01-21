@@ -105,4 +105,9 @@ public class PlayerInventory : Inventory
         return contentsWeight = inventoryContents.Select(c => c.itemWeight).ToList().Sum();
     }
 
+    //void OnDeserialize()
+    //{
+    //    RebuildUIPanel();
+    //}
+
 }

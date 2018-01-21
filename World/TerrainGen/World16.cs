@@ -4,11 +4,18 @@ using System.Collections.Generic;
 
 public class World16 : MonoBehaviour {
 
+    public static GameObject worldGameObject;
+
     public Dictionary<WorldPos, Chunk16> chunk16s = new Dictionary<WorldPos, Chunk16>();
     public GameObject chunk16Prefab;
-
+    public GameObject treePrefab;
 
     public string worldName = "world16";
+
+    public void Awake()
+    {
+        worldGameObject = this.gameObject;
+    }
 
     public void CreateChunk16(int x, int y, int z)
     {
@@ -33,11 +40,11 @@ public class World16 : MonoBehaviour {
         newChunk16.SetBlock16sUnmodified();
         //if (newChunk16.airCount == 6144) { newChunk16.gameObject.SetActive(false); }
 
-        //for(int i = 0; i < newChunk.treeList.Count; i++)
-        //{
-        //    GameObject newTree = Instantiate(treePrefab);
-        //    newTree.transform.position = newChunk.treeList[i];
-        //}
+        for (int i = 0; i < newChunk16.treeList.Count; i++)
+        {
+            GameObject newTree = Instantiate(treePrefab);
+            newTree.transform.position = newChunk16.treeList[i];
+        }
         //for (int i = 0; i < newChunk.bushList.Count; i++)
         //{World
         //    GameObject newBush = Instantiate(huckPrefab);
@@ -119,6 +126,7 @@ public class World16 : MonoBehaviour {
                                 Mathf.FloorToInt((y - chunk16.pos.y) / 16),
                                 Mathf.FloorToInt((z - chunk16.pos.z) / 16),block16);
             chunk16.update = true;
+            chunk16.UpdateChunk16();
             UpdateIfEqual(Mathf.FloorToInt((x - chunk16.pos.x)/16)*16, 0, new WorldPos(Mathf.FloorToInt(x / 16) * 16 - 16, Mathf.FloorToInt(y / 16) * 16, Mathf.FloorToInt(z / 16) * 16));
             UpdateIfEqual(Mathf.FloorToInt((x - chunk16.pos.x) / 16) * 16, Chunk16.chunk16Size - 1, new WorldPos(Mathf.FloorToInt(x / 16) * 16 + 16, Mathf.FloorToInt(y / 16) * 16, Mathf.FloorToInt(z / 16) * 16));
             UpdateIfEqual(Mathf.FloorToInt((y - chunk16.pos.y) / 16) * 16, 0, new WorldPos(Mathf.FloorToInt(x / 16) * 16, Mathf.FloorToInt(y / 16) * 16 - 16, Mathf.FloorToInt(z / 16) * 16));
@@ -136,7 +144,10 @@ public class World16 : MonoBehaviour {
         {
             Chunk16 chunk16 = GetChunk16(pos.x, pos.y, pos.z);
             if (chunk16 != null)
+            {
                 chunk16.update = true;
+                chunk16.UpdateChunk16();
+            }
         }
     }
 }

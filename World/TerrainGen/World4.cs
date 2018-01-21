@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class World4 : MonoBehaviour {
 
+    public static GameObject worldGameObject;
+
     public Dictionary<WorldPos, Chunk4> chunk4s = new Dictionary<WorldPos, Chunk4>();
     public GameObject chunk4Prefab;
     //public GameObject treePrefab;
@@ -12,6 +14,11 @@ public class World4 : MonoBehaviour {
     //public GameObject huckPrefab;
 
     public string worldName = "world4";
+
+    public void Awake()
+    {
+        worldGameObject = this.gameObject;
+    }
 
     public void CreateChunk4(int x, int y, int z)
     {
@@ -120,6 +127,7 @@ public class World4 : MonoBehaviour {
 
             chunk4.SetBlock4(x - chunk4.pos.x, y - chunk4.pos.y, z - chunk4.pos.z, block4);
             chunk4.update = true;
+            chunk4.UpdateChunk4();
             UpdateIfEqual(x - chunk4.pos.x, 0, new WorldPos(x - 1, y, z));
             UpdateIfEqual(x - chunk4.pos.x, Chunk4.chunk4Size - 1, new WorldPos(x + 1, y, z));
             UpdateIfEqual(y - chunk4.pos.y, 0, new WorldPos(x, y - 1, z));
@@ -135,7 +143,10 @@ public class World4 : MonoBehaviour {
         {
             Chunk4 chunk4 = GetChunk4(pos.x, pos.y, pos.z);
             if (chunk4 != null)
+            {
                 chunk4.update = true;
+                chunk4.UpdateChunk4();
+            }            
         }
     }
 

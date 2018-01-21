@@ -4,14 +4,23 @@ using System.Collections.Generic;
 
 public class World1 : MonoBehaviour {
 
+    public static GameObject worldGameObject;
+
     public Dictionary<WorldPos, Chunk1> chunk1s = new Dictionary<WorldPos, Chunk1>();
     public GameObject chunk1Prefab;
-    //public GameObject treePrefab;
-    //public GameObject bonePrefab;
-    //public GameObject horsePrefab;
-    //public GameObject huckPrefab;
+    public GameObject treePrefab;
+    public GameObject bonePrefab;
+    public GameObject horsePrefab;
+    public GameObject huckPrefab;
+    public GameObject waterPrefab;
+    public ItemDictionary itemDictionary;
 
-    public string worldName = "world1";
+    public string worldName = "world1"; 
+
+    public void Awake()
+    {
+        worldGameObject = this.gameObject;
+    }
 
     public void CreateChunk1(int x, int y, int z)
     {
@@ -35,29 +44,39 @@ public class World1 : MonoBehaviour {
         newChunk1 = terrainGen.Chunk1Gen(newChunk1);
         //if (newChunk1.airCount == 6144) { newChunk1.gameObject.SetActive(false); }
         newChunk1.SetBlock1sUnmodified();
-        //for(int i = 0; i < newChunk1.treeList.Count; i++)
-        //{
-        //    GameObject newTree = Instantiate(treePrefab);
-        //    newTree.transform.position = newChunk1.treeList[i];
-        //}
-        //for (int i = 0; i < newChunk1.bushList.Count; i++)
-        //{
-        //    GameObject newBush = Instantiate(huckPrefab);
-        //    newBush.transform.position = newChunk1.bushList[i];
-        //}
-        //if (newChunk1.boneSpawn)
-        //{
-        //    print("boneSpawn");
-        //    GameObject newBone = Instantiate(bonePrefab);
-        //    newBone.transform.position = newChunk1.boneList[0];
-        //}
-        //if (newChunk1.horseSpawn)
-        //{
-        //    print("boneSpawn");
-        //    GameObject newHorse = Instantiate(horsePrefab);
-        //    newHorse.transform.position = newChunk1.horseList[0];
-        //}
+        for (int i = 0; i < newChunk1.treeList.Count; i++)
+        {
+            GameObject newTree = Instantiate(treePrefab);
+            newTree.transform.position = newChunk1.treeList[i];
+        }
+        for (int i = 0; i < newChunk1.bushList.Count; i++)
+        {
+            GameObject newBush = Instantiate(huckPrefab);
+            newBush.transform.position = newChunk1.bushList[i];
+        }
+        if (newChunk1.boneSpawn)
+        {
+            print("boneSpawn");
+            GameObject newBone = Instantiate(bonePrefab);
+            newBone.transform.position = newChunk1.boneList[0];
+            int r = Random.Range(0, 9);
+            GameObject randomItem = Instantiate(itemDictionary.items[r]);
+            newBone.GetComponent<LootInventory>().AddItem(randomItem.GetComponent<Item>());
+        }
+        if (newChunk1.horseSpawn)
+        {
+            print("horseSpawn");
+            GameObject newHorse = Instantiate(horsePrefab);
+            newHorse.transform.position = newChunk1.horseList[0];
+        }
         Serialization1.Load(newChunk1);
+        if (newChunk1.hasWater)
+        {
+            GameObject newWater = Instantiate(waterPrefab);
+            newWater.transform.position = newChunk1.transform.position;
+            newChunk1.water = newWater;
+            newChunk1.chunkWater = newWater.GetComponent<ChunkWater>();
+        }
     }
 
     public void DestroyChunk1(int x, int y, int z)
@@ -114,6 +133,7 @@ public class World1 : MonoBehaviour {
         {
             chunk1.SetBlock1(x - chunk1.pos.x, y - chunk1.pos.y, z - chunk1.pos.z, block1);
             chunk1.update = true;
+            chunk1.UpdateChunk1();
             UpdateIfEqual(x - chunk1.pos.x, 0, new WorldPos(x - 1, y, z));
             UpdateIfEqual(x - chunk1.pos.x, Chunk1.chunk1Size - 1, new WorldPos(x + 1, y, z));
             UpdateIfEqual(y - chunk1.pos.y, 0, new WorldPos(x, y - 1, z));
@@ -129,7 +149,10 @@ public class World1 : MonoBehaviour {
         {
             Chunk1 chunk1 = GetChunk1(pos.x, pos.y, pos.z);
             if (chunk1 != null)
+            {
                 chunk1.update = true;
+                chunk1.UpdateChunk1();
+            }
         }
     }
 

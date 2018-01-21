@@ -6,11 +6,19 @@ using UnityEngine.EventSystems;
 
 public class ModelViewer : MonoBehaviour, IDragHandler, IScrollHandler
 {
+    public static RectTransform modelViewerObject;
     public GameObject currModel;
     public RectTransform panel;
     public RectTransform parentCanvas;
+    public static GameObject modelViewObject;
 
     int defaultSize = 2;
+
+    void Awake()
+    {
+        modelViewerObject = this.GetComponent<RectTransform>();
+        modelViewObject = this.gameObject;
+    }
 
     public void ChangeModel(GameObject newModel)
     {
@@ -59,8 +67,11 @@ public class ModelViewer : MonoBehaviour, IDragHandler, IScrollHandler
 
     void OnRectTransformDimensionsChange()
     {
-        float scale = (panel.rect.xMax - panel.rect.xMin) < (panel.rect.yMax - panel.rect.yMin) ? (panel.rect.xMax - panel.rect.xMin)/defaultSize : (panel.rect.yMax - panel.rect.yMin)/defaultSize;
-        currModel.transform.localScale = 1.8f*scale*Vector3.one;
+        if (currModel != null)
+        {
+            float scale = (panel.rect.xMax - panel.rect.xMin) < (panel.rect.yMax - panel.rect.yMin) ? (panel.rect.xMax - panel.rect.xMin) / defaultSize : (panel.rect.yMax - panel.rect.yMin) / defaultSize;
+            currModel.transform.localScale = 1.8f * scale * Vector3.one;
+        }
     }
 }
 

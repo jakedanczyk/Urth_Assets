@@ -8,13 +8,11 @@ public class HumanDefaultStats : CreatureStats
     {
         //attributes
         //physical
-        if (GetStat<RPGAttribute>(RPGStatType.Agility) == null)
-        {
-            var agility = CreateOrGetStat<RPGAttribute>(RPGStatType.Agility);
-            agility.StatName = "Agility";
-            agility.StatBaseValue = 200;
-            agility.Aptitude = 100;
-        }
+        var agility = CreateOrGetStat<RPGAttribute>(RPGStatType.Agility);
+        agility.StatName = "Agility";
+        agility.StatBaseValue = 200;
+        agility.Aptitude = 100;
+
 
         var dexterity = CreateOrGetStat<RPGAttribute>(RPGStatType.Dexterity);
         dexterity.StatName = "Dexterity";

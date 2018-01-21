@@ -4,11 +4,19 @@ using System.Collections.Generic;
 
 public class World64 : MonoBehaviour {
 
+    public static GameObject worldGameObject;
+
     public Dictionary<WorldPos, Chunk64> chunk64s = new Dictionary<WorldPos, Chunk64>();
     public GameObject chunk64Prefab;
+    public GameObject treePrefab;
 
 
     public string worldName = "world64";
+
+    public void Awake()
+    {
+        worldGameObject = this.gameObject;
+    }
 
     public void CreateChunk64(int x, int y, int z)
     {
@@ -33,11 +41,11 @@ public class World64 : MonoBehaviour {
         newChunk64.SetBlock64sUnmodified();
         //if (newChunk64.airCount == 6144) { newChunk64.gameObject.SetActive(false); }
 
-        //for(int i = 0; i < newChunk.treeList.Count; i++)
-        //{
-        //    GameObject newTree = Instantiate(treePrefab);
-        //    newTree.transform.position = newChunk.treeList[i];
-        //}
+        for (int i = 0; i < newChunk64.treeList.Count; i++)
+        {
+            GameObject newTree = Instantiate(treePrefab);
+            newTree.transform.position = newChunk64.treeList[i];
+        }
         //for (int i = 0; i < newChunk.bushList.Count; i++)
         //{World
         //    GameObject newBush = Instantiate(huckPrefab);
@@ -117,6 +125,7 @@ public class World64 : MonoBehaviour {
                                 Mathf.FloorToInt((y - chunk64.pos.y) / 64),
                                 Mathf.FloorToInt((z - chunk64.pos.z) / 64),block64);
             chunk64.update = true;
+            chunk64.UpdateChunk64();
             UpdateIfEqual(Mathf.FloorToInt((x - chunk64.pos.x) / 64) * 64, 0, new WorldPos(Mathf.FloorToInt(x / 64) * 64 - 64, Mathf.FloorToInt(y / 64) * 64, Mathf.FloorToInt(z / 64) * 64));
             UpdateIfEqual(Mathf.FloorToInt((x - chunk64.pos.x) / 64) * 64, 16 - 1, new WorldPos(Mathf.FloorToInt(x / 64) * 64 + 64, Mathf.FloorToInt(y / 64) * 64, Mathf.FloorToInt(z / 64) * 64));
             UpdateIfEqual(Mathf.FloorToInt((y - chunk64.pos.y) / 64) * 64, 0, new WorldPos(Mathf.FloorToInt(x / 64) * 64, Mathf.FloorToInt(y / 64) * 64 - 64, Mathf.FloorToInt(z / 64) * 64));
@@ -132,7 +141,10 @@ public class World64 : MonoBehaviour {
         {
             Chunk64 chunk64 = GetChunk64(pos.x, pos.y, pos.z);
             if (chunk64 != null)
+            { 
                 chunk64.update = true;
+                chunk64.UpdateChunk64();
+            }
         }
     }
 }

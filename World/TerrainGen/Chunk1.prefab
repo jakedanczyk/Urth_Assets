@@ -19,7 +19,7 @@ GameObject:
   m_TagString: Terrain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &400000
 Transform:
@@ -100,16 +100,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hasTree: 0
   hasBush: 0
+  hasWater: 0
   treeList: []
   boneList: []
   bushList: []
   horseList: []
+  waterList: []
   airCount: 0
   boneSpawn: 0
   horseSpawn: 0
   spawned: 0
   update: 0
   rendered: 0
+  isSubChunked: 0
+  subChunkList: []
+  chunkWater: {fileID: 0}
+  water: {fileID: 0}
   world1: {fileID: 0}
   pos:
     x: 0

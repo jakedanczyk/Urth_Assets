@@ -409,6 +409,7 @@ public class BodyManager_Human_Player : BodyManager {
             }
             else if (hit.collider.transform.tag == "BodyPart")
             {
+                audioSource.PlayOneShot(playerAudioManager.hitBody);
                 print(0);
                 int pierce = rHandWeapon.basePierce * (1 + (stats.GetStat(RPGStatType.Pick).StatValue / 10));
                 int blunt = (rHandWeapon.baseBlunt * 5 + rHandWeapon.itemWeight) * stats.GetStat(RPGStatType.Dexterity).StatValue * stats.GetStat(RPGStatType.Strength).StatValue;
@@ -521,7 +522,7 @@ public class BodyManager_Human_Player : BodyManager {
 
     public void PlaceInBag(Item_Weapon weapon, Inventory bag) { }
 
-
+    // Add a garment to the player's outfit. Player protection stats are updated. Character model updated if item has model.
     public void EquipWearable(Item_Garment newWearable)
     {
         if (!newWearable.equipped)
@@ -541,7 +542,8 @@ public class BodyManager_Human_Player : BodyManager {
             UpdateWeatherProtection();
             if (newWearable.hasModel)
             {
-                newWearable.material.SetTexture("_MainTex", newWearable.texture);
+                if(newWearable.texture != null)
+                    newWearable.material.SetTexture("_MainTex", newWearable.texture);
                 mcs.SetClothingVisibility(newWearable.modelID, true);
                 mcsUI.SetClothingVisibility(newWearable.modelID, true);
             }
@@ -887,25 +889,25 @@ public class BodyManager_Human_Player : BodyManager {
     }
 
     int printPos = 375;
-    //void OnGUI()
-    //{
+    void OnGUI()
+    {
 
-    //    GUI.Label(new Rect(0, 400, 500, 500), "Core Temp: " + coreTemp);
-    //    GUI.Label(new Rect(0, 425, 500, 500), "Local Temp: " + localTemperature);
-    //    GUI.Label(new Rect(0, 450, 500, 500), "Heart Rate: " + heartRate);
-    //    GUI.Label(new Rect(0, 475, 500, 500), "Hydration: " + hydration + "%");
-    //    GUI.Label(new Rect(0, 500, 500, 500), "Sleep Debt: " + sleepDebt + " hrs");
-    //    GUI.Label(new Rect(0, 525, 500, 500), "Calories: " + calories);
-    //    GUI.Label(new Rect(0, 550, 500, 500), "Encumbrance: " + encumbrance + "%");
-    //    GUI.Label(new Rect(0, 575, 500, 500), "Stamina Max: " + maxStamina);
-    //    GUI.Label(new Rect(0, 600, 500, 500), "Stamina: " + stamina);
+        GUI.Label(new Rect(0, 400, 500, 500), "Core Temp: " + coreTemp);
+        GUI.Label(new Rect(0, 425, 500, 500), "Local Temp: " + localTemperature);
+        GUI.Label(new Rect(0, 450, 500, 500), "Heart Rate: " + heartRate);
+        GUI.Label(new Rect(0, 475, 500, 500), "Hydration: " + hydration + "%");
+        GUI.Label(new Rect(0, 500, 500, 500), "Sleep Debt: " + sleepDebt + " hrs");
+        GUI.Label(new Rect(0, 525, 500, 500), "Calories: " + calories);
+        GUI.Label(new Rect(0, 550, 500, 500), "Encumbrance: " + encumbrance + "%");
+        GUI.Label(new Rect(0, 575, 500, 500), "Stamina Max: " + maxStamina);
+        GUI.Label(new Rect(0, 600, 500, 500), "Stamina: " + stamina);
 
-    //    for (int j = 0; j < outfit.Count; j++)
-    //    {
-    //        GUI.Label(new Rect(1100, printPos, 500, 500), outfit[j].itemName);
-    //        printPos = printPos + 25;
-    //    }
-    //}
+        for (int j = 0; j < outfit.Count; j++)
+        {
+            GUI.Label(new Rect(1100, printPos, 500, 500), outfit[j].itemName);
+            printPos = printPos + 25;
+        }
+    }
 
     public void ReadWeather()
     {

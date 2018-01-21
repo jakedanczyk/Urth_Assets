@@ -49,7 +49,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public bool inventoryActive, lootActive;
         public LootInventoryFocusPanel lootPanelScript;
 
-        public GameObject modelViewUI;
+        GameObject modelViewObject;
+        public RectTransform modelViewUI;
         public GameObject butcheringUI;
         public RectTransform lootingUI;
         public RectTransform lootPanel;
@@ -122,12 +123,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             crouching = false;
             lastPosition = this.transform.position;
+            playerControlsGameObject = this.gameObject;
         }
 
         // Use this for initialization
         private void Start()
         {
-            playerControlsGameObject = this.gameObject;
+            modelViewObject = ModelViewer.modelViewObject;
+            modelViewUI = ModelViewer.modelViewerObject.GetComponent<ModelViewer>().parentCanvas;
             m_AudioSource = GetComponent<AudioSource>();
             if (LevelSerializer.IsDeserializing) return;
 
@@ -153,7 +156,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public Vector3 lastPosition;
         bool check;
         int fallingCount;
+        public int FallingCount { get { return fallingCount; } set { fallingCount = value; } }
         float fallTime,fallSpeed;
+        public float FallSpeed { get { return fallSpeed; } set { fallSpeed = value; } }
         public int requiredFallTime;
         // Update is called once per frame
         private void Update()
@@ -189,9 +194,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 fallSpeed = m_MoveDir.y;
             }
-            if(fallSpeed < -7.6f && fallingCount == 0)
+            else if(fallSpeed < -10f && fallingCount == 0)
             {
-                playerStats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue += (int)((fallSpeed + 7.6f) * 10);
+                playerStats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue += (int)((fallSpeed + 10f) * 10);
                 fallSpeed = 0;
             }
 
@@ -754,7 +759,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 if (showInventory)
                 {
-                    modelViewUI.SetActive(false);
+                    modelViewObject.SetActive(false);
+                    modelViewUI.gameObject.SetActive(false);
                     player_bodyManager.baseInventory.selectedItem = null;
                     inventoryUIPanel.gameObject.SetActive(false);
                     lootInventory = null;
@@ -768,7 +774,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 }
                 else
                 {
-                    modelViewUI.SetActive(true);
+                    modelViewObject.SetActive(true);
+                    modelViewUI.gameObject.SetActive(true);
                     inventoryUIPanel.gameObject.SetActive(true);
                     showInventory = true;
                     m_AudioSource.PlayOneShot(playerAudioManager.openInventory);
@@ -824,6 +831,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     playerCrafting.isCrafting = true;
                     Cursor.lockState = CursorLockMode.None;
                 }
+            }
+
+            if (Input.GetKeyDown(KeyCode.M))
+            {
+
             }
         } //end of Update
 

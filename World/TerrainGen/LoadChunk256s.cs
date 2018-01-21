@@ -72,18 +72,37 @@ public class LoadChunk256s : MonoBehaviour
 
     int timer = 0;
 
+    StartupScript startupScript;
+
     void Start()
     {
+        startupScript = StartupScript.startupObject.GetComponent<StartupScript>();
+        WorldPos playerPos = new WorldPos(
+            Mathf.RoundToInt(transform.position.x / (4096f)) * (4096),
+            Mathf.RoundToInt(transform.position.y / (4096f)) * (4096),
+            Mathf.RoundToInt(transform.position.z / (4096f)) * (4096)
+            );
 
+        for (int y = 0; y < 3; y++)
+        {
+            for (int x = playerPos.x - 20480; x <= playerPos.x + 20480; x += 4096)
+            {
+                for (int z = playerPos.z - 20480; z <= playerPos.z + 20480; z += 4096)
+                {
+                    buildList.Add(new WorldPos(x, y * 4096, z));
+                    updateList.Add(new WorldPos(x, y * 4096, z));
+                }
+            }
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (DeleteChunk256s())
-            return;
+        //if (DeleteChunk256s())
+        //    return;
 
-        FindChunk256sToLoad();
+        //FindChunk256sToLoad();
         LoadAndRenderChunk256s();
     }
 
@@ -202,10 +221,21 @@ public class LoadChunk256s : MonoBehaviour
 
         if (updateList.Count != 0)
         {
-            Chunk256 chunk256 = world256.GetChunk256(updateList[0].x, updateList[0].y, updateList[0].z);
-            if (chunk256 != null)
-                chunk256.update = true;
-            updateList.RemoveAt(0);
+            for (int i = 0; i < updateList.Count && i < 4; i++)
+            {
+                Chunk256 chunk256 = world256.GetChunk256(updateList[0].x, updateList[0].y, updateList[0].z);
+                if (chunk256 != null)
+                {
+                    chunk256.update = true;
+                    chunk256.UpdateChunk256();
+                }
+                updateList.RemoveAt(0);
+            }
+        }
+
+        if(buildList.Count == 0 && updateList.Count == 0)
+        {
+            startupScript.ready = true;
         }
     }
 

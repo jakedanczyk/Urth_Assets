@@ -12,14 +12,13 @@ GameObject:
   - component: {fileID: 6400000}
   - component: {fileID: 2300000}
   - component: {fileID: 205131219598924832}
-  - component: {fileID: 114020797687277750}
   - component: {fileID: 114384504542596466}
-  m_Layer: 17
+  m_Layer: 13
   m_Name: Chunk16
   m_TagString: Terrain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &400000
 Transform:
@@ -98,17 +97,6 @@ Prefab:
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 100000}
   m_IsPrefabParent: 1
---- !u!114 &114020797687277750
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6e038bf700cfa444fb16c6ef963be9f9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114384504542596466
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -120,9 +108,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ca9d7030728d15458b9a869cc544394, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hasTree: 0
+  treeList: []
   airCount: 0
   update: 0
   rendered: 0
+  isSubChunked: 0
+  subChunkList: []
   world16: {fileID: 0}
   pos:
     x: 0

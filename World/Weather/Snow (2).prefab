@@ -38,7 +38,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1602053406855808}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 8, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -85,21 +85,21 @@ EllipsoidParticleEmitter:
   m_Emit: 1
   minSize: 0.04
   maxSize: 0.1
-  minEnergy: 8
-  maxEnergy: 8
-  minEmission: 50
-  maxEmission: 50
-  worldVelocity: {x: 5.37, y: -1.5, z: 0}
+  minEnergy: 16
+  maxEnergy: 16
+  minEmission: 500
+  maxEmission: 1500
+  worldVelocity: {x: 1, y: -1.5, z: 0}
   localVelocity: {x: 0, y: 0, z: 0}
   rndVelocity: {x: 0.1, y: 0.5, z: 0.1}
   emitterVelocityScale: 0.05
   tangentVelocity: {x: 0, y: 0, z: 0}
-  angularVelocity: 0
-  rndAngularVelocity: 0
+  angularVelocity: 12
+  rndAngularVelocity: 5
   rndRotation: 0
   Simulate in Worldspace?: 1
   m_OneShot: 0
-  m_Ellipsoid: {x: 10, y: 0.1, z: 10}
+  m_Ellipsoid: {x: 30, y: 0.1, z: 30}
   m_MinEmitterRange: 0
 --- !u!26 &26203403443670506
 ParticleRenderer:

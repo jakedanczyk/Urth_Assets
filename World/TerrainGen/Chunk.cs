@@ -36,14 +36,14 @@ public class Chunk : MonoBehaviour
     }
 
     //Update is called once per frame
-    void Update()
-    {
-        if (update)
-        {
-            update = false;
-            UpdateChunk();
-        }
-    }
+    //void Update()
+    //{
+    //    if (update)
+    //    {
+    //        update = false;
+    //        UpdateChunk();
+    //    }
+    //}
 
 	public Block GetBlock(int x, int y, int z)
 	{

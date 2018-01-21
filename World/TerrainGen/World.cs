@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class World : MonoBehaviour {
 
+    public static GameObject worldGameObject;
+
     public Dictionary<WorldPos, Chunk> chunks = new Dictionary<WorldPos, Chunk>();
     public GameObject chunkPrefab;
     public GameObject treePrefab;
@@ -12,9 +14,13 @@ public class World : MonoBehaviour {
     public GameObject huckPrefab;
     public GameObject waterPrefab;
     public ItemDictionary itemDictionary;
-
-
+    
     public string worldName = "world";
+
+    public void Awake()
+    {
+        worldGameObject = this.gameObject;
+    }
 
     public void CreateChunk(int x, int y, int z)
     {

@@ -73,20 +73,20 @@ public class WorldTime : MonoBehaviour
     }
 
 
-    //void OnGUI()
-    //{
+    void OnGUI()
+    {
 
-    //    GUI.Label(new Rect(0, 200, 500, 500), "Total Seconds: " + totalGameSeconds);
-    //    GUI.Label(new Rect(0, 225, 500, 500), "Seconds Per Second: " + secondsPerSecond);
+        GUI.Label(new Rect(0, 200, 500, 500), "Total Seconds: " + totalGameSeconds);
+        GUI.Label(new Rect(0, 225, 500, 500), "Seconds Per Second: " + secondsPerSecond);
 
-    //    GUI.Label(new Rect(0, 250, 500, 500), "Second: " + (int)seconds % 60);
-    //    GUI.Label(new Rect(0, 275, 500, 500), "Minute: " + (int)minutes % 60);
-    //    GUI.Label(new Rect(0, 300, 500, 500), "Hour: " + (int)hours % 24);
-    //    GUI.Label(new Rect(0, 325, 500, 500), "Day: " + (int)days % (365 / 12));
-    //    GUI.Label(new Rect(0, 350, 500, 500), "Month: " + (int)months % 12);
-    //    GUI.Label(new Rect(0, 375, 500, 500), "Year: " + (int)years);
+        GUI.Label(new Rect(0, 250, 500, 500), "Second: " + (int)seconds % 60);
+        GUI.Label(new Rect(0, 275, 500, 500), "Minute: " + (int)minutes % 60);
+        GUI.Label(new Rect(0, 300, 500, 500), "Hour: " + (int)hours % 24);
+        GUI.Label(new Rect(0, 325, 500, 500), "Day: " + (int)days % (365 / 12));
+        GUI.Label(new Rect(0, 350, 500, 500), "Month: " + (int)months % 12);
+        GUI.Label(new Rect(0, 375, 500, 500), "Year: " + (int)years);
 
-    //}
+    }
 
 
 }

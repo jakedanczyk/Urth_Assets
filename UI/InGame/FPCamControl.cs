@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class FPCamControl : MonoBehaviour {
 
-    UnityStandardAssets.Characters.FirstPerson.PlayerControls playerControls;
-
-    void OnCollisionEnter(Collision collision)
+    public GameObject player;
+    
+    void LateUpdate()
     {
-        playerControls.RevertCam();
+        transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z);
     }
 }

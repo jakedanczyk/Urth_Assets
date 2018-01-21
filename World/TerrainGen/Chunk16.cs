@@ -10,8 +10,8 @@ using System.Collections;
 
 public class Chunk16 : MonoBehaviour
 {
-    //public bool hasTree, hasBush;
-    //public List<Vector3> treeList, boneList, bushList, horseList;
+    public bool hasTree;
+    public List<Vector3> treeList;
     public Block16[, ,] block16s = new Block16[16, 16, 16];
 
     public int airCount = 0;
@@ -19,6 +19,8 @@ public class Chunk16 : MonoBehaviour
     public static int chunk16Size = 16;
     public bool update = false;
     public bool rendered;
+    public bool isSubChunked = false;
+    public List<Chunk4> subChunkList = new List<Chunk4>();
 
     MeshFilter filter;
     MeshCollider coll;
@@ -33,14 +35,14 @@ public class Chunk16 : MonoBehaviour
     }
 
     //Update is called once per frame
-    void Update()
-    {
-        if (update)
-        {
-            update = false;
-            UpdateChunk16();
-        }
-    }
+    //void Update()
+    //{
+    //    if (update)
+    //    {
+    //        update = false;
+    //        UpdateChunk16();
+    //    }
+    //}
 
 	public Block16 GetBlock16(int x, int y, int z)
 	{
@@ -78,7 +80,7 @@ public class Chunk16 : MonoBehaviour
     }
 
     // Updates the chunk based on its contents
-    void UpdateChunk16()
+    public void UpdateChunk16()
     {
         rendered = true;
         MeshData meshData = new MeshData();
@@ -117,4 +119,19 @@ public class Chunk16 : MonoBehaviour
         coll.sharedMesh = mesh;
     }
 
+    public void ConvertDown()
+    {
+        if (isSubChunked)
+        {
+            foreach (Chunk4 chunk in subChunkList)
+            {
+                chunk.gameObject.GetComponent<MeshRenderer>().enabled = true;
+                chunk.gameObject.layer = 15;
+            }
+            this.gameObject.GetComponent<MeshRenderer>().enabled = false;
+            this.gameObject.layer = 12;
+        }
+        else
+            LoadChunk4s.terrainLoadManager.GetComponent<LoadChunk4s>().ReplaceChunk16(this, pos);
+    }
 }

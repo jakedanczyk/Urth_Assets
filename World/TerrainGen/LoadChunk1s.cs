@@ -4,7 +4,9 @@ using System.Collections.Generic;
 
 public class LoadChunk1s : MonoBehaviour
 {
-	static WorldPos[] chunk1Positions = {   new WorldPos (0, 0, 0),
+    public static GameObject terrainLoadManager;
+
+    static WorldPos[] chunk1Positions = {   new WorldPos (0, 0, 0),
 		
 		new WorldPos (1, 0, 0), new WorldPos (-1, 0, 0), new WorldPos (0, 0, -1), new WorldPos (0, 0, 1), 
 		new WorldPos (-1, 0, -1), new WorldPos (-1, 0, 1), new WorldPos (1, 0, -1), new WorldPos (1, 0, 1), 
@@ -61,6 +63,7 @@ public class LoadChunk1s : MonoBehaviour
         //new WorldPos (7, 0, -2), new WorldPos (7, 0, 2)
     };
 
+    public WaterGen waterGen;
     public World1 world1;
     //public GameObject treePrefab;
     public Transform playerTransform;
@@ -70,20 +73,28 @@ public class LoadChunk1s : MonoBehaviour
     List<WorldPos> updateList = new List<WorldPos>();
     List<WorldPos> buildList = new List<WorldPos>();
 
+    Dictionary<WorldPos, Chunk4> parentList = new Dictionary<WorldPos, Chunk4>();
+    Dictionary<WorldPos, Chunk4> replaceList = new Dictionary<WorldPos, Chunk4>();
+
     int timer = 0;
 
-    void Start()
+    void Awake()
     {
+        terrainLoadManager = this.gameObject;
+    }
 
+    private void Start()
+    {
+        waterGen = WaterGen.waterGenObject.GetComponent<WaterGen>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (DeleteChunk1s())
-            return;
+        //if (DeleteChunk1s())
+        //    return;
 
-        FindChunk1sToLoad();
+        //FindChunk1sToLoad();
         LoadAndRenderChunk1s();
     }
 
@@ -157,10 +168,28 @@ public class LoadChunk1s : MonoBehaviour
 
         if (updateList.Count != 0)
         {
-            Chunk1 chunk1 = world1.GetChunk1(updateList[0].x, updateList[0].y, updateList[0].z);
-            if (chunk1 != null)
-                chunk1.update = true;
-            updateList.RemoveAt(0);
+            for (int i = 0; i < updateList.Count && i < 4; i++)
+            {
+                Chunk1 chunk1 = world1.GetChunk1(updateList[0].x, updateList[0].y, updateList[0].z);
+                if (chunk1 != null)
+                {
+                    chunk1.update = true;
+                    chunk1.UpdateChunk1();
+                    if (parentList.ContainsKey(updateList[0]))
+                    {
+                        parentList[updateList[0]].subChunkList.Add(chunk1);
+                        parentList.Remove(updateList[0]);
+                    }
+                }
+                if (replaceList.ContainsKey(updateList[0]))
+                {
+                    replaceList[updateList[0]].gameObject.GetComponent<MeshRenderer>().enabled = false;
+                    replaceList[updateList[0]].gameObject.layer = 14;
+                    replaceList[updateList[0]].isSubChunked = true;
+                    replaceList.Remove(updateList[0]);
+                }
+                updateList.RemoveAt(0);
+            }
         }
     }
 
@@ -170,6 +199,30 @@ public class LoadChunk1s : MonoBehaviour
         {
             world1.CreateChunk1(pos.x, pos.y, pos.z);
         }
+        Chunk1 chunk1 = world1.GetChunk1(pos.x, pos.y, pos.z);
+        //if (chunk1.hasWater)
+        //{
+        //    for (int y = 15; y >= 0; y--)
+        //    {
+        //        if (chunk1.block1s[7, y, 7] is Block1Air)
+        //        {
+        //        }
+        //        else
+        //        {
+        //            if (!waterGen.waterSpawnPosDict.ContainsKey(new WorldPos(chunk1.pos.x + 7, chunk1.pos.y + y, chunk1.pos.z + 7)))
+        //            {
+        //                waterGen.waterActiveSpawnPosList.Add(new WorldPos(chunk1.pos.x + 7, chunk1.pos.y + y, chunk1.pos.z + 7));
+        //                waterGen.waterSpawnPosDict[new WorldPos(chunk1.pos.x + 7, chunk1.pos.y + y, chunk1.pos.z + 7)] = true;
+        //                break;
+        //            }
+        //        }
+        //        if (y == 0)
+        //        {
+        //            chunk1.hasWater = false;
+        //            Destroy(chunk1.water.gameObject);
+        //        }
+        //    }
+        //}
     }
 
     public int dist;
@@ -202,5 +255,28 @@ public class LoadChunk1s : MonoBehaviour
 
         timer++;
         return false;
+    }
+
+    //Generate chunk1s to fill a Chunk4
+    public void ReplaceChunk4(Chunk4 chunk4, WorldPos chunk4Pos)
+    {
+        for (int y = -1; y < 5; y++)
+        {
+            for (int x = -1; x < 5; x++)
+            {
+                for (int z = -1; z < 5; z++)
+                {
+                    WorldPos worldPos = new WorldPos(chunk4Pos.x + x * 16, chunk4Pos.y + y * 16, chunk4Pos.z + z * 16);
+                    Chunk1 chunk = world1.GetChunk1(worldPos.x, worldPos.y, worldPos.z);
+                    if (chunk == null)
+                    {
+                        buildList.Add(worldPos);
+                        updateList.Add(worldPos);
+                        parentList[worldPos] = chunk4;
+                    }
+                }
+            }
+        }
+        replaceList[new WorldPos(chunk4Pos.x + 32, chunk4Pos.y + 32, chunk4Pos.z + 32)] = chunk4;
     }
 }

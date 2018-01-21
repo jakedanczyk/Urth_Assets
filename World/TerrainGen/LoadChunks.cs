@@ -4,7 +4,9 @@ using System.Collections.Generic;
 
 public class LoadChunks : MonoBehaviour
 {
-	static WorldPos[] chunkPositions = {   new WorldPos (0, 0, 0),
+    public static GameObject terrainLoadManager;
+
+    static WorldPos[] chunkPositions = {   new WorldPos (0, 0, 0),
 		
 		new WorldPos (1, 0, 0), new WorldPos (-1, 0, 0), new WorldPos (0, 0, -1), new WorldPos (0, 0, 1), 
 		new WorldPos (-1, 0, -1), new WorldPos (-1, 0, 1), new WorldPos (1, 0, -1), new WorldPos (1, 0, 1), 
@@ -68,20 +70,23 @@ public class LoadChunks : MonoBehaviour
     List<WorldPos> updateList = new List<WorldPos>();
     List<WorldPos> buildList = new List<WorldPos>();
 
+    Dictionary<WorldPos, Chunk1> parentList = new Dictionary<WorldPos, Chunk1>();
+    Dictionary<WorldPos, Chunk1> replaceList = new Dictionary<WorldPos, Chunk1>();
+
     int timer = 0;
 
     void Start()
     {
-
+        terrainLoadManager = this.gameObject;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (DeleteChunks())
-            return;
+        //if (DeleteChunks())
+        //    return;
 
-        FindChunksToLoad();
+        //FindChunksToLoad();
         LoadAndRenderChunks();
     }
 
@@ -154,10 +159,27 @@ public class LoadChunks : MonoBehaviour
 
         if (updateList.Count != 0)
         {
-            Chunk chunk = world.GetChunk(updateList[0].x, updateList[0].y, updateList[0].z);
-            if (chunk != null)
-                chunk.update = true;
-            updateList.RemoveAt(0);
+            for (int i = 0; i < updateList.Count && i < 4; i++)
+            {
+                Chunk chunk = world.GetChunk(updateList[0].x, updateList[0].y, updateList[0].z);
+                if (chunk != null)
+                {
+                    chunk.update = true;
+                    if (parentList.ContainsKey(updateList[0]))
+                    {
+                        parentList[updateList[0]].subChunkList.Add(chunk);
+                        parentList.Remove(updateList[0]);
+                    }
+                }
+                if (replaceList.ContainsKey(updateList[0]))
+                {
+                    replaceList[updateList[0]].gameObject.GetComponent<MeshRenderer>().enabled = false;
+                    replaceList[updateList[0]].gameObject.layer = 16;
+                    replaceList[updateList[0]].isSubChunked = true;
+                    replaceList.Remove(updateList[0]);
+                }
+                updateList.RemoveAt(0);
+            }
         }
     }
 
@@ -194,5 +216,28 @@ public class LoadChunks : MonoBehaviour
 
         timer++;
         return false;
+    }
+
+    //Generate chunks to fill a Chunk1
+    public void ReplaceChunk1(Chunk1 chunk1, WorldPos chunk1Pos)
+    {
+        for (int y = 0; y < 4; y++)
+        {
+            for (int x = 0; x < 4; x++)
+            {
+                for (int z = 0; z < 4; z++)
+                {
+                    WorldPos worldPos = new WorldPos(chunk1Pos.x + x * 4, chunk1Pos.y + y * 4, chunk1Pos.z + z * 4);
+                    Chunk chunk = world.GetChunk(worldPos.x, worldPos.y, worldPos.z);
+                    if (chunk == null)
+                    {
+                        buildList.Add(worldPos);
+                        updateList.Add(worldPos);
+                        parentList[worldPos] = chunk1;
+                    }
+                }
+            }
+        }
+        replaceList[new WorldPos(chunk1Pos.x + 12, chunk1Pos.y + 12, chunk1Pos.z + 12)] = chunk1;
     }
 }

@@ -4,7 +4,9 @@ using System.Collections.Generic;
 
 public class LoadChunk4s : MonoBehaviour
 {
-	static WorldPos[] chunk4Positions = {   new WorldPos (0, 0, 0),
+    public static GameObject terrainLoadManager;
+
+    static WorldPos[] chunk4Positions = {   new WorldPos (0, 0, 0),
 		
 		new WorldPos (1, 0, 0), new WorldPos (-1, 0, 0), new WorldPos (0, 0, -1), new WorldPos (0, 0, 1), 
 		new WorldPos (-1, 0, -1), new WorldPos (-1, 0, 1), new WorldPos (1, 0, -1), new WorldPos (1, 0, 1), 
@@ -70,20 +72,24 @@ public class LoadChunk4s : MonoBehaviour
     List<WorldPos> updateList = new List<WorldPos>();
     List<WorldPos> buildList = new List<WorldPos>();
 
+    Dictionary<WorldPos, Chunk16> parentList = new Dictionary<WorldPos, Chunk16>();
+    Dictionary<WorldPos, Chunk16> replaceList = new Dictionary<WorldPos, Chunk16>();
+
+
     int timer = 0;
 
     void Start()
     {
-
+        terrainLoadManager = this.gameObject;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (DeleteChunk4s())
-            return;
+        //if (DeleteChunk4s())
+        //    return;
 
-        FindChunk4sToLoad();
+        //FindChunk4sToLoad();
         LoadAndRenderChunk4s();
     }
 
@@ -157,10 +163,28 @@ public class LoadChunk4s : MonoBehaviour
 
         if (updateList.Count != 0)
         {
-            Chunk4 chunk4 = world4.GetChunk4(updateList[0].x, updateList[0].y, updateList[0].z);
-            if (chunk4 != null)
-                chunk4.update = true;
-            updateList.RemoveAt(0);
+            for (int i = 0; i < updateList.Count && i < 4; i++)
+            {
+                Chunk4 chunk4 = world4.GetChunk4(updateList[0].x, updateList[0].y, updateList[0].z);
+                if (chunk4 != null)
+                {
+                    chunk4.update = true;
+                    chunk4.UpdateChunk4();
+                    if (parentList.ContainsKey(updateList[0]))
+                    {
+                        parentList[updateList[0]].subChunkList.Add(chunk4);
+                        parentList.Remove(updateList[0]);
+                    }
+                }
+                if (replaceList.ContainsKey(updateList[0]))
+                {
+                    replaceList[updateList[0]].gameObject.GetComponent<MeshRenderer>().enabled = false;
+                    replaceList[updateList[0]].gameObject.layer = 12;
+                    replaceList[updateList[0]].isSubChunked = true;
+                    replaceList.Remove(updateList[0]);
+                }
+                updateList.RemoveAt(0);
+            }
         }
     }
 
@@ -202,5 +226,28 @@ public class LoadChunk4s : MonoBehaviour
 
         timer++;
         return false;
+    }
+
+    //Generate chunk4s to fill a Chunk16
+    public void ReplaceChunk16(Chunk16 chunk16, WorldPos chunk16Pos)
+    {
+        for (int y = -1; y < 5; y++)
+        {
+            for (int x = -1; x < 5; x++)
+            {
+                for (int z = -1; z < 5; z++)
+                {
+                    WorldPos worldPos = new WorldPos(chunk16Pos.x + x * 64, chunk16Pos.y + y * 64, chunk16Pos.z + z * 64);
+                    Chunk4 chunk4 = world4.GetChunk4(worldPos.x, worldPos.y, worldPos.z);
+                    if (chunk4 == null)
+                    {
+                        buildList.Add(worldPos);
+                        updateList.Add(worldPos);
+                        parentList[worldPos] = chunk16;
+                    }
+                }
+            }
+        }
+        replaceList[new WorldPos(chunk16Pos.x + 128, chunk16Pos.y + 128, chunk16Pos.z + 128)] = chunk16;
     }
 }

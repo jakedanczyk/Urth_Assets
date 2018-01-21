@@ -19,6 +19,8 @@ public class Chunk256 : MonoBehaviour
     public static int chunk256Size = 256;
     public bool update = false;
     public bool rendered;
+    public bool isSubChunked = false;
+    public List<Chunk64> subChunkList = new List<Chunk64>();
 
     MeshFilter filter;
     MeshCollider coll;
@@ -33,14 +35,14 @@ public class Chunk256 : MonoBehaviour
     }
 
     //Update is called once per frame
-    void Update()
-    {
-        if (update)
-        {
-            update = false;
-            UpdateChunk256();
-        }
-    }
+    //void Update()
+    //{
+    //    if (update)
+    //    {
+    //        update = false;
+    //        UpdateChunk256();
+    //    }
+    //}
 
 	public Block256 GetBlock256(int x, int y, int z)
 	{
@@ -78,7 +80,7 @@ public class Chunk256 : MonoBehaviour
     }
 
     // Updates the chunk based on its contents
-    void UpdateChunk256()
+    public void UpdateChunk256()
     {
         rendered = true;
         MeshData meshData = new MeshData();
@@ -93,7 +95,6 @@ public class Chunk256 : MonoBehaviour
                 }
             }
         }
-
         RenderMesh(meshData);
     }
 
@@ -117,4 +118,21 @@ public class Chunk256 : MonoBehaviour
         coll.sharedMesh = mesh;
     }
 
+    public void ConvertDown()
+    {
+        if (isSubChunked)
+        {
+            foreach (Chunk64 chunk64 in subChunkList)
+            {
+                chunk64.gameObject.GetComponent<MeshRenderer>().enabled = true;
+                chunk64.gameObject.layer = 11;
+            }
+            this.gameObject.GetComponent<MeshRenderer>().enabled = false;
+            this.gameObject.layer = 8;
+        }
+        else
+        {
+            LoadChunk64s.terrainLoadManager.GetComponent<LoadChunk64s>().ReplaceChunk256(this, pos);
+        }
+    }
 }
