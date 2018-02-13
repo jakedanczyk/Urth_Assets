@@ -23,6 +23,10 @@ public enum WeaponType
 
     Pick = 7,
 
+    Club = 8,
+
+    Hammer = 9,
+
     Arm = 100,
 
     Leg = 101,

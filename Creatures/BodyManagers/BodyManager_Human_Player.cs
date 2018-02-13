@@ -70,14 +70,14 @@ public class BodyManager_Human_Player : BodyManager {
         weatherSystem = WeatherControl.manager.GetComponent<WeatherControl>();
         speed = 1.25F + 1.25f * gait;
 
-        InvokeRepeating("UpdateHeartRate", 6f, 6f);
+        InvokeRepeating("UpdateHeartRate", 1f, 1f);
         InvokeRepeating("ReadWeather", 1.5f, 300f);
-        InvokeRepeating("UpdateCoreTemp", 7f, 6f);
-        InvokeRepeating("Encumbrance", 8f, 6f);
-        InvokeRepeating("CalorieBurn", 9f, 6f);
-        InvokeRepeating("Hydration", 10f, 6f);
+        InvokeRepeating("UpdateCoreTemp", 1.5f, 1f);
+        InvokeRepeating("Encumbrance", 2f, 2f);
+        InvokeRepeating("CalorieBurn", 1f, 2f);
+        InvokeRepeating("Hydration", 3f, 2f);
         InvokeRepeating("SleepDebt", 11f, 2f);
-        InvokeRepeating("StaminaUpdate", 9.5f, 6f);
+        InvokeRepeating("StaminaUpdate", 1f, 1f);
         sleepMod.OnValueChange += SleepOnValueChange;
         stats.GetStat<RPGAttribute>(RPGStatType.Strength).AddModifier(sleepMod);
         stats.GetStat<RPGAttribute>(RPGStatType.Agility).AddModifier(sleepMod);
@@ -92,7 +92,6 @@ public class BodyManager_Human_Player : BodyManager {
         if (LevelSerializer.IsDeserializing) return;
 
 
-        anim = GetComponentInChildren<Animator>();
         gait = 0;
         stamina = maxStamina = stats.GetStat(RPGStatType.Endurance).StatValue*10;
         heartRate = stats.GetStat(RPGStatType.RestingHeartRate).StatValue;
@@ -115,6 +114,9 @@ public class BodyManager_Human_Player : BodyManager {
         }
     }
 
+    /*
+     * Weapons and Combat 
+     */
     private void OnTriggerEnter(Collider other)
     {
         collisionList.Add(other);
@@ -138,7 +140,7 @@ public class BodyManager_Human_Player : BodyManager {
         }
     }
 
-    public override void SheatheWeapon(Item_Weapon aWeapon)
+    public void SheatheWeapon(Item_Weapon aWeapon)
     {
         if (!aWeapon.wielded)
             return;
@@ -148,6 +150,7 @@ public class BodyManager_Human_Player : BodyManager {
         aWeapon.GetComponent<Rigidbody>().useGravity = true;
         aWeapon.gameObject.SetActive(false);
         anim.SetBool("ArmsRaised", false);
+        audioSource.PlayOneShot(playerAudioManager.sheathe);
         if (aWeapon is Item_Weapon_Bow)
         {
             wieldingBow = false;
@@ -191,6 +194,7 @@ public class BodyManager_Human_Player : BodyManager {
             //drawnWeapon.gameObject.transform.position = rHandTransform.position;
             drawnWeapon.gameObject.transform.localPosition = Vector3.zero;
         }
+        audioSource.PlayOneShot(playerAudioManager.draw);
         drawnWeapon.gameObject.transform.localRotation = Quaternion.Euler(drawnWeapon.gripOrientation);
         //drawnWeapon.gameObject.transform.localRotation.Equals(drawnWeapon.gripOrientation);
         drawnWeapon.gameObject.transform.localPosition = drawnWeapon.gripAdjust;
@@ -262,7 +266,7 @@ public class BodyManager_Human_Player : BodyManager {
         { WeaponType.Pick, new Tuple<string,RPGStatType>("PickSwing",RPGStatType.Pick) }
     };
        
-    public void MainAttack()
+    public override void MainAttack()
     {
         if (attacking) { return; }
         audioSource.PlayOneShot(playerAudioManager.swing);
@@ -290,20 +294,21 @@ public class BodyManager_Human_Player : BodyManager {
                 print(collisionList[0].transform.root.GetComponent<Tree>().health);
                 collisionList[0].transform.root.GetComponent<Tree>().health -= (cut * blunt + 10);
                 print(collisionList[0].transform.root.GetComponent<Tree>().health);
+                audioSource.PlayOneShot(playerAudioManager.metalOnWood);
             }
             else if (collisionList[0].transform.tag == "BodyPart")
             {
-                print(1);
 
                 BodyPartColliderScript bp = collisionList[0].GetComponent<BodyPartColliderScript>();
                 int[] z = new int[] { 0, 0, 0 }; int[] o = new int[] { blunt, cut, pierce };
                 z = bp.parentBody.SendArmorNumbers(bp.bodyPartType);
                 bp.parentBody.stats.GetStat<RPGBodyPart>(bp.bodyPartType).StatCurrentValue -= ((pierce / z[0]) + (blunt / z[1]));
-                print(2);
                 print(o[0] + ","+ o[1] + "," + o[2]);
-                print(0);
                 AttackResolution(bp, bp.parentBody.stats, stats.GetStat<RPGSkill>(mainAttackDict[rHandWeapon.weaponType].second), z, o);
-                print(4);
+            }
+            else if (collisionList[0].transform.tag == "Terrain")
+            {
+
             }
         }
         print("turning off trigger");
@@ -333,12 +338,9 @@ public class BodyManager_Human_Player : BodyManager {
         else if (roll < (dodgeChance + deflectChance + absorbChance)) { bp.parentBody.Absorb(); print("absorb"); return; }
         else if (roll < (dodgeChance + deflectChance + absorbChance + hitChance))
         {
-            print(bp.name);
-            print("hit");
+            audioSource.PlayOneShot(playerAudioManager.hitBody);
             //bp.parentBody.stats.GetStat<RPGBodyPart>(bp.bodyPartType).StatCurrentValue -= ((o[0] / d[0]) + ( o[1] / d[1]) + (o[2] / d[2]));
             bp.parentBody.stats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue -= (int)(bp.parentBody.stats.GetStat<RPGBodyPart>(bp.bodyPartType).damageModifer * ((o[0] / d[0]) + (o[1] / d[1]) + (o[2] / d[2])));
-            print(bp.parentBody.stats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue);
-            print((int)(bp.parentBody.stats.GetStat<RPGBodyPart>(bp.bodyPartType).damageModifer * ((o[0] / d[0]) + (o[1] / d[1]) + (o[2] / d[2]))));
             attackSkill.GainXP(10);
             return;
         }
@@ -436,28 +438,52 @@ public class BodyManager_Human_Player : BodyManager {
     public bool wieldingBow, arrowKnocked, drawingBow, bowDrawn;
     public float startTime, nowTime;
     public float drawTime = 3f;
+    GameObject loadedProjectile;
     public void KnockArrow()
     {
-        if(!drawingBow && !(currentAmmo == null))
-        arrowKnocked = true;
+        if (!drawingBow && !arrowKnocked && currentAmmo != null)
+        {
+            arrowKnocked = true;
+            Item_Weapon_Bow bow = (Item_Weapon_Bow)lHandWeapon;
+            if (bow != null)
+            {
+                loadedProjectile = Instantiate(currentAmmoPrefab, bow.nockPoint) as GameObject;
+                loadedProjectile.transform.localPosition = Vector3.zero;
+                loadedProjectile.transform.localRotation = Quaternion.identity;
+                loadedProjectile.GetComponent<Rigidbody>().isKinematic = true;
+                loadedProjectile.GetComponent<Item_Ammo_Arrow>().attackCollider.isTrigger = false;
+                loadedProjectile.SetActive(true);
+                //loadedProjectile.GetComponent<Item_Ammo_Arrow>().attackCollider.isTrigger = false;
+            }
+        }
     }
     public void DrawBow()
     {
         anim.SetBool("DrawingBow", true);
         drawingBow = true;
+        Item_Weapon_Bow bow = (Item_Weapon_Bow)lHandWeapon;
+        if(bow != null)
+        {
+            bow.Draw();
+        }
         StartCoroutine(BowPull());
         startTime = Time.time;
     }
     private IEnumerator BowPull()
     {
         print("Start");
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(1);
         print("done");
         if(drawingBow)
         bowDrawn = true;
     }
     public void ReleaseBow()
     {
+        Item_Weapon_Bow bow = (Item_Weapon_Bow)lHandWeapon;
+        if (bow != null)
+        {
+            bow.Release();
+        }
         anim.SetBool("DrawingBow", false);
         drawingBow = false;
         bowDrawn = false;
@@ -483,18 +509,23 @@ public class BodyManager_Human_Player : BodyManager {
 
         if (drawingBow && bowDrawn && arrowKnocked)
         {
+            Item_Weapon_Bow bow = (Item_Weapon_Bow)lHandWeapon;
+            if (bow != null)
+            {
+                bow.Fire();
+            }
             bowDrawn = false;
             drawingBow = arrowKnocked = false;
             anim.SetTrigger("FireBow");
             anim.SetBool("DrawingBow", false);
-            GameObject clone;
-            clone = Instantiate(currentAmmoPrefab, aimPoint) as GameObject;
-            Item_Ammo_Arrow thisArrow = clone.GetComponent<Item_Ammo_Arrow>();
-            clone.SetActive(true);
-            clone.transform.parent = null;
-            clone.transform.position = new Vector3(aimPoint.position.x + .14f, aimPoint.position.y - 0.04f, aimPoint.position.z + .177f);
-            clone.GetComponent<Rigidbody>().AddForce(aimPoint.TransformDirection(Vector3.forward * 2000));
-            //clone.GetComponent<Rigidbody>().velocity = aimPoint.TransformDirection(Vector3.forward * 50);
+            Item_Ammo_Arrow thisArrow = loadedProjectile.GetComponent<Item_Ammo_Arrow>();
+            loadedProjectile.GetComponent<Rigidbody>().isKinematic = false;
+            Vector3 pos = loadedProjectile.transform.position;
+            loadedProjectile.transform.parent = null;
+            loadedProjectile.transform.position = arrowReleasePoint.position;
+            loadedProjectile.GetComponent<Rigidbody>().AddForce(arrowReleasePoint.TransformDirection(Vector3.forward * 10));
+            thisArrow.projectile.previousPosition = loadedProjectile.transform.position;
+            thisArrow.projectile.enabled = true;
             thisArrow.projectile.shooter = thisManager;
             thisArrow.attackCollider.isTrigger = true;
             thisArrow.numItems = 1;
@@ -520,6 +551,9 @@ public class BodyManager_Human_Player : BodyManager {
         //}
     }
 
+    /*
+     * Inventory and Outfit 
+     */
     public void PlaceInBag(Item_Weapon weapon, Inventory bag) { }
 
     // Add a garment to the player's outfit. Player protection stats are updated. Character model updated if item has model.
@@ -550,7 +584,7 @@ public class BodyManager_Human_Player : BodyManager {
         }
     }
 
-    public override void RemoveGarment(Item_Garment thisWearable)
+    public void RemoveGarment(Item_Garment thisWearable)
     {
         if (!thisWearable.equipped)
             return;
@@ -572,7 +606,7 @@ public class BodyManager_Human_Player : BodyManager {
         thisWearable.equipped = false;
     }
 
-    public int[] SendArmorNumbers(RPGStatType bodyPart)
+    public new int[] SendArmorNumbers(RPGStatType bodyPart)
     {
         int b = 0, c = 0, p = 0;
         int[] z = new int[] { 0, 0, 0 };
@@ -740,6 +774,10 @@ public class BodyManager_Human_Player : BodyManager {
         return z;
     }
 
+    /*
+     *Bodily Needs
+     */
+
     public float heartRate;
 
     public bool moving, sprinting;
@@ -765,13 +803,14 @@ public class BodyManager_Human_Player : BodyManager {
     {
         test = stats.GetStat(RPGStatType.RestingHeartRate).StatValue;
         float target;
-        target = stats.GetStat(RPGStatType.RestingHeartRate).StatValue + (moving ? 0 : (gait * 30 * (crouching ? 1:1.5f))) + (.001f * (maxStamina - stamina)) + (shivering ? 30 : 0);
+        target = stats.GetStat(RPGStatType.RestingHeartRate).StatValue + (moving ? (gait * 30 * (crouching ? 1:1.5f)) : 0) + (.001f * (maxStamina - stamina)) + (shivering ? 30 : 0);
         target += encumbrance * 60;
+        target = Math.Min(target, 200);
         float diff = target - heartRate;
         float now = worldTime.totalGameSeconds;
-        heartRate = Math.Min(heartRate + (now - lastHeartCheckTime) / 6 * ((.0005f * diff * diff) + (.01f * diff)),200);
+        heartRate = Math.Min(heartRate + (now - lastHeartCheckTime) * ((.0005f * diff * Math.Abs(diff)) + (.01f * diff)),200);
         heartRate = Math.Max(10, heartRate);
-        lastHeartCheckTime = 0;
+        lastHeartCheckTime = now;
     }
 
     public float coreTempBase = 37f;
@@ -792,7 +831,7 @@ public class BodyManager_Human_Player : BodyManager {
     void UpdateCoreTemp()
     {
         ReadWeather();
-        float heatProduction = 0.005f * stats.GetStat(RPGStatType.Weight).StatValue * heartRate * heartRate / (stats.GetStat(RPGStatType.RestingHeartRate).StatValue * stats.GetStat(RPGStatType.RestingHeartRate).StatValue);
+        float heatProduction = 0.005f * stats.GetStat(RPGStatType.Weight).StatValue * heartRate / (stats.GetStat(RPGStatType.RestingHeartRate).StatValue);
         float heatLoss = ((coreTemp - localTemperature) * (.1f+humidity) + localTemperature * localTemperature * humidity) * stats.GetStat(RPGStatType.Height).StatValue / totalInsulation;
         //print(coreTemp + ", " + localTemperature + ", " + heartRate);
         //float coolingFactor = coreTemp * (0.000001f * (coreTemp - localTemperature + 10 - (5*heartRate/60)));
@@ -998,7 +1037,9 @@ public class BodyManager_Human_Player : BodyManager {
     }
 
 
-    //Tasks
+    /*
+     * Tasks
+     */
     private IEnumerator coroutine;
     public float taskStartTime, taskTimeNeeded;
 

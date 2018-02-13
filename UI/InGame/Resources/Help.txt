@@ -1,7 +1,7 @@
 Help
 
 Controls
-Caps Lock - cycle gait: slow walk, walk, jog run
+Caps Lock - cycle gait: slow walk, walk, jog, run
 Shift - hold down to sprint
 Ctrl - toggle crouch
 
@@ -14,18 +14,19 @@ O - Chacter overview
 K - Crafting
 L - Actions
 
-Building mode
 B - Activate building mode
-Left click -  Build when green
-Right click - Rotate
+Left click -  Build when preview is green
+Right click - Rotate 90 degrees
 0 - Cycle through buildings
 
 P - Pause
 
-Time Control - Clock time only:
+1/2/3 - World time of day, bodily needs, and tasks progress at...
 1 - 1 second per second
 2 - 1 minute per second
 3 - 1 hour per second
 
-Time Control - Clock & Physics:
-[] (Left/Right Bracket) - Half/Double time between 1x and 64x
+[] (Left/Right Bracket) - Halve/Double game speed between 1x and 64x. Useful for fast travel.
+
+= while holding N - increase terrain resolution.
+- while holding N - decrease terrain resolution.

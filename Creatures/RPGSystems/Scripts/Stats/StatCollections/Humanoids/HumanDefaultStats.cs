@@ -239,6 +239,10 @@ public class HumanDefaultStats : CreatureStats
         legStrike.StatName = "Leg Strike";
         legStrike.StatBaseValue = 1;
 
+        var bite = CreateOrGetStat<RPGSkill>(RPGStatType.Bite);
+        bite.StatName = "Bite";
+        bite.StatBaseValue = 1;
+
         var axe = CreateOrGetStat<RPGSkill>(RPGStatType.Axe);
         axe.StatName = "Axe";
         axe.StatBaseValue = 1;

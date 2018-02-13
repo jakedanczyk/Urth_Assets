@@ -109,7 +109,7 @@ public class BodyManager_Human : BodyManager {
         }
     }
 
-    public override void SheatheWeapon(Item_Weapon heldWeapon)
+    public void SheatheWeapon(Item_Weapon heldWeapon)
     {
         print("Sheate weapon: " + heldWeapon.itemName);
 
@@ -161,7 +161,7 @@ public class BodyManager_Human : BodyManager {
         { WeaponType.Pick, "PickSwing" }
     };
        
-    public void MainAttack()
+    public override void MainAttack()
     {
         if (attacking) { return; }
         collisionList.Clear();
@@ -400,7 +400,7 @@ public class BodyManager_Human : BodyManager {
         }
     }
 
-    public override void RemoveGarment(Item_Garment thisWearable)
+    public void RemoveGarment(Item_Garment thisWearable)
     {
         foreach (RPGStatType partCovered in thisWearable.bodyPartCoverage)
         {

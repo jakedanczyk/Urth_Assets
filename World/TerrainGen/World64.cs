@@ -78,6 +78,15 @@ public class World64 : MonoBehaviour {
         }
     }
 
+    public void RemoveChunk64(WorldPos worldPos)
+    {
+        chunk64s.Remove(worldPos);
+    }
+    public void AddChunk64(WorldPos worldPos, Chunk64 chunk)
+    {
+        chunk64s[worldPos] = chunk;
+    }
+
     public Chunk64 GetChunk64(int x, int y, int z)
     {
         WorldPos pos = new WorldPos();

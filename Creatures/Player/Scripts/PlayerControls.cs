@@ -166,14 +166,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
             if (LevelSerializer.IsDeserializing) return;
 
             RaycastHit ground;
-            if (Physics.Raycast(this.transform.position, Vector3.down, out ground, 512f, mask1))
+            if (Physics.Raycast(this.transform.position + Vector3.up, Vector3.down, out ground, 512f, mask1))
             {
                 aboveDetailedChunk = true;
-                lastPosition = this.transform.position;
-            }
-            else if (Physics.Raycast(this.transform.position, Vector3.down, out ground, 512f, mask2))
-            {
-                aboveDetailedChunk = false;
                 lastPosition = this.transform.position;
             }
             else
@@ -530,24 +525,15 @@ namespace UnityStandardAssets.Characters.FirstPerson
                             {
                                 player_bodyManager.SheatheWeapon(selectedItem);
                             }
-                            else if (player_bodyManager.rHandWeapon == null)
+                            else
                             {
+                                if (player_bodyManager.rHandWeapon != null)
+                                {
+                                    player_bodyManager.DropItem(player_bodyManager.rHandWeapon);
+                                }
                                 if (!selectedItem.wielded)
                                 {
                                     player_bodyManager.DrawWeapon(selectedItem);
-                                    m_AudioSource.PlayOneShot(playerAudioManager.draw);
-                                }
-                                else if (selectedItem.wielded)
-                                {
-                                    player_bodyManager.SheatheWeapon(selectedItem);
-                                    m_AudioSource.PlayOneShot(playerAudioManager.sheathe);
-                                }
-                            }
-                            else if (player_bodyManager.lHandWeapon == null)
-                            {
-                                if (!selectedItem.wielded)
-                                {
-                                    player_bodyManager.OffHandDrawWeapon(selectedItem);
                                 }
                                 else if (selectedItem.wielded)
                                 {
@@ -832,11 +818,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     Cursor.lockState = CursorLockMode.None;
                 }
             }
-
-            if (Input.GetKeyDown(KeyCode.M))
-            {
-
-            }
         } //end of Update
 
 
@@ -900,7 +881,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private void LateUpdate()
         {
-            m_Camera = Camera.main.GetComponent<Camera>();
+            //m_Camera = Camera.main.GetComponent<Camera>();
 
             shoulderGirdle.transform.Rotate(m_Camera.transform.rotation.eulerAngles.x, 0, 0);
         }

@@ -8,14 +8,19 @@ public class Chase : MonoBehaviour {
     public Transform player;
     public Animator anim;
     public AICharacterControl aiCharControl;
-    public BodyManager_Skeleton skeletonBody;
+    public BodyManager bodyManager;
     public bool attacking = false;
+    [Range(1f, 180f)]
+    public float visionSpread;
+    [Range(0.01f, 1000f)]
+    public float visionDistance;
+
 
 	// Use this for initialization
 	void Start () {
         if (LevelSerializer.IsDeserializing) return;
 
-        player = GameObject.Find("PlayerObject").transform;
+        player = UnityStandardAssets.Characters.FirstPerson.PlayerControls.playerControlsGameObject.transform;
         playerBody = player.GetComponent<BodyManager>();
         anim = GetComponent<Animator>();
         anim.speed = 2.0f;
@@ -25,7 +30,7 @@ public class Chase : MonoBehaviour {
     void Update() {
         Vector3 direction = player.position - this.transform.position;
         float angle = Vector3.Angle(direction, this.transform.forward);
-        if (Vector3.Distance(player.position, this.transform.position) < 64 && angle < 90)
+        if (Vector3.Distance(player.position, this.transform.position) < 64 && angle < visionSpread)
         {
             RaycastHit hit;
             if (Physics.Raycast(this.transform.position, direction, out hit, 64))
@@ -64,15 +69,16 @@ public class Chase : MonoBehaviour {
             anim.SetBool("isWalking", false);
             anim.SetBool("isAttacking", false);
             CancelInvoke();
-            skeletonBody.StopCoroutine("Claw");
+            //skeletonBody.StopCoroutine("Claw");
         }
     }
 
     void MainAttack()
     {
         print(664);
+        bodyManager.MainAttack();
 
-        skeletonBody.MainAttack();
+        //skeletonBody.MainAttack();
     }
 
     void OnDeserialize()

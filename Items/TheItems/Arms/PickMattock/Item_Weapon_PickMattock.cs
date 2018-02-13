@@ -15,6 +15,5 @@ public class Item_Weapon_PickMattock : Item_Weapon {
         gripOrientation = new Vector3(82.28f, 27.9f, -13.7f);
         //attackList.Add(new Item_Attack("Hammer", 3, 0, 3));
         //print(attackList[1].attackName);
-
     }
 }

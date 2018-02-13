@@ -146,6 +146,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1475525501041886
+GameObject:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4259395215737492}
+  m_Layer: 0
+  m_Name: Nock
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1510025662425476
 GameObject:
   m_ObjectHideFlags: 1
@@ -323,6 +338,19 @@ Transform:
   m_Father: {fileID: 4147466989608922}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4259395215737492
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1475525501041886}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4310098061069502}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!4 &4310098061069502
 Transform:
   m_ObjectHideFlags: 1
@@ -332,7 +360,8 @@ Transform:
   m_LocalRotation: {x: 0, y: -0, z: -0.7071068, w: 0.7071068}
   m_LocalPosition: {x: -0, y: 0, z: -0.120556496}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 4259395215737492}
   m_Father: {fileID: 4147466989608922}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -355,8 +384,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1099907128242714}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2594.863, y: 5171.262, z: -1486.341}
+  m_LocalRotation: {x: -0.00000028211963, y: -0.9884941, z: 0.000002607133, w: 0.1512597}
+  m_LocalPosition: {x: -4787.634, y: 7207.861, z: -5318.8013}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4021714068545428}
@@ -439,7 +468,7 @@ Animator:
   m_GameObject: {fileID: 1117165753798770}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: c482d46fb92d24e44b9f8fa39b8829b7, type: 3}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 0ac6b475124b30e4a8452fe600948421, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 1
@@ -514,7 +543,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsDeserializing: 0
-  _id: d22fc3f6-bb30-4f0b-8cba-bdb6cafdd0ff
+  _id: 74bead20-60e0-441f-ace3-c2a66dd788ee
   classId: 490f1914-52ba-4358-9633-ecb65c7d9423
   StoreAllComponents: 1
   Components: []
@@ -532,6 +561,8 @@ MonoBehaviour:
   parentItem: {fileID: 114388410938160282}
   parentInventory: {fileID: 0}
   thisButton: {fileID: 114326525081437470}
+  panel: {fileID: 0}
+  playerControls: {fileID: 0}
 --- !u!114 &114234566316865020
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -544,7 +575,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsDeserializing: 0
-  _id: 668d8aab-845e-4b55-8fa8-5c12510ebbd9
+  _id: 416002d5-7736-47b0-b71b-c895c6f4be74
   classId: 8725597b-139e-432d-94c2-3ce02100eec0
   StoreAllComponents: 1
   Components: []
@@ -636,6 +667,8 @@ MonoBehaviour:
   gripOrientation: {x: 7.693, y: -85.59, z: -63.426}
   collList: []
   drawTime: 1
+  nockPoint: {fileID: 4259395215737492}
+  anim: {fileID: 95289904391554096}
 --- !u!114 &114486770124998990
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -41,7 +41,7 @@ public class BodyManager_Horse : BodyManager {
         }
     }
 
-    public override void RemoveGarment(Item_Garment garment)
+    public void RemoveGarment(Item_Garment garment)
     {
 
     }
@@ -52,7 +52,7 @@ public class BodyManager_Horse : BodyManager {
 
 
 
-    public override void SheatheWeapon(Item_Weapon aWeapon)
+    public void SheatheWeapon(Item_Weapon aWeapon)
     {
         if (!aWeapon.wielded)
             return;
@@ -62,4 +62,17 @@ public class BodyManager_Horse : BodyManager {
         aWeapon.gameObject.SetActive(false);
     }
 
+    public override void MainAttack()
+    {
+        if (attacking) { return; }
+        collisionList.Clear();
+        print("main attack");
+        Kick();
+    }
+
+
+    void Kick()
+    {
+
+    }
 }

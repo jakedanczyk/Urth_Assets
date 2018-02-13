@@ -266,6 +266,10 @@ public class LoadChunk1s : MonoBehaviour
             {
                 for (int z = -1; z < 5; z++)
                 {
+                    if (z == 2 && x == 2 && y == 2)
+                    {
+                        continue;
+                    }
                     WorldPos worldPos = new WorldPos(chunk4Pos.x + x * 16, chunk4Pos.y + y * 16, chunk4Pos.z + z * 16);
                     Chunk1 chunk = world1.GetChunk1(worldPos.x, worldPos.y, worldPos.z);
                     if (chunk == null)
@@ -276,6 +280,14 @@ public class LoadChunk1s : MonoBehaviour
                     }
                 }
             }
+        }
+        WorldPos worldPosCenter = new WorldPos(chunk4Pos.x + 32, chunk4Pos.y + 32, chunk4Pos.z + 32);
+        Chunk1 chunkCenter = world1.GetChunk1(worldPosCenter.x, worldPosCenter.y, worldPosCenter.z);
+        if (chunkCenter == null)
+        {
+            buildList.Add(worldPosCenter);
+            updateList.Add(worldPosCenter);
+            parentList[worldPosCenter] = chunk4;
         }
         replaceList[new WorldPos(chunk4Pos.x + 32, chunk4Pos.y + 32, chunk4Pos.z + 32)] = chunk4;
     }

@@ -75,7 +75,7 @@ public enum RPGStatType {
 
     ArmStrike = 553,
     LegStrike = 554,
-    Throwing = 555,
+    Bite = 555,
 
     Axe = 556,      //hatchet, wood axe, 1hand axe, 2hand axe
     Blunt = 557,    //clubs, maces, hammers, flails, morningstart
@@ -90,6 +90,7 @@ public enum RPGStatType {
     Bow = 565,
     Sling = 566,
     Atlatl = 567,
+    Throwing = 568,
 
     //movement skills
     //Sneak = 590,
@@ -330,4 +331,6 @@ public enum RPGStatType {
     Torso = 4051,
     Limb = 4052,
     Leg = 4053,
+    Arm = 4054,
+    Tail = 4055,
 }

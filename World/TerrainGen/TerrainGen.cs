@@ -29,8 +29,8 @@ public class TerrainGen
     float snowNoiseHeight = 1;
     float snowHeight = 0;
 
-    float treeline = 3700;
-    float shrubline = 5050;
+    public float treeline = 3700;
+    public float shrubline = 5050;
     float snowline = 5180;
     float caveFrequency = 0.0025f;
     int caveSize = 21;
@@ -230,6 +230,78 @@ public class TerrainGen
         return dirtHeight;
     }
 
+    public float SnowHeight(float x, float y, float z)
+    {
+        stoneHeight = stoneBaseHeight;
+
+        stoneHeight += GetNoiseF(x, 0, z, stoneMountainFrequency, stoneMountainHeight);
+
+        if (stoneHeight < stoneMinHeight)
+            stoneHeight = stoneMinHeight;
+
+        float cliffHeight = Mathf.Min((y - 3000f) / 300 * Mathf.Pow(GetNoiseF(x, 0, z, cliffFrequency, cliffMax), 3f), 500f);
+
+        if (cliffHeight > 20)
+            stoneHeight += cliffHeight;
+
+        stoneHeight += GetNoiseF(x, 0, z, stoneMinorNoise, stoneMinorHeight);
+        stoneHeight += GetNoiseF(x, 0, z, stoneBaseNoise, stoneBaseNoiseHeight);
+
+
+        snowHeight = stoneHeight + snowBaseHeight;
+        snowHeight += GetNoiseF(x, 100, z, snowNoise, snowNoiseHeight);
+
+        return snowHeight;
+    }
+    public float StoneHeight256(float x, float y, float z)
+    {
+        stoneHeight = stoneBaseHeight;
+
+        stoneHeight += GetNoiseF(x, 0, z, stoneMountainFrequency, stoneMountainHeight);
+
+        if (stoneHeight < stoneMinHeight)
+            stoneHeight = stoneMinHeight;
+
+        stoneHeight += GetNoiseF(x, 0, z, stoneMinorNoise, stoneMinorHeight);
+        stoneHeight += GetNoiseF(x, 0, z, stoneBaseNoise, stoneBaseNoiseHeight);
+        return stoneHeight;
+    }
+
+    public float DirtHeight256(float x, float y, float z)
+    {
+        stoneHeight = stoneBaseHeight;
+
+        stoneHeight += GetNoiseF(x, 0, z, stoneMountainFrequency, stoneMountainHeight);
+
+        if (stoneHeight < stoneMinHeight)
+            stoneHeight = stoneMinHeight;
+
+        stoneHeight += GetNoiseF(x, 0, z, stoneMinorNoise, stoneMinorHeight);
+        stoneHeight += GetNoiseF(x, 0, z, stoneBaseNoise, stoneBaseNoiseHeight);
+
+        dirtHeight = stoneHeight + dirtBaseHeight;
+        dirtHeight += GetNoiseF(x, 100, z, dirtNoise, dirtNoiseHeight);
+        return dirtHeight;
+    }
+
+    public float SnowHeight256(float x, float y, float z)
+    {
+        stoneHeight = stoneBaseHeight;
+
+        stoneHeight += GetNoiseF(x, 0, z, stoneMountainFrequency, stoneMountainHeight);
+
+        if (stoneHeight < stoneMinHeight)
+            stoneHeight = stoneMinHeight;
+
+        stoneHeight += GetNoiseF(x, 0, z, stoneMinorNoise, stoneMinorHeight);
+        stoneHeight += GetNoiseF(x, 0, z, stoneBaseNoise, stoneBaseNoiseHeight);
+
+        snowHeight = stoneHeight + snowBaseHeight;
+        snowHeight += GetNoiseF(x, 100, z, snowNoise, snowNoiseHeight);
+
+        return snowHeight;
+    }
+
     public Chunk ChunkGen(Chunk chunk)
     {
         for (float x = chunk.pos.x; x < chunk.pos.x + 4; x += .25f) //Change this line
@@ -299,40 +371,28 @@ public class TerrainGen
             }
             else if (y < shrubline && y <= dirtHeight && caveSize < caveChance)
             {
-                //System.Random rnd = new System.Random();
-                //int month = rnd.Next(1, 13);
-                //if (month < 11)
-                //{
-                if (GetNoiseF(x, y/2, z, pondFrequency, 350) < pondDensity)
+                SetBlock(x, y, z, new BlockGrass(), chunk);
+                if (y <= treeline && !chunk.hasTree && GetNoise((int)x, 0, (int)z, treeFrequency, 100) < treeDensity)
                 {
-                    SetBlock(x, y, z, new BlockWater(), chunk);
-                    chunk.hasWater = true;
-                }
-                else
-                {
-                    SetBlock(x, y, z, new BlockGrass(), chunk);
-                    if (y <= treeline && !chunk.hasTree && GetNoise((int)x, 0, (int)z, treeFrequency, 100) < treeDensity)
-                    {
-                        chunk.hasTree = true;
-                        chunk.treeList.Add(new Vector3(x, y, z));
-                        //treeVar = (GameObject)Resources.Load("Tree1", typeof(GameObject));
-                        //treeVar.transform.position = new Vector3(x, y, z);
-                    }
-                    if (y == dirtHeight && GetNoise((int)x, 0, (int)z, huckFrequency, 100) < huckDensity)
-                    {
-                        chunk.hasBush = true;
-                        chunk.bushList.Add(new Vector3(x, y, z));
-                    }
+                    chunk.hasTree = true;
+                    chunk.treeList.Add(new Vector3(x, y, z));
                     //treeVar = (GameObject)Resources.Load("Tree1", typeof(GameObject));
                     //treeVar.transform.position = new Vector3(x, y, z);
-                    //CreateTree(x, y + 1, z, chunk);
-                    //}
-                    //else
-                    //{
-                    //    SetBlock(x, y, z, new BlockWater(), chunk);
-                    //    chunk.hasWater = true;
-                    //}
                 }
+                if (y == dirtHeight && GetNoise((int)x, 0, (int)z, huckFrequency, 100) < huckDensity)
+                {
+                    chunk.hasBush = true;
+                    chunk.bushList.Add(new Vector3(x, y, z));
+                }
+                //treeVar = (GameObject)Resources.Load("Tree1", typeof(GameObject));
+                //treeVar.transform.position = new Vector3(x, y, z);
+                //CreateTree(x, y + 1, z, chunk);
+                //}
+                //else
+                //{
+                //    SetBlock(x, y, z, new BlockWater(), chunk);
+                //    chunk.hasWater = true;
+                //}
             }
             else if (y >= snowline && y <= snowHeight)
             {
@@ -416,11 +476,6 @@ public class TerrainGen
             }
             else if (y < shrubline && y <= dirtHeight && caveSize < caveChance)
             {
-                if (GetNoiseF(x, y / 2, z, pondFrequency, 350) < pondDensity)
-                {
-                    SetBlock1(x, y, z, new Block1Water(), chunk1);
-                    chunk1.hasWater = true;
-                }
                 SetBlock1(x, y, z, new Block1Grass(), chunk1);
 
                 if (y == dirtHeight && y <= treeline && !chunk1.hasTree && GetNoise(x, 0, z, treeFrequency, 100) < treeDensity)
@@ -511,6 +566,7 @@ public class TerrainGen
 
             if (y <= stoneHeight && caveSize < caveChance)
             {
+                SetBlock4(x, y, z, new Block4(), chunk4);
                 //if(goldSize > goldChance)
                 //{
                 //    SetBlock(x, y, z, new BlockQuartzGold(), chunk);
@@ -520,9 +576,8 @@ public class TerrainGen
                 //    SetBlock(x, y, z, new BlockCopperOre(), chunk);
                 //}
                 //else { SetBlock(x, y, z, new Block(), chunk); }
-                SetBlock4(x, y, z, new Block4(), chunk4);
             }
-            else if (y < shrubline && y-2 <= dirtHeight && caveSize < caveChance)
+            else if (y < shrubline && (y - 2) <= dirtHeight && caveSize < caveChance)
             {
                 SetBlock4(x, y, z, new Block4Grass(), chunk4);
 
@@ -677,9 +732,7 @@ public class TerrainGen
                 SetBlock64(x, y, z, new Block64Air(), chunk64);
                 chunk64.airCount++;
             }
-
         }
-
         return chunk64;
     }
 
@@ -721,12 +774,12 @@ public class TerrainGen
                 //else { SetBlock(x, y, z, new Block(), chunk); }
                 SetBlock256(x, y, z, new Block256(), chunk256);
             }
-            else if (y <= shrubline && (y - 256) <= dirtHeight)
+            else if (y <= shrubline && (y - 255) <= dirtHeight)
             {
                 SetBlock256(x, y, z, new Block256Grass(), chunk256);
 
             }
-            else if (y >= snowline && (y-256) <= snowHeight)
+            else if (y >= snowline && (y - 255) <= snowHeight)
             {
                 SetBlock256(x, y, z, new Block256Snow(), chunk256);
 

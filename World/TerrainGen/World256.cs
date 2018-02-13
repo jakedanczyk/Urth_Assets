@@ -77,6 +77,15 @@ public class World256 : MonoBehaviour {
         }
     }
 
+    public void RemoveChunk256(WorldPos worldPos)
+    {
+        chunk256s.Remove(worldPos);
+    }
+    public void AddChunk256(WorldPos worldPos, Chunk256 chunk)
+    {
+        chunk256s[worldPos] = chunk;
+    }
+
     public Chunk256 GetChunk256(int x, int y, int z)
     {
         WorldPos pos = new WorldPos();

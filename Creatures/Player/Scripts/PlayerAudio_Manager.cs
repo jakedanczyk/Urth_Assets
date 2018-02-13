@@ -7,8 +7,10 @@ public class PlayerAudio_Manager : MonoBehaviour {
     public AudioClip inventoryTransfer;
     public AudioClip openInventory;
     public AudioClip metalOnStone;
+    public AudioClip metalOnWood;
     public AudioClip draw;
     public AudioClip sheathe;
     public AudioClip swing,equip,hitBody;
     public AudioClip drink;
+    public AudioClip fall;
 }

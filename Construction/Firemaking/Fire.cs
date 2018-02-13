@@ -7,8 +7,8 @@ public class Fire : MonoBehaviour {
 
     public Inventory fireContents;
     public LootInventory fireLoot;
-    public float fuelRate = 666f;
-    public float fuel = 10000f;
+    public float fuelRate = 22f;
+    public float fuel = 20000f;
     public bool isLit;
 
     float maxTemp = 500f;
@@ -18,6 +18,12 @@ public class Fire : MonoBehaviour {
     public AudioSource soundFX;
 
     public WorldTime worldTime;
+    float prevFuelCheckTime;
+
+    private void Start()
+    {
+        worldTime = WorldTime.thisObject.GetComponent<WorldTime>();
+    }
 
     public void LightFire()
     {
@@ -31,7 +37,8 @@ public class Fire : MonoBehaviour {
 
     void BurnFuel()
     {
-        fuel -= fuelRate;
+        fuel -= fuelRate * (worldTime.totalGameSeconds - prevFuelCheckTime);
+        prevFuelCheckTime = worldTime.totalGameSeconds;
         if (fireContents.inventoryContents.Any())
         {
             Item newFuel = fireContents.inventoryContents.FirstOrDefault(item => item.primaryMaterialType == ItemMaterialType.Wood);

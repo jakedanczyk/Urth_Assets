@@ -77,6 +77,15 @@ public class World16 : MonoBehaviour {
         }
     }
 
+    public void RemoveChunk16(WorldPos worldPos)
+    {
+        chunk16s.Remove(worldPos);
+    }
+    public void AddChunk16(WorldPos worldPos, Chunk16 chunk)
+    {
+        chunk16s[worldPos] = chunk;
+    }
+
     public Chunk16 GetChunk16(int x, int y, int z)
     {
         WorldPos pos = new WorldPos();

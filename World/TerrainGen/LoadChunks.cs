@@ -221,12 +221,16 @@ public class LoadChunks : MonoBehaviour
     //Generate chunks to fill a Chunk1
     public void ReplaceChunk1(Chunk1 chunk1, WorldPos chunk1Pos)
     {
-        for (int y = 0; y < 4; y++)
+        for (int y = -1; y < 5; y++)
         {
-            for (int x = 0; x < 4; x++)
+            for (int x = -1; x < 5; x++)
             {
-                for (int z = 0; z < 4; z++)
+                for (int z = -1; z < 5; z++)
                 {
+                    if (z == 2 && x == 2 && y == 2)
+                    {
+                        continue;
+                    }
                     WorldPos worldPos = new WorldPos(chunk1Pos.x + x * 4, chunk1Pos.y + y * 4, chunk1Pos.z + z * 4);
                     Chunk chunk = world.GetChunk(worldPos.x, worldPos.y, worldPos.z);
                     if (chunk == null)
@@ -238,6 +242,14 @@ public class LoadChunks : MonoBehaviour
                 }
             }
         }
-        replaceList[new WorldPos(chunk1Pos.x + 12, chunk1Pos.y + 12, chunk1Pos.z + 12)] = chunk1;
+        WorldPos worldPosCenter = new WorldPos(chunk1Pos.x + 8, chunk1Pos.y + 8, chunk1Pos.z + 8);
+        Chunk chunkCenter = world.GetChunk(worldPosCenter.x, worldPosCenter.y, worldPosCenter.z);
+        if (chunkCenter == null)
+        {
+            buildList.Add(worldPosCenter);
+            updateList.Add(worldPosCenter);
+            parentList[worldPosCenter] = chunk1;
+        }
+        replaceList[worldPosCenter] = chunk1;
     }
 }

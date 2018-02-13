@@ -16,6 +16,7 @@ public enum BodyPartType
     Pelvis = 22,
     UpperBack = 23,
     LowerBack = 24,
+    Tail = 25,
 
     LeftThigh = 40,
     RightThigh = 41,
@@ -37,6 +38,6 @@ public enum BodyPartType
     Torso = 71,
     Limb = 72,
     Leg = 73,
-       
+    Arm = 74,   
 
 }

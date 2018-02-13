@@ -1,0 +1,424 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class River : MonoBehaviour
+{
+    public List<Vector3> waypoints, left, right;
+    public List<float> speeds = new List<float>();
+    public List<float> widths = new List<float>();
+    public Vector3 source;
+    public float sourceFlow;
+    public List<float> turns;
+    float radius = 3f;
+    
+    public GameObject lakePrefab;
+    public IEnumerator initialGenerate, generate, findJunction, joinLake;
+    public RiverGenLeader riverGenLeader;
+    public List<River> tributaries;
+    public River parentStem;
+    public Lake endLake;
+    public List<RiverNode> nodes;
+
+    public GameObject nodePrefab;
+
+
+    private void Awake()
+    {
+        initialGenerate = InitialGenerate();
+        generate = Generate();
+    }
+
+    IEnumerator InitialGenerate()
+    {
+        var terrainGen = new TerrainGen();
+        this.gameObject.transform.position = source;
+        waypoints.Add(Vector3.zero);
+        sourceFlow = Random.Range(.03f, 3f);
+        widths.Add(sourceFlow);
+        float theta = 45f * Mathf.PI / 180f;
+        float low;
+        float height;
+        float turn = 0;
+        float moveX = 0;
+        float moveZ = 0;
+        float t, x, z;
+        for (int c = 0; c < 10000; c++) // (true)
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                low = 999999f;
+                for (int j = 0; j < 8; j++)
+                {
+                    t = theta * j;
+                    x = (15 * Mathf.Cos(t));
+                    z = (15 * Mathf.Sin(t));
+                    height = terrainGen.StoneHeight256(source.x + waypoints[waypoints.Count - 1].x + x, 0, source.z + waypoints[waypoints.Count - 1].z + z);
+                    if (height < low)
+                    {
+                        turn = t;
+                        low = height;
+                        moveX = radius * Mathf.Cos(turn);
+                        moveZ = radius * Mathf.Sin(turn);
+                    }
+                }
+
+                float drop = terrainGen.StoneHeight256(source.x + waypoints[waypoints.Count - 1].x + moveX, 0, source.z + waypoints[waypoints.Count - 1].z + moveZ) - source.y; 
+                if (drop - waypoints[waypoints.Count - 1].y > 0)
+                {
+                    doneForNow = true;
+                    //in a depression, form a pond/lake
+                    Render();
+                    GameObject lake = Instantiate(lakePrefab);
+                    lake.transform.position = waypoints[waypoints.Count - 1] + source;
+                    endLake = lake.GetComponent<Lake>();
+                    if(!endLake.sources.Contains(this))
+                        endLake.sources.Add(this);
+                    endLake.Generate();
+                    riverGenLeader.transform.position = waypoints[waypoints.Count - 1] + source;
+                    findJunction = FindJunction(riverGenLeader.touchedRiver);
+                    StartCoroutine(findJunction);
+                    JoinLake(riverGenLeader.touchedLake);
+                    StopCoroutine(initialGenerate);
+                    yield return null;
+                }
+                else if (drop - waypoints[waypoints.Count - 1].y > -.1)
+                {
+
+                }
+                turns.Add(turn);
+                waypoints.Add(new Vector3(waypoints[waypoints.Count - 1].x + moveX, drop, waypoints[waypoints.Count - 1].z + moveZ));
+                speeds.Add(10 * (waypoints[waypoints.Count - 2].y - drop) / 16);
+                widths.Add(0.5f * sourceFlow / speeds[speeds.Count - 1]);
+                left.Add(new Vector3(waypoints[waypoints.Count - 1].x + (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z + (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
+                right.Add(new Vector3(waypoints[waypoints.Count - 1].x - (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z - (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
+            }
+            riverGenLeader.transform.position = waypoints[waypoints.Count - 1] + source;
+            yield return null;
+        }
+        findJunction = FindJunction(riverGenLeader.touchedRiver);
+        StartCoroutine(findJunction);
+        JoinLake(riverGenLeader.touchedLake);
+        StopCoroutine(initialGenerate);
+        Render();
+        yield return null;
+    }
+
+    IEnumerator GenerateFromLake()
+    {
+        var terrainGen = new TerrainGen();
+        this.gameObject.transform.position = source;
+        waypoints.Add(Vector3.zero);
+        widths.Add(sourceFlow);
+        float theta = 45f * Mathf.PI / 180f;
+        float low;
+        float height;
+        float turn = 0;
+        float moveX = 0;
+        float moveZ = 0;
+        float t, x, z;
+        for (int c = 0; c < 10000; c++) // (true)
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                low = 999999f;
+                for (int j = 0; j < 8; j++)
+                {
+                    t = theta * j;
+                    x = (radius * Mathf.Cos(t));
+                    z = (radius * Mathf.Sin(t));
+                    height = terrainGen.StoneHeight256(source.x + waypoints[waypoints.Count - 1].x + x, 0, source.z + waypoints[waypoints.Count - 1].z + z);
+                    if (height < low)
+                    {
+                        turn = t;
+                        low = height;
+                        moveX = 16f * Mathf.Cos(turn);
+                        moveZ = 16f * Mathf.Sin(turn);
+                    }
+                }
+                turns.Add(turn);
+                float drop = low - source.y; // - waypoints[waypoints.Count - 1].y + terrainGen.StoneHeight(source.x + waypoints[waypoints.Count - 1].x + moveX, 0, source.z + waypoints[waypoints.Count - 1].z + moveZ);
+                if (drop - waypoints[waypoints.Count - 1].y > 0)
+                {
+                    doneForNow = true;
+                    //in a depression, form a pond/lake
+                    GameObject lake = Instantiate(lakePrefab);
+                    lake.transform.position = waypoints[waypoints.Count - 1] + source;
+                    endLake = lake.GetComponent<Lake>();
+                    if (!endLake.sources.Contains(this))
+                        endLake.sources.Add(this);
+                    endLake.Generate();
+                    riverGenLeader.transform.position = waypoints[waypoints.Count - 1] + source;
+                    findJunction = FindJunction(riverGenLeader.touchedRiver);
+                    StartCoroutine(findJunction);
+                    JoinLake(riverGenLeader.touchedLake);
+                    StopCoroutine(initialGenerate);
+                    Render();
+                    yield return null;
+                }
+
+                waypoints.Add(new Vector3(waypoints[waypoints.Count - 1].x + moveX, drop, waypoints[waypoints.Count - 1].z + moveZ));
+                speeds.Add(10 * (waypoints[waypoints.Count - 2].y - drop) / 16);
+                widths.Add(0.5f * sourceFlow / speeds[speeds.Count - 1]);
+                left.Add(new Vector3(waypoints[waypoints.Count - 1].x + (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z + (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
+                right.Add(new Vector3(waypoints[waypoints.Count - 1].x - (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z - (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
+            }
+            riverGenLeader.transform.position = waypoints[waypoints.Count - 1] + source;
+            yield return null;
+        }
+        findJunction = FindJunction(riverGenLeader.touchedRiver);
+        StartCoroutine(findJunction);
+        JoinLake(riverGenLeader.touchedLake);
+        StopCoroutine(initialGenerate);
+        Render();
+        yield return null;
+    }
+
+    IEnumerator Generate()
+    {
+        var terrainGen = new TerrainGen();
+        float theta = 45f * Mathf.PI / 180f;
+        float low;
+        float height;
+        float turn = 0;
+        float moveX = 0;
+        float moveZ = 0;
+        float t, x, z;
+        for (int c = 0; c < 10000; c++) // (true)
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                low = 999999f;
+                for (int j = 0; j < 8; j++)
+                {
+                    t = theta * j;
+                    x = (radius * Mathf.Cos(t));
+                    z = (radius * Mathf.Sin(t));
+                    height = terrainGen.StoneHeight256(source.x + waypoints[waypoints.Count - 1].x + x, 0, source.z + waypoints[waypoints.Count - 1].z + z);
+                    if (height < low)
+                    {
+                        turn = t;
+                        low = height;
+                        moveX = 16f * Mathf.Cos(turn);
+                        moveZ = 16f * Mathf.Sin(turn);
+                    }
+                }
+                turns.Add(turn);
+                float drop = low - source.y; // - waypoints[waypoints.Count - 1].y + terrainGen.StoneHeight(source.x + waypoints[waypoints.Count - 1].x + moveX, 0, source.z + waypoints[waypoints.Count - 1].z + moveZ);
+                if (drop - waypoints[waypoints.Count - 1].y > 0)
+                {
+                    //in a depression, form a pond/lake
+                    doneForNow = true;
+                    GameObject lake = Instantiate(lakePrefab);
+                    lake.transform.position = waypoints[waypoints.Count - 1] + source;
+                    endLake = lake.GetComponent<Lake>();
+                    if (!endLake.sources.Contains(this))
+                        endLake.sources.Add(this);
+                    endLake.Generate();
+                    StopCoroutine(generate);
+                    riverGenLeader.transform.position = waypoints[waypoints.Count - 1] + source;
+                    findJunction = FindJunction(riverGenLeader.touchedRiver);
+                    StartCoroutine(findJunction);
+                    JoinLake(riverGenLeader.touchedLake);
+                    StopCoroutine(initialGenerate);
+                    Render();
+                    yield return null;
+                }
+
+                waypoints.Add(new Vector3(waypoints[waypoints.Count - 1].x + moveX, drop, waypoints[waypoints.Count - 1].z + moveZ));
+                speeds.Add(10 * (waypoints[waypoints.Count - 2].y - drop) / 16);
+                widths.Add(0.5f * sourceFlow / speeds[speeds.Count - 1]);
+                left.Add(new Vector3(waypoints[waypoints.Count - 1].x + (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z + (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
+                right.Add(new Vector3(waypoints[waypoints.Count - 1].x - (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z - (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
+            }
+            riverGenLeader.transform.position = waypoints[waypoints.Count - 1];
+            findJunction = FindJunction(riverGenLeader.touchedRiver);
+            StartCoroutine(findJunction);
+            JoinLake(riverGenLeader.touchedLake);
+            StopCoroutine(initialGenerate);
+            Render();
+            yield return null;
+        }
+        Render();
+        yield return null;
+    }
+
+    public void Extend()
+    {
+        StopCoroutine(initialGenerate);
+        StopCoroutine(generate);
+        var terrainGen = new TerrainGen();
+
+        float extend = radius;
+        float theta = 45f * Mathf.PI / 360f;
+        float low;
+        float height;
+        float turn = 0;
+        float moveX = 0;
+        float moveZ = 0;
+        float t, x, z;
+        for (int c = 0; c < 10000; c++) // (true)
+        {
+            extend = extend * 2;
+            low = 999999f;
+            for (int j = 0; j < Mathf.RoundToInt(8 * extend / radius); j++)
+            {
+                t = theta * j;
+                x = (extend * Mathf.Cos(t));
+                z = (extend * Mathf.Sin(t));
+                height = terrainGen.StoneHeight256(source.x + waypoints[waypoints.Count - 1].x + x, 0, source.z + waypoints[waypoints.Count - 1].z + z);
+                if (height < low)
+                {
+                    turn = t;
+                    low = height;
+                    moveX = x;
+                    moveZ = z;
+                }
+            }
+            float drop = low - source.y; // - waypoints[waypoints.Count - 1].y + terrainGen.StoneHeight(source.x + waypoints[waypoints.Count - 1].x + moveX, 0, source.z + waypoints[waypoints.Count - 1].z + moveZ);
+            if (drop - waypoints[waypoints.Count - 1].y > 0)
+            {
+                // no exits found, double search radius and halve search angle and try again;
+            }
+            else
+            {
+                turns.Add(turn);
+                waypoints.Add(new Vector3(waypoints[waypoints.Count - 1].x + moveX, drop, waypoints[waypoints.Count - 1].z + moveZ));
+                speeds.Add(10 * (waypoints[waypoints.Count - 2].y - drop) / extend);
+                widths.Add(0.5f * sourceFlow / speeds[speeds.Count - 1]);
+                left.Add(new Vector3(waypoints[waypoints.Count - 1].x + (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z + (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
+                right.Add(new Vector3(waypoints[waypoints.Count - 1].x - (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z - (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
+                StartCoroutine(generate);
+                return;
+            }
+        }
+        Render();
+    }
+
+    void Render()
+    {
+        foreach(RiverNode node in nodes)
+        {
+            Destroy(node.gameObject);
+        }
+        for (int i = 0; i < left.Count - 1; i+= 100)
+        {
+            for (int j = 0; j < 100 && (j + i < left.Count - 1); i++)
+            {
+                MeshData fineMeshData = new MeshData();
+                MeshData roughMeshData = new MeshData();
+                GameObject newNode = Instantiate<GameObject>(nodePrefab,this.transform);
+                RiverNode node = newNode.GetComponent<RiverNode>();
+                nodes.Add(node);
+                if(i+j+50 < waypoints.Count)
+                    newNode.transform.localPosition = waypoints[i + j + 50];
+                else
+                    newNode.transform.localPosition = waypoints[i + j];
+                fineMeshData.AddVertex(right[i + j] - newNode.transform.localPosition);
+                fineMeshData.AddVertex(left[i + j] - newNode.transform.localPosition);
+                fineMeshData.AddVertex(left[i + j + 1] - newNode.transform.localPosition);
+                fineMeshData.AddVertex(right[i + j + 1] - newNode.transform.localPosition);
+
+                fineMeshData.AddQuadTriangles();
+                fineMeshData.useRenderDataForCol = true;
+
+                if (j % 10 == 0 && (i + j + 10) < left.Count)
+                {
+                    roughMeshData.AddVertex(right[i + j] - newNode.transform.localPosition);
+                    roughMeshData.AddVertex(left[i + j] - newNode.transform.localPosition);
+                    roughMeshData.AddVertex(left[i + j + 10] - newNode.transform.localPosition);
+                    roughMeshData.AddVertex(right[i + j + 10] - newNode.transform.localPosition);
+
+                    roughMeshData.AddQuadTriangles();
+                }
+                node.RenderMeshFine(fineMeshData);
+                node.RenderMeshRough(roughMeshData);
+            }
+        }
+    }
+
+    IEnumerator FindJunction(River river)
+    {
+        for (int j = 0; j < 100; j++)
+        {
+            if (riverGenLeader.isTouchingRiver)
+            {
+                bool found = false;
+                int i = 0;
+                while (!found)
+                {
+                    if (riverGenLeader.isTouchingRiver == false)
+                    {
+                        found = true;
+                        waypoints.RemoveRange(waypoints.Count - i, i);
+                        right.RemoveRange(right.Count - i, i);
+                        left.RemoveRange(left.Count - i, i);
+                        widths.RemoveRange(widths.Count - i, i);
+                        speeds.RemoveRange(speeds.Count - i, i);
+                        turns.RemoveRange(turns.Count - i, i);
+                        if (sourceFlow >= riverGenLeader.touchedRiver.sourceFlow)
+                        {
+                            riverGenLeader.touchedRiver.parentStem = this;
+                            tributaries.Add(riverGenLeader.touchedRiver);
+                            sourceFlow += riverGenLeader.touchedRiver.sourceFlow;
+                            if (endLake != null)
+                            {
+                                endLake.Generate();
+                            }
+                            if (riverGenLeader.touchedRiver.endLake != null)
+                            {
+                                Destroy(riverGenLeader.touchedRiver.endLake.gameObject);
+                            }
+                            Render();
+                            StopCoroutine(findJunction);
+                            StartCoroutine(generate);
+                            yield return null;
+                        }
+                        else
+                        {
+                            Render();
+                            parentStem = riverGenLeader.touchedRiver;
+                            riverGenLeader.touchedRiver.tributaries.Add(this);
+                            riverGenLeader.touchedRiver.sourceFlow += sourceFlow;
+                            if (riverGenLeader.touchedRiver.endLake != null)
+                            {
+                                riverGenLeader.touchedRiver.endLake.Generate();
+                            }
+                            if (endLake != null)
+                            {
+                                Destroy(endLake.gameObject);
+                            }
+                            StopCoroutine(findJunction);
+                            yield return null;
+                        }
+                        break;
+                    }
+                    i++;
+                    riverGenLeader.transform.position = source + waypoints[waypoints.Count - i];
+                    yield return null;
+                }
+                StopCoroutine(findJunction);
+                yield return null;
+            }
+        }
+        yield return null;
+    }
+
+    void JoinLake(Lake lake)
+    {
+        if (riverGenLeader.isTouchingLake && riverGenLeader.touchedLake != endLake)
+        {
+            Destroy(endLake.gameObject);
+            endLake = riverGenLeader.touchedLake;
+            if (!endLake.sources.Contains(this))
+                endLake.sources.Add(this);
+            endLake.StopAllCoroutines();
+            endLake.Generate();
+            Destroy(riverGenLeader.gameObject);
+        }
+    }
+
+
+    private bool doneForNow = false;
+    public bool DoneForNow { get; set; }
+}

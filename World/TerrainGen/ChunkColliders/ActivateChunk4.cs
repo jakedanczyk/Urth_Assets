@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class ActivateChunk4 : MonoBehaviour {
 
+    public World4 world;
+
     void OnTriggerExit(Collider col)
     {
         col.gameObject.GetComponent<MeshRenderer>().enabled = true;
@@ -11,6 +13,8 @@ public class ActivateChunk4 : MonoBehaviour {
         Chunk4 parentChunk = col.gameObject.GetComponent<Chunk4>();
         if (parentChunk != null)
         {
+            if (!world.chunk4s.ContainsKey(parentChunk.pos))
+                world.AddChunk4(parentChunk.pos, parentChunk);
             if (parentChunk.isSubChunked)
             {
                 foreach (Chunk1 chunk in parentChunk.subChunkList)

@@ -19,7 +19,7 @@ GameObject:
   m_TagString: Terrain
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &400000
 Transform:
@@ -132,7 +132,7 @@ MonoBehaviour:
   boneSpawn: 0
   horseSpawn: 0
   spawned: 0
-  update: 1
+  update: 0
   rendered: 0
   filter: {fileID: 0}
   coll: {fileID: 0}

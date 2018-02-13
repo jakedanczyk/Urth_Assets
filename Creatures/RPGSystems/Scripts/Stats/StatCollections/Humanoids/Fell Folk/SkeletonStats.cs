@@ -126,7 +126,7 @@ public class SkeletonStats : CreatureStats
         var weight = CreateOrGetStat<RPGVital>(RPGStatType.Weight);
         weight.StatName = "Weight";
         weight.StatBaseValue = 0; //g
-        weight.AddLinker(new RPGStatLinkerQuadratic(CreateOrGetStat<RPGAttribute>(RPGStatType.Height), .000012f, 0));
+        weight.AddLinker(new RPGStatLinkerQuadratic(CreateOrGetStat<RPGAttribute>(RPGStatType.Height), .0015f, 0));
         weight.UpdateLinkers();
         weight.SetCurrentValueToMax();
 

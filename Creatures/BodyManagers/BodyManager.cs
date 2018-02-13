@@ -9,7 +9,7 @@ public abstract class BodyManager : MonoBehaviour {
     public List<Item_Garment> outfit;
     public Inventory inventory; // all carried items
     public LootInventory lootInventory;
-    public Transform aimPoint;
+    public Transform aimPoint, arrowReleasePoint;
 
     public Animator anim;
     public Weapon mainWeapon;
@@ -56,11 +56,6 @@ public abstract class BodyManager : MonoBehaviour {
         }
     }
 
-    public abstract void RemoveGarment(Item_Garment aGarment);
-
-    public abstract void SheatheWeapon(Item_Weapon aWeapon);
-
-
     public void PickupItem(Item anItem)
     {
         inventory.AddItem(anItem);
@@ -74,14 +69,6 @@ public abstract class BodyManager : MonoBehaviour {
     {
         if (anItem == null)
             return;
-        if (anItem is Item_Garment)
-        {
-            RemoveGarment((Item_Garment)anItem);
-        }
-        else if (anItem is Item_Weapon)
-        {
-            SheatheWeapon((Item_Weapon)anItem);
-        }
         inventory.selectedItem = null;
         inventory.RemoveItem(anItem);
         anItem.loose = true;
@@ -116,5 +103,6 @@ public abstract class BodyManager : MonoBehaviour {
     public List<GameObject> butcheringReturns; // Outside in. Feathers, skin/exoskeloton, fat, muscle, organs, bones
     public int butcherTime; // seconds
     public int butcherSkillFactor; // how variable is quality?
-    public abstract void ProcessThisBody(); 
+    public abstract void ProcessThisBody();
+    public abstract void MainAttack();
 }

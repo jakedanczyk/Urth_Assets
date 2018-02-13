@@ -14,7 +14,7 @@ public class HorseStats : CreatureStats
 
         var dexterity = CreateOrGetStat<RPGAttribute>(RPGStatType.Dexterity);
         dexterity.StatName = "Dexterity";
-        dexterity.StatBaseValue = 0;
+        dexterity.StatBaseValue = 1;
         dexterity.Aptitude = 0;
 
         var endurance = CreateOrGetStat<RPGAttribute>(RPGStatType.Endurance);

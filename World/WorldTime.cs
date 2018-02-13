@@ -4,7 +4,7 @@ using System.Collections;
 [System.Serializable]
 public class WorldTime : MonoBehaviour
 {
-
+    public static GameObject thisObject;
 
 
     public float totalGameSeconds;
@@ -21,6 +21,11 @@ public class WorldTime : MonoBehaviour
     private float secondsPerSecond;
 
     public DayNightController dayNightController;
+
+    private void Awake()
+    {
+        thisObject = this.gameObject;
+    }
 
     void Start()
     {

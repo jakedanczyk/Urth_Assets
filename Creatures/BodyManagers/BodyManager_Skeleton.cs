@@ -97,7 +97,7 @@ public class BodyManager_Skeleton : BodyManager {
         else { guardRaised = true; }
     }
 
-    public override void SheatheWeapon(Item_Weapon aWeapon)
+    public void SheatheWeapon(Item_Weapon aWeapon)
     {
         if (!aWeapon.wielded)
             return;
@@ -114,13 +114,14 @@ public class BodyManager_Skeleton : BodyManager {
 
     }
 
+    [DoNotSerialize]
     public Dictionary<WeaponType, string> mainAttackDict = new Dictionary<WeaponType, string>
     {
         { WeaponType.Axe_1H, "AxeChop" }, { WeaponType.Axe_2H, "AxeChop" }, { WeaponType.Arm, "RightPunch" }, { WeaponType.Bow, "FireBow" },
         { WeaponType.Pick, "PickSwing" }
     };
 
-    public void MainAttack()
+    public override void MainAttack()
     {
         if (attacking) { return; }
         collisionList.Clear();
@@ -363,7 +364,7 @@ public class BodyManager_Skeleton : BodyManager {
         }
     }
 
-    public override void RemoveGarment(Item_Garment thisWearable)
+    public void RemoveGarment(Item_Garment thisWearable)
     {
         foreach (RPGStatType partCovered in thisWearable.bodyPartCoverage)
         {
