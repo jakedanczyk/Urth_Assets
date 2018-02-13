@@ -297,23 +297,27 @@ public class River : MonoBehaviour
 
     void Render()
     {
-        foreach(RiverNode node in nodes)
+        foreach(RiverNode oldNode in nodes)
         {
-            Destroy(node.gameObject);
+            Destroy(oldNode.gameObject);
         }
+        MeshData fineMeshData, roughMeshData;
+        GameObject newNode;
+        RiverNode node;
         for (int i = 0; i < left.Count - 1; i+= 100)
         {
-            for (int j = 0; j < 100 && (j + i < left.Count - 1); i++)
+            fineMeshData = new MeshData();
+            roughMeshData = new MeshData();
+            newNode = Instantiate<GameObject>(nodePrefab, this.transform);
+            node = newNode.GetComponent<RiverNode>();
+            nodes.Add(node);
+            if (i + 50 < waypoints.Count)
+                newNode.transform.localPosition = waypoints[i + 50];
+            else
+                newNode.transform.localPosition = waypoints[i];
+            for (int j = 0; j < 100 && (j + i < left.Count - 1); j++)
             {
-                MeshData fineMeshData = new MeshData();
-                MeshData roughMeshData = new MeshData();
-                GameObject newNode = Instantiate<GameObject>(nodePrefab,this.transform);
-                RiverNode node = newNode.GetComponent<RiverNode>();
-                nodes.Add(node);
-                if(i+j+50 < waypoints.Count)
-                    newNode.transform.localPosition = waypoints[i + j + 50];
-                else
-                    newNode.transform.localPosition = waypoints[i + j];
+
                 fineMeshData.AddVertex(right[i + j] - newNode.transform.localPosition);
                 fineMeshData.AddVertex(left[i + j] - newNode.transform.localPosition);
                 fineMeshData.AddVertex(left[i + j + 1] - newNode.transform.localPosition);
@@ -331,9 +335,9 @@ public class River : MonoBehaviour
 
                     roughMeshData.AddQuadTriangles();
                 }
-                node.RenderMeshFine(fineMeshData);
-                node.RenderMeshRough(roughMeshData);
             }
+            node.RenderMeshFine(fineMeshData);
+            node.RenderMeshRough(roughMeshData);
         }
     }
 
