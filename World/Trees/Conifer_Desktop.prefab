@@ -643,9 +643,9 @@ Rigidbody:
   m_GameObject: {fileID: 1365215440365562}
   serializedVersion: 2
   m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
+  m_Drag: 0.5
+  m_AngularDrag: 0.5
+  m_UseGravity: 1
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
@@ -688,7 +688,7 @@ MonoBehaviour:
     type: 2}
   kindlingPilePrefab: {fileID: 1303878830487058, guid: 5397bb051fae3ac46b85600c001f116c,
     type: 2}
-  treeRigidBody: {fileID: 0}
+  treeRigidBody: {fileID: 54065274863004782}
   kindling: 0
   sticks: 0
   greenBoughs: 0
@@ -852,19 +852,19 @@ LODGroup:
   m_FadeMode: 2
   m_AnimateCrossFading: 1
   m_LODs:
-  - screenRelativeHeight: 0.5
+  - screenRelativeHeight: 0.789767
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 23093795717298422}
-  - screenRelativeHeight: 0.25
+  - screenRelativeHeight: 0.6281022
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 23840499761261652}
-  - screenRelativeHeight: 0.125
+  - screenRelativeHeight: 0.4024526
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 23545991319618284}
-  - screenRelativeHeight: 0.01
+  - screenRelativeHeight: 0.03978558
     fadeTransitionWidth: 0
     renderers:
     - renderer: {fileID: 227768075767758832}

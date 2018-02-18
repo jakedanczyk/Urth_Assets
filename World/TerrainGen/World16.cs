@@ -5,10 +5,14 @@ using System.Collections.Generic;
 public class World16 : MonoBehaviour {
 
     public static GameObject worldGameObject;
-
+    public NavMeshSourceTag navMeshSourceTag;
     public Dictionary<WorldPos, Chunk16> chunk16s = new Dictionary<WorldPos, Chunk16>();
     public GameObject chunk16Prefab;
     public GameObject treePrefab;
+    public GameObject bonePrefab;
+    public GameObject horsePrefab;
+    public GameObject huckPrefab;
+    public GameObject allosaurPrefab;
 
     public string worldName = "world16";
 
@@ -45,24 +49,29 @@ public class World16 : MonoBehaviour {
             GameObject newTree = Instantiate(treePrefab);
             newTree.transform.position = newChunk16.treeList[i];
         }
-        //for (int i = 0; i < newChunk.bushList.Count; i++)
-        //{World
-        //    GameObject newBush = Instantiate(huckPrefab);
-        //    newBush.transform.position = newChunk.bushList[i];
-        //}
-        //if (newChunk.boneSpawn)
-        //{
-        //    print("boneSpawn");
-        //    GameObject newBone = Instantiate(bonePrefab);
-        //    newBone.transform.position = newChunk.boneList[0];
-        //}
-        //if (newChunk.horseSpawn)
-        //{
-        //    print("boneSpawn");
-        //    GameObject newHorse = Instantiate(horsePrefab);
-        //    newHorse.transform.position = newChunk.horseList[0];
-        //}
-
+        for (int i = 0; i < newChunk16.bushList.Count; i++)
+        {
+            GameObject newBush = Instantiate(huckPrefab);
+            newBush.transform.position = newChunk16.bushList[i];
+        }
+        if (newChunk16.boneSpawn)
+        {
+            print("boneSpawn");
+            GameObject newBone = Instantiate(bonePrefab);
+            newBone.transform.position = newChunk16.boneList[0];
+        }
+        if (newChunk16.horseSpawn)
+        {
+            print("horseSpawn");
+            GameObject newHorse = Instantiate(horsePrefab);
+            newHorse.transform.position = newChunk16.horseList[0];
+        }
+        if (newChunk16.allosaurusSpawn)
+        {
+            print("allosaurusSpawn");
+            GameObject newAllosaurus = Instantiate(allosaurPrefab);
+            newAllosaurus.transform.position = newChunk16.allosaurusList[0];
+        }
         Serialization16.Load16(newChunk16);
     }
 

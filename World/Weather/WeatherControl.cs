@@ -35,6 +35,9 @@ public class WeatherControl : MonoBehaviour {
     public List<int> schedule;
     public List<int> durations;
 
+    //Clouds
+    public LazyClouds lazyClouds;
+
     private void Awake()
     {
         manager = this.gameObject;
@@ -47,6 +50,7 @@ public class WeatherControl : MonoBehaviour {
         currentDuration = 300 + Random.Range(0, 36000);
         precipRate = weathers[currentWeatherIndex].precipRate;
         windSpeed = weathers[currentWeatherIndex].windSpeed;
+        lazyClouds.LS_CloudScattering = weathers[currentWeatherIndex].LS_CloudScattering;
     }
 
     // Use this for initialization
@@ -88,7 +92,6 @@ public class WeatherControl : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-        if (LevelSerializer.IsDeserializing) return;
         if(currentWeatherFX == null)
             currentWeatherFX = Instantiate<GameObject>(weathers[currentWeatherIndex].weatherFX, player.transform);
         dayHour = time.hours % 24;
@@ -139,6 +142,7 @@ public class WeatherControl : MonoBehaviour {
         currentDuration = durations[0];
         precipRate = weathers[schedule[0]].precipRate;
         windSpeed = weathers[schedule[0]].windSpeed;
+        lazyClouds.LS_CloudScattering = weathers[currentWeatherIndex].LS_CloudScattering;
         schedule.RemoveAt(0);
         durations.RemoveAt(0);
         schedule.Add(Random.Range(0, 4));

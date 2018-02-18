@@ -11,9 +11,7 @@ GameObject:
   - component: {fileID: 3300000}
   - component: {fileID: 6400000}
   - component: {fileID: 2300000}
-  - component: {fileID: 205131219598924832}
   - component: {fileID: 114384504542596466}
-  - component: {fileID: 114955536767211456}
   m_Layer: 13
   m_Name: Chunk16
   m_TagString: Terrain
@@ -110,44 +108,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hasTree: 0
+  hasBush: 0
   treeList: []
+  boneList: []
+  bushList: []
+  horseList: []
+  allosaurusList: []
   airCount: 0
+  boneSpawn: 0
+  horseSpawn: 0
+  spawned: 0
+  allosaurusSpawn: 0
   update: 0
   rendered: 0
   isSubChunked: 0
+  isWalkable: 0
   subChunkList: []
+  filter: {fileID: 3300000}
+  coll: {fileID: 6400000}
   world16: {fileID: 0}
   pos:
     x: 0
     y: 0
     z: 0
---- !u!114 &114955536767211456
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6e038bf700cfa444fb16c6ef963be9f9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!205 &205131219598924832
-LODGroup:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100000}
-  serializedVersion: 2
-  m_LocalReferencePoint: {x: 0, y: 0, z: 0}
-  m_Size: 1
-  m_FadeMode: 0
-  m_AnimateCrossFading: 0
-  m_LODs:
-  - screenRelativeHeight: 0.014414092
-    fadeTransitionWidth: 0
-    renderers: []
-  - screenRelativeHeight: 0.014414092
-    fadeTransitionWidth: 0
-    renderers: []
-  m_Enabled: 1

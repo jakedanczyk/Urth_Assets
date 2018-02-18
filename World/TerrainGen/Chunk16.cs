@@ -10,29 +10,23 @@ using System.Collections;
 
 public class Chunk16 : MonoBehaviour
 {
-    public bool hasTree;
-    public List<Vector3> treeList;
+    public bool hasTree, hasBush;
+    public List<Vector3> treeList, boneList, bushList, horseList, allosaurusList;
     public Block16[, ,] block16s = new Block16[16, 16, 16];
 
     public int airCount = 0;
-    //public bool boneSpawn, horseSpawn, spawned;
+    public bool boneSpawn, horseSpawn, spawned, allosaurusSpawn;
     public static int chunk16Size = 16;
     public bool update = false;
     public bool rendered;
-    public bool isSubChunked = false;
+    public bool isSubChunked = false, isWalkable = false;
     public List<Chunk4> subChunkList = new List<Chunk4>();
 
-    MeshFilter filter;
-    MeshCollider coll;
+    public MeshFilter filter;
+    public MeshCollider coll;
 
     public World16 world16;
     public WorldPos pos;
-
-    void Start()
-    {
-        filter = gameObject.GetComponent<MeshFilter>();
-        coll = gameObject.GetComponent<MeshCollider>();
-    }
 
     //Update is called once per frame
     //void Update()
@@ -95,7 +89,8 @@ public class Chunk16 : MonoBehaviour
                 }
             }
         }
-
+        if (isWalkable && GetComponent<NavMeshSourceTag>() == null)
+            gameObject.AddComponent<NavMeshSourceTag>();
         RenderMesh(meshData);
     }
 

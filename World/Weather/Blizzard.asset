@@ -17,3 +17,12 @@ MonoBehaviour:
   windSpeed: 10
   precipRate: 10
   weatherFX: {fileID: 1602053406855808, guid: 0ea583ab00ae1944d801521138a37470, type: 2}
+  LS_CloudTimeScale: 2
+  LS_CloudScale: 4
+  LS_CloudScattering: 0.69
+  LS_CloudIntensity: 4
+  LS_CloudSharpness: 0.75
+  LS_CloudThickness: 1
+  LS_ShadowScale: 0.75
+  LS_DistScale: 10
+  LS_CloudColor: {x: 1, y: 0.9, z: 0.95}

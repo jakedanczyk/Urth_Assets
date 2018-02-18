@@ -13,7 +13,7 @@ public class River : MonoBehaviour
     float radius = 3f;
     
     public GameObject lakePrefab;
-    public IEnumerator initialGenerate, generate, findJunction, joinLake;
+    public IEnumerator initialGenerate, generate, findJunction, joinLake, generateFromLake;
     public RiverGenLeader riverGenLeader;
     public List<River> tributaries;
     public River parentStem;
@@ -21,12 +21,23 @@ public class River : MonoBehaviour
     public List<RiverNode> nodes;
 
     public GameObject nodePrefab;
-
+    GameObject waterManagerObject;
+    WaterManager waterManager;
 
     private void Awake()
     {
         initialGenerate = InitialGenerate();
         generate = Generate();
+        generateFromLake = GenerateFromLake();
+    }
+
+    private void Start()
+    {
+        waterManagerObject = WaterManager.waterManagerObject;
+        waterManager = waterManagerObject.GetComponent<WaterManager>();
+        if (LevelSerializer.IsDeserializing) return;
+        waterManager.riversHash.Add(this);
+        waterManager.rivers.Add(this);
     }
 
     IEnumerator InitialGenerate()
@@ -89,9 +100,9 @@ public class River : MonoBehaviour
                 turns.Add(turn);
                 waypoints.Add(new Vector3(waypoints[waypoints.Count - 1].x + moveX, drop, waypoints[waypoints.Count - 1].z + moveZ));
                 speeds.Add(10 * (waypoints[waypoints.Count - 2].y - drop) / 16);
-                widths.Add(0.5f * sourceFlow / speeds[speeds.Count - 1]);
-                left.Add(new Vector3(waypoints[waypoints.Count - 1].x + (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z + (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
-                right.Add(new Vector3(waypoints[waypoints.Count - 1].x - (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z - (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
+                widths.Add(Mathf.Min(0.5f * sourceFlow / speeds[speeds.Count - 1], 10 * Mathf.Sqrt(sourceFlow)));
+                left.Add(new Vector3(waypoints[waypoints.Count - 1].x - (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z + (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
+                right.Add(new Vector3(waypoints[waypoints.Count - 1].x + (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z - (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
             }
             riverGenLeader.transform.position = waypoints[waypoints.Count - 1] + source;
             yield return null;
@@ -152,14 +163,14 @@ public class River : MonoBehaviour
                     findJunction = FindJunction(riverGenLeader.touchedRiver);
                     StartCoroutine(findJunction);
                     JoinLake(riverGenLeader.touchedLake);
-                    StopCoroutine(initialGenerate);
+                    StopCoroutine(generateFromLake);
                     Render();
                     yield return null;
                 }
 
                 waypoints.Add(new Vector3(waypoints[waypoints.Count - 1].x + moveX, drop, waypoints[waypoints.Count - 1].z + moveZ));
                 speeds.Add(10 * (waypoints[waypoints.Count - 2].y - drop) / 16);
-                widths.Add(0.5f * sourceFlow / speeds[speeds.Count - 1]);
+                widths.Add(Mathf.Min(0.5f * sourceFlow / speeds[speeds.Count - 1], 10 * Mathf.Sqrt(sourceFlow)));
                 left.Add(new Vector3(waypoints[waypoints.Count - 1].x + (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z + (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
                 right.Add(new Vector3(waypoints[waypoints.Count - 1].x - (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z - (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
             }
@@ -169,7 +180,7 @@ public class River : MonoBehaviour
         findJunction = FindJunction(riverGenLeader.touchedRiver);
         StartCoroutine(findJunction);
         JoinLake(riverGenLeader.touchedLake);
-        StopCoroutine(initialGenerate);
+        StopCoroutine(generateFromLake);
         Render();
         yield return null;
     }
@@ -227,7 +238,7 @@ public class River : MonoBehaviour
 
                 waypoints.Add(new Vector3(waypoints[waypoints.Count - 1].x + moveX, drop, waypoints[waypoints.Count - 1].z + moveZ));
                 speeds.Add(10 * (waypoints[waypoints.Count - 2].y - drop) / 16);
-                widths.Add(0.5f * sourceFlow / speeds[speeds.Count - 1]);
+                widths.Add(Mathf.Min(0.5f * sourceFlow / speeds[speeds.Count - 1], 10 * Mathf.Sqrt(sourceFlow)));
                 left.Add(new Vector3(waypoints[waypoints.Count - 1].x + (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z + (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
                 right.Add(new Vector3(waypoints[waypoints.Count - 1].x - (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z - (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
             }
@@ -285,7 +296,7 @@ public class River : MonoBehaviour
                 turns.Add(turn);
                 waypoints.Add(new Vector3(waypoints[waypoints.Count - 1].x + moveX, drop, waypoints[waypoints.Count - 1].z + moveZ));
                 speeds.Add(10 * (waypoints[waypoints.Count - 2].y - drop) / extend);
-                widths.Add(0.5f * sourceFlow / speeds[speeds.Count - 1]);
+                widths.Add(Mathf.Min(0.5f * sourceFlow / speeds[speeds.Count - 1], 10 * Mathf.Sqrt(sourceFlow)));
                 left.Add(new Vector3(waypoints[waypoints.Count - 1].x + (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z + (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
                 right.Add(new Vector3(waypoints[waypoints.Count - 1].x - (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z - (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
                 StartCoroutine(generate);
@@ -299,45 +310,49 @@ public class River : MonoBehaviour
     {
         foreach(RiverNode oldNode in nodes)
         {
-            Destroy(oldNode.gameObject);
+            if(oldNode != null)
+                Destroy(oldNode.gameObject);
         }
         MeshData fineMeshData, roughMeshData;
-        GameObject newNode;
-        RiverNode node;
+        GameObject newNodeObject;
+        RiverNode newNode;
         for (int i = 0; i < left.Count - 1; i+= 100)
         {
             fineMeshData = new MeshData();
             roughMeshData = new MeshData();
-            newNode = Instantiate<GameObject>(nodePrefab, this.transform);
-            node = newNode.GetComponent<RiverNode>();
-            nodes.Add(node);
+            newNodeObject = Instantiate<GameObject>(nodePrefab, this.transform);
+            newNode = newNodeObject.GetComponent<RiverNode>();
+            nodes.Add(newNode);
             if (i + 50 < waypoints.Count)
-                newNode.transform.localPosition = waypoints[i + 50];
+                newNodeObject.transform.localPosition = waypoints[i + 50];
             else
-                newNode.transform.localPosition = waypoints[i];
+                newNodeObject.transform.localPosition = waypoints[i];
             for (int j = 0; j < 100 && (j + i < left.Count - 1); j++)
             {
-
-                fineMeshData.AddVertex(right[i + j] - newNode.transform.localPosition);
-                fineMeshData.AddVertex(left[i + j] - newNode.transform.localPosition);
-                fineMeshData.AddVertex(left[i + j + 1] - newNode.transform.localPosition);
-                fineMeshData.AddVertex(right[i + j + 1] - newNode.transform.localPosition);
+                newNode.waypoints.Add(waypoints[i + j] - newNodeObject.transform.localPosition);
+                newNode.left.Add(left[i + j] - newNodeObject.transform.localPosition);
+                newNode.right.Add(right[i + j] - newNodeObject.transform.localPosition);
+                newNode.widths.Add(widths[i + j]);
+                fineMeshData.AddVertex(right[i + j] - newNodeObject.transform.localPosition);
+                fineMeshData.AddVertex(left[i + j] - newNodeObject.transform.localPosition);
+                fineMeshData.AddVertex(left[i + j + 1] - newNodeObject.transform.localPosition);
+                fineMeshData.AddVertex(right[i + j + 1] - newNodeObject.transform.localPosition);
 
                 fineMeshData.AddQuadTriangles();
                 fineMeshData.useRenderDataForCol = true;
 
                 if (j % 10 == 0 && (i + j + 10) < left.Count)
                 {
-                    roughMeshData.AddVertex(right[i + j] - newNode.transform.localPosition);
-                    roughMeshData.AddVertex(left[i + j] - newNode.transform.localPosition);
-                    roughMeshData.AddVertex(left[i + j + 10] - newNode.transform.localPosition);
-                    roughMeshData.AddVertex(right[i + j + 10] - newNode.transform.localPosition);
+                    roughMeshData.AddVertex(right[i + j] - newNodeObject.transform.localPosition);
+                    roughMeshData.AddVertex(left[i + j] - newNodeObject.transform.localPosition);
+                    roughMeshData.AddVertex(left[i + j + 10] - newNodeObject.transform.localPosition);
+                    roughMeshData.AddVertex(right[i + j + 10] - newNodeObject.transform.localPosition);
 
                     roughMeshData.AddQuadTriangles();
                 }
             }
-            node.RenderMeshFine(fineMeshData);
-            node.RenderMeshRough(roughMeshData);
+            newNode.RenderMeshFine(fineMeshData);
+            newNode.RenderMeshRough(roughMeshData);
         }
     }
 
@@ -425,4 +440,9 @@ public class River : MonoBehaviour
 
     private bool doneForNow = false;
     public bool DoneForNow { get; set; }
+
+    private void OnDestroy()
+    {
+        waterManager.riversHash.Remove(this);
+    }
 }

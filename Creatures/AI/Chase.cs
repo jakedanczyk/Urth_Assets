@@ -54,14 +54,11 @@ public class Chase : MonoBehaviour {
                         attacking = true;
                         anim.SetBool("isAttacking", true);
                         anim.SetBool("isWalking", false);
-                        print(665);
                         InvokeRepeating("MainAttack", .5f, 3f);
                     }
                 }
             }
         }
-
-
 
         else
         {
@@ -75,7 +72,6 @@ public class Chase : MonoBehaviour {
 
     void MainAttack()
     {
-        print(664);
         bodyManager.MainAttack();
 
         //skeletonBody.MainAttack();

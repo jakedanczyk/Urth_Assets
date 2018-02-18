@@ -23,39 +23,78 @@ public class Block16
     {
 
         meshData.useRenderDataForCol = true;
-
-        if (!chunk16.GetBlock16(x, y + 1, z).IsSolid(Direction.down))
+        if (!chunk16.isWalkable)
         {
-            meshData = FaceDataUp(chunk16, x, y, z, meshData);
-        }
+            if (!chunk16.GetBlock16(x, y + 1, z).IsSolid(Direction.down))
+            {
+                chunk16.isWalkable = true;
+                meshData = FaceDataUp(chunk16, x, y, z, meshData);
+            }
 
-        if (!chunk16.GetBlock16(x, y - 1, z).IsSolid(Direction.up))
+            if (!chunk16.GetBlock16(x, y - 1, z).IsSolid(Direction.up))
+            {
+                meshData = FaceDataDown(chunk16, x, y, z, meshData);
+            }
+
+            if (!chunk16.GetBlock16(x, y, z + 1).IsSolid(Direction.south))
+            {
+                chunk16.isWalkable = true;
+                meshData = FaceDataNorth(chunk16, x, y, z, meshData);
+            }
+
+            if (!chunk16.GetBlock16(x, y, z - 1).IsSolid(Direction.north))
+            {
+                chunk16.isWalkable = true;
+                meshData = FaceDataSouth(chunk16, x, y, z, meshData);
+            }
+
+            if (!chunk16.GetBlock16(x + 1, y, z).IsSolid(Direction.west))
+            {
+                chunk16.isWalkable = true;
+                meshData = FaceDataEast(chunk16, x, y, z, meshData);
+            }
+
+            if (!chunk16.GetBlock16(x - 1, y, z).IsSolid(Direction.east))
+            {
+                chunk16.isWalkable = true;
+                meshData = FaceDataWest(chunk16, x, y, z, meshData);
+            }
+        }
+        else
         {
-            meshData = FaceDataDown(chunk16, x, y, z, meshData);
-        }
+            meshData.useRenderDataForCol = true;
 
-        if (!chunk16.GetBlock16(x, y, z + 1).IsSolid(Direction.south))
-        {
-            meshData = FaceDataNorth(chunk16, x, y, z, meshData);
-        }
+            if (!chunk16.GetBlock16(x, y + 1, z).IsSolid(Direction.down))
+            {
+                meshData = FaceDataUp(chunk16, x, y, z, meshData);
+            }
 
-        if (!chunk16.GetBlock16(x, y, z - 1).IsSolid(Direction.north))
-        {
-            meshData = FaceDataSouth(chunk16, x, y, z, meshData);
-        }
+            if (!chunk16.GetBlock16(x, y - 1, z).IsSolid(Direction.up))
+            {
+                meshData = FaceDataDown(chunk16, x, y, z, meshData);
+            }
 
-        if (!chunk16.GetBlock16(x + 1, y, z).IsSolid(Direction.west))
-        {
-            meshData = FaceDataEast(chunk16, x, y, z, meshData);
-        }
+            if (!chunk16.GetBlock16(x, y, z + 1).IsSolid(Direction.south))
+            {
+                meshData = FaceDataNorth(chunk16, x, y, z, meshData);
+            }
 
-        if (!chunk16.GetBlock16(x - 1, y, z).IsSolid(Direction.east))
-        {
-            meshData = FaceDataWest(chunk16, x, y, z, meshData);
-        }
+            if (!chunk16.GetBlock16(x, y, z - 1).IsSolid(Direction.north))
+            {
+                meshData = FaceDataSouth(chunk16, x, y, z, meshData);
+            }
 
+            if (!chunk16.GetBlock16(x + 1, y, z).IsSolid(Direction.west))
+            {
+                meshData = FaceDataEast(chunk16, x, y, z, meshData);
+            }
+
+            if (!chunk16.GetBlock16(x - 1, y, z).IsSolid(Direction.east))
+            {
+                meshData = FaceDataWest(chunk16, x, y, z, meshData);
+            }
+        }
         return meshData;
-
     }
 
     protected virtual MeshData FaceDataUp

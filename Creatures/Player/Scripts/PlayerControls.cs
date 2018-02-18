@@ -163,20 +163,18 @@ namespace UnityStandardAssets.Characters.FirstPerson
         // Update is called once per frame
         private void Update()
         {
-            if (LevelSerializer.IsDeserializing) return;
-
-            RaycastHit ground;
-            if (Physics.Raycast(this.transform.position + Vector3.up, Vector3.down, out ground, 512f, mask1))
-            {
-                aboveDetailedChunk = true;
-                lastPosition = this.transform.position;
-            }
-            else
-            {
-                aboveDetailedChunk = false;
-                this.transform.position = lastPosition;
-            }
-            lastPosition = this.transform.position;
+            //RaycastHit ground;
+            //if (Physics.Raycast(this.transform.position + Vector3.up, Vector3.down, out ground, 512f, mask1))
+            //{
+            //    aboveDetailedChunk = true;
+            //    lastPosition = this.transform.position;
+            //}
+            //else
+            //{
+            //    aboveDetailedChunk = false;
+            //    this.transform.position = lastPosition;
+            //}
+            //lastPosition = this.transform.position;
 
             // the jump state needs to read here to make sure it is not missed
             if (!m_Jump)

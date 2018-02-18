@@ -6,8 +6,8 @@ using System.Linq;
 public class Lake : MonoBehaviour
 {
     public bool settled = false;
-    MeshFilter filter;
-    MeshCollider coll;
+    public MeshFilter fineFilter,roughFilter;
+    public MeshCollider coll;
     public Vector3 source;
     public List<River> sources, outlets;
     public float depth, volume, size, maxSize;
@@ -18,17 +18,20 @@ public class Lake : MonoBehaviour
     public int rewind = 0;
     public Vector2 lead = Vector2.zero;
     public Vector2 check;
-    IEnumerator coroutineA,coroutineB;
+    IEnumerator volumeFill,finalFill;
+    GameObject waterManagerObject;
+    WaterManager waterManager;
+
     private void Awake()
     {
         terrainGen = new TerrainGen();
-        coll = gameObject.GetComponent<MeshCollider>();
-        filter = gameObject.GetComponent<MeshFilter>();
     }
 
     private void Start()
     {
-        WaterManager.waterManagerObject.GetComponent<WaterManager>().lakes.Add(this);
+        waterManagerObject = WaterManager.waterManagerObject;
+        waterManager = waterManagerObject.GetComponent<WaterManager>();
+        waterManager.lakesHash.Add(this);
     }
 
     public void Generate()
@@ -76,14 +79,14 @@ public class Lake : MonoBehaviour
         else
             gridStep = 64;
 
-        coroutineA = VolumeFill();
-        coroutineB = FinalFill();
-        StartCoroutine(coroutineA);
+        volumeFill = VolumeFill();
+        finalFill = FinalFill();
+        StartCoroutine(volumeFill);
     }
 
     private void OnDestroy()
     {
-        WaterManager.waterManagerObject.GetComponent<WaterManager>().lakes.Remove(this);
+        waterManagerObject.GetComponent<WaterManager>().lakesHash.Remove(this);
     }
 
     IEnumerator VolumeFill()
@@ -303,7 +306,7 @@ public class Lake : MonoBehaviour
                         StopAllCoroutines();
                         done = true;
                         //coroutine = VolumeFill();
-                        StartCoroutine("FinalFill");
+                        StartCoroutine(finalFill);
                         yield return null;
                     }
                     else if (rewind >= grid.Count)
@@ -320,7 +323,7 @@ public class Lake : MonoBehaviour
                     done = true;
 
                     //coroutine = VolumeFill();
-                    StartCoroutine("FinalFill");
+                    StartCoroutine(finalFill);
                     yield return null;
                 }
             }
@@ -329,7 +332,7 @@ public class Lake : MonoBehaviour
 
     IEnumerator FinalFill()
     {
-        StopCoroutine(coroutineA);
+        StopCoroutine(volumeFill);
 
 
         //else if ((depth - 2) < 0.1)
@@ -544,12 +547,13 @@ public class Lake : MonoBehaviour
         //                }
         //            }
         //        }
-        //        StopCoroutine(coroutineB);
+        //        StopCoroutine(finalFill);
         //        yield return null;
         //    }
         //}
         //else
         //{
+        rewind = 0;
         lead = Vector2.zero;
         grid.Clear();
         gridList.Clear();
@@ -641,7 +645,7 @@ public class Lake : MonoBehaviour
                                     river.endLake = this;
                                 }
                                 Destroy(lake.gameObject);
-                                StopCoroutine(coroutineB);
+                                StopCoroutine(finalFill);
                                 Generate();
                             }
                         }
@@ -671,7 +675,7 @@ public class Lake : MonoBehaviour
                                     river.endLake = this;
                                 }
                                 Destroy(lake.gameObject);
-                                StopCoroutine(coroutineB);
+                                StopCoroutine(finalFill);
                                 Generate();
                             }
                         }
@@ -747,7 +751,7 @@ public class Lake : MonoBehaviour
                     settled = true;
                     notDone = false;
                     Render();
-                    StopCoroutine(coroutineB);
+                    StopCoroutine(finalFill);
                     yield return null;
                 }
                 left = new Vector2(-facing.y, facing.x);
@@ -822,7 +826,7 @@ public class Lake : MonoBehaviour
                                                         river.endLake = this;
                                                     }
                                                     Destroy(lake.gameObject);
-                                                    StopCoroutine(coroutineB);
+                                                    StopCoroutine(finalFill);
                                                     Generate();
                                                 }
                                             }
@@ -852,7 +856,7 @@ public class Lake : MonoBehaviour
                                                         river.endLake = this;
                                                     }
                                                     Destroy(lake.gameObject);
-                                                    StopCoroutine(coroutineB);
+                                                    StopCoroutine(finalFill);
                                                     Generate();
                                                 }
                                             }
@@ -926,7 +930,7 @@ public class Lake : MonoBehaviour
                                             SpawnOutlet();
                                         }
                                         settled = true;
-                                        StopCoroutine(coroutineB);
+                                        StopCoroutine(finalFill);
                                         notDone = false;
                                         Render();
                                         yield return null;
@@ -967,7 +971,7 @@ public class Lake : MonoBehaviour
                                                     river.endLake = this;
                                                 }
                                                 Destroy(lake.gameObject);
-                                                StopCoroutine(coroutineB);
+                                                StopCoroutine(finalFill);
                                                 Generate();
                                             }
                                         }
@@ -997,7 +1001,7 @@ public class Lake : MonoBehaviour
                                                     river.endLake = this;
                                                 }
                                                 Destroy(lake.gameObject);
-                                                StopCoroutine(coroutineB);
+                                                StopCoroutine(finalFill);
                                                 Generate();
                                             }
                                         }
@@ -1071,7 +1075,7 @@ public class Lake : MonoBehaviour
                                         SpawnOutlet();
                                     }
                                     settled = true;
-                                    StopCoroutine(coroutineB);
+                                    StopCoroutine(finalFill);
                                     notDone = false;
                                     Render();
                                     yield return null;
@@ -1129,7 +1133,7 @@ public class Lake : MonoBehaviour
                                                     river.endLake = this;
                                                 }
                                                 Destroy(lake.gameObject);
-                                                StopCoroutine(coroutineB);
+                                                StopCoroutine(finalFill);
                                                 Generate();
                                             }
                                         }
@@ -1159,7 +1163,7 @@ public class Lake : MonoBehaviour
                                                     river.endLake = this;
                                                 }
                                                 Destroy(lake.gameObject);
-                                                StopCoroutine(coroutineB);
+                                                StopCoroutine(finalFill);
                                                 Generate();
                                             }
                                         }
@@ -1233,7 +1237,7 @@ public class Lake : MonoBehaviour
                                         SpawnOutlet();
                                     }
                                     settled = true;
-                                    StopCoroutine(coroutineB);
+                                    StopCoroutine(finalFill);
                                     notDone = false;
                                     Render();
                                     yield return null;
@@ -1274,7 +1278,7 @@ public class Lake : MonoBehaviour
                                                 river.endLake = this;
                                             }
                                             Destroy(lake.gameObject);
-                                            StopCoroutine(coroutineB);
+                                            StopCoroutine(finalFill);
                                             Generate();
                                         }
                                     }
@@ -1304,7 +1308,7 @@ public class Lake : MonoBehaviour
                                                 river.endLake = this;
                                             }
                                             Destroy(lake.gameObject);
-                                            StopCoroutine(coroutineB);
+                                            StopCoroutine(finalFill);
                                             Generate();
                                         }
                                     }
@@ -1378,7 +1382,7 @@ public class Lake : MonoBehaviour
                                     SpawnOutlet();
                                 }
                                 settled = true;
-                                StopCoroutine(coroutineB);
+                                StopCoroutine(finalFill);
                                 notDone = false;
                                 Render();
                                 yield return null;
@@ -1446,7 +1450,7 @@ public class Lake : MonoBehaviour
                                                     river.endLake = this;
                                                 }
                                                 Destroy(lake.gameObject);
-                                                StopCoroutine(coroutineB);
+                                                StopCoroutine(finalFill);
                                                 Generate();
                                             }
                                         }
@@ -1476,7 +1480,7 @@ public class Lake : MonoBehaviour
                                                     river.endLake = this;
                                                 }
                                                 Destroy(lake.gameObject);
-                                                StopCoroutine(coroutineB);
+                                                StopCoroutine(finalFill);
                                                 Generate();
                                             }
                                         }
@@ -1550,7 +1554,7 @@ public class Lake : MonoBehaviour
                                         SpawnOutlet();
                                     }
                                     settled = true;
-                                    StopCoroutine(coroutineB);
+                                    StopCoroutine(finalFill);
                                     notDone = false;
                                     Render();
                                     yield return null;
@@ -1590,7 +1594,7 @@ public class Lake : MonoBehaviour
                                                 river.endLake = this;
                                             }
                                             Destroy(lake.gameObject);
-                                            StopCoroutine(coroutineB);
+                                            StopCoroutine(finalFill);
                                             Generate();
                                         }
                                     }
@@ -1620,7 +1624,7 @@ public class Lake : MonoBehaviour
                                                 river.endLake = this;
                                             }
                                             Destroy(lake.gameObject);
-                                            StopCoroutine(coroutineB);
+                                            StopCoroutine(finalFill);
                                             Generate();
                                         }
                                     }
@@ -1694,7 +1698,7 @@ public class Lake : MonoBehaviour
                                     SpawnOutlet();
                                 }
                                 settled = true;
-                                StopCoroutine(coroutineB);
+                                StopCoroutine(finalFill);
                                 notDone = false;
                                 Render();
                                 yield return null;
@@ -1750,7 +1754,7 @@ public class Lake : MonoBehaviour
                                                 river.endLake = this;
                                             }
                                             Destroy(lake.gameObject);
-                                            StopCoroutine(coroutineB);
+                                            StopCoroutine(finalFill);
                                             Generate();
                                         }
                                     }
@@ -1780,7 +1784,7 @@ public class Lake : MonoBehaviour
                                                 river.endLake = this;
                                             }
                                             Destroy(lake.gameObject);
-                                            StopCoroutine(coroutineB);
+                                            StopCoroutine(finalFill);
                                             Generate();
                                         }
                                     }
@@ -1854,7 +1858,7 @@ public class Lake : MonoBehaviour
                                     SpawnOutlet();
                                 }
                                 settled = true;
-                                StopCoroutine(coroutineB);
+                                StopCoroutine(finalFill);
                                 notDone = false;
                                 Render();
                                 yield return null;
@@ -1895,7 +1899,7 @@ public class Lake : MonoBehaviour
                                             river.endLake = this;
                                         }
                                         Destroy(lake.gameObject);
-                                        StopCoroutine(coroutineB);
+                                        StopCoroutine(finalFill);
                                         Generate();
                                     }
                                 }
@@ -1925,7 +1929,7 @@ public class Lake : MonoBehaviour
                                             river.endLake = this;
                                         }
                                         Destroy(lake.gameObject);
-                                        StopCoroutine(coroutineB);
+                                        StopCoroutine(finalFill);
                                         Generate();
                                     }
                                 }
@@ -1999,7 +2003,7 @@ public class Lake : MonoBehaviour
                                 SpawnOutlet();
                             }
                             settled = true;
-                            StopCoroutine(coroutineB);
+                            StopCoroutine(finalFill);
                             notDone = false;
                             Render();
                             yield return null;
@@ -2060,7 +2064,7 @@ public class Lake : MonoBehaviour
                                 river.endLake = this;
                             }
                             Destroy(lake.gameObject);
-                            StopCoroutine(coroutineB);
+                            StopCoroutine(finalFill);
                             Generate();
                         }
                     }
@@ -2090,7 +2094,7 @@ public class Lake : MonoBehaviour
                                 river.endLake = this;
                             }
                             Destroy(lake.gameObject);
-                            StopCoroutine(coroutineB);
+                            StopCoroutine(finalFill);
                             Generate();
                         }
                     }
@@ -2165,47 +2169,54 @@ public class Lake : MonoBehaviour
                 }
                 settled = true;
                 notDone = false;
-                StopCoroutine(coroutineB);
+                StopCoroutine(finalFill);
                 Render();
                 yield return null;
             }
             yield return null;
         //}
         }
+        StopCoroutine(finalFill);
+        yield return null;
     }
 
     void Render()
     {
-        MeshData meshData = new MeshData();
-        meshData.useRenderDataForCol = true;
+        MeshData fineMeshData = new MeshData(), roughMeshData = new MeshData();
+        fineMeshData.useRenderDataForCol = true;
         for (int i = 0; i < grid.Count; i++)
         {
-            //if (grid.Contains(new Vector2(gridList[i].x + gridStep, gridList[i].y)) && grid.Contains(new Vector2(gridList[i].x - gridStep, gridList[i].y)) && grid.Contains(new Vector2(gridList[i].x, gridList[i].y + gridStep)) && grid.Contains(new Vector2(gridList[i].x, gridList[i].y - gridStep)))
-            //{
-            //    meshData.AddVertex(new Vector3(gridList[i].x, depth, gridList[i].y));
-            //}
-            //else
-            //{
-                meshData.AddVertex(new Vector3(gridList[i].x, depth, gridList[i].y));
-                meshData.AddVertex(new Vector3(gridList[i].x, depth, gridList[i].y + gridStep));
-                meshData.AddVertex(new Vector3(gridList[i].x + gridStep, depth, gridList[i].y + gridStep));
-                meshData.AddVertex(new Vector3(gridList[i].x + gridStep, depth, gridList[i].y));
+            fineMeshData.AddVertex(new Vector3(gridList[i].x, depth, gridList[i].y));
+            fineMeshData.AddVertex(new Vector3(gridList[i].x, depth, gridList[i].y + gridStep));
+            fineMeshData.AddVertex(new Vector3(gridList[i].x + gridStep, depth, gridList[i].y + gridStep));
+            fineMeshData.AddVertex(new Vector3(gridList[i].x + gridStep, depth, gridList[i].y));
 
-                meshData.AddQuadTriangles();
+            fineMeshData.AddQuadTriangles();
+
+            if(i % 10 == 0 && (i + 10) < grid.Count)
+            {
+                roughMeshData.AddVertex(new Vector3(gridList[i].x, depth, gridList[i].y));
+                roughMeshData.AddVertex(new Vector3(gridList[i].x, depth, gridList[i].y + 10 * gridStep));
+                roughMeshData.AddVertex(new Vector3(gridList[i].x + 10 * gridStep, depth, gridList[i].y + 10 * gridStep));
+                roughMeshData.AddVertex(new Vector3(gridList[i].x + 10 * gridStep, depth, gridList[i].y));
+
+                roughMeshData.AddQuadTriangles();
+            }
     
         //}
         }
-        RenderMesh(meshData);
+        RenderFineMesh(fineMeshData);
+        RenderRoughMesh(roughMeshData);
     }
 
-    void RenderMesh(MeshData meshData)
+    void RenderFineMesh(MeshData meshData)
     {
-        filter.mesh.Clear();
-        filter.mesh.vertices = meshData.vertices.ToArray();
-        filter.mesh.triangles = meshData.triangles.ToArray();
+        fineFilter.mesh.Clear();
+        fineFilter.mesh.vertices = meshData.vertices.ToArray();
+        fineFilter.mesh.triangles = meshData.triangles.ToArray();
 
-        filter.mesh.uv = meshData.uv.ToArray();
-        filter.mesh.RecalculateNormals();
+        fineFilter.mesh.uv = meshData.uv.ToArray();
+        fineFilter.mesh.RecalculateNormals();
 
         coll.sharedMesh = null;
         Mesh mesh = new Mesh();
@@ -2216,6 +2227,24 @@ public class Lake : MonoBehaviour
         coll.sharedMesh = mesh;
     }
 
+
+    void RenderRoughMesh(MeshData meshData)
+    {
+        roughFilter.mesh.Clear();
+        roughFilter.mesh.vertices = meshData.vertices.ToArray();
+        roughFilter.mesh.triangles = meshData.triangles.ToArray();
+
+        roughFilter.mesh.uv = meshData.uv.ToArray();
+        roughFilter.mesh.RecalculateNormals();
+
+        coll.sharedMesh = null;
+        Mesh mesh = new Mesh();
+        mesh.vertices = meshData.colVertices.ToArray();
+        mesh.triangles = meshData.colTriangles.ToArray();
+        mesh.RecalculateNormals();
+
+        coll.sharedMesh = mesh;
+    }
 
     void SpawnOutlet()
     {

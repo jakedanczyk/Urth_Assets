@@ -30,6 +30,7 @@ public class Tree : MonoBehaviour {
         transform.localScale = new Vector3(size, size, size);
         standing = true;
         health = 100 * size * size;
+        treeRigidBody.mass = (100 * size) * (size) * (size);
 	}
 
     // Update is called once per frame

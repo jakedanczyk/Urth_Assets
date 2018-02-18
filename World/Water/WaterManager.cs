@@ -11,7 +11,10 @@ public class WaterManager : MonoBehaviour {
     public List<Chunk256> chunks;
     IEnumerator generate,erode256;
     public List<River> rivers;
-    public List<Lake> lakes;
+    public HashSet<River> riversHash = new HashSet<River>();
+    public List<Lake> lakesList;
+    public HashSet<Lake> lakesHash = new HashSet<Lake>();
+    public List<AudioSource> riverAudioSources;
 
     private void Awake()
     {
@@ -54,7 +57,7 @@ public class WaterManager : MonoBehaviour {
         while (!lakesSettled)
         {
             lakesSettled = true;
-            foreach (Lake lake in lakes)
+            foreach (Lake lake in lakesHash)
             {
                 if (!lake.settled)
                     lakesSettled = false;
@@ -68,11 +71,10 @@ public class WaterManager : MonoBehaviour {
     public River SpawnRiverFromLake(Vector3 vector3,Lake lake)
     {
         River newRiver = Instantiate(riverPrefab).GetComponent<River>();
-        rivers.Add(newRiver);
         newRiver.source = vector3;
         foreach (River river in lake.sources)
             newRiver.sourceFlow += river.sourceFlow;
-        newRiver.StartCoroutine(newRiver.initialGenerate);
+        newRiver.StartCoroutine(newRiver.generateFromLake);
         return newRiver;
     }
 
@@ -98,7 +100,7 @@ public class WaterManager : MonoBehaviour {
             }
             yield return null;
         }
-        foreach (Lake lake in lakes)
+        foreach (Lake lake in lakesHash)
         {
             if (lake != null)
             {

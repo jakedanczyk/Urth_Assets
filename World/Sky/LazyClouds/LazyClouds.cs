@@ -12,14 +12,8 @@ public class LazyClouds : MonoBehaviour {
 	public float LS_ShadowScale = 0.75f;
 	public float LS_DistScale = 10.0f;
 	public Vector3 LS_CloudColor = new Vector3(1,0.9f,0.95f);
-
-	void Start () {
 	
-	
-	}
-	
-	void Update () {
-	
+	void Update () {	
 		
 	
 		Shader.SetGlobalFloat("ls_time", Time.time*LS_CloudTimeScale*0.25f);

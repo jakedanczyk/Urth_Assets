@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 3300000}
   - component: {fileID: 6400000}
   - component: {fileID: 2300000}
-  - component: {fileID: 205131219598924832}
   - component: {fileID: 114405241344206200}
   m_Layer: 11
   m_Name: Chunk64
@@ -121,22 +120,3 @@ MonoBehaviour:
     x: 0
     y: 0
     z: 0
---- !u!205 &205131219598924832
-LODGroup:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100000}
-  serializedVersion: 2
-  m_LocalReferencePoint: {x: 0, y: 0, z: 0}
-  m_Size: 1
-  m_FadeMode: 0
-  m_AnimateCrossFading: 0
-  m_LODs:
-  - screenRelativeHeight: 0.0004382413
-    fadeTransitionWidth: 0
-    renderers: []
-  - screenRelativeHeight: 0.0004382413
-    fadeTransitionWidth: 0
-    renderers: []
-  m_Enabled: 1

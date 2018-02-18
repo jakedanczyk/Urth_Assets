@@ -24,9 +24,9 @@ public class StartupScript : MonoBehaviour {
 
         heightsDict[174592] = 513;
         heightsDict[174080] = 65;
-        heightsDict[172032] = 17;
-        heightsDict[163840] = 5;
-        heightsDict[131072] = 2;
+        heightsDict[172032] = 1;
+        heightsDict[163840] = 1;
+        heightsDict[131072] = 1;
         mask = 174592;
         playerControl.gameObject.transform.position = new Vector3(this.transform.position.x, this.transform.position.y + heightsDict[mask.value], this.transform.position.z);
         playerControl.lastPosition = playerControl.transform.position;
@@ -91,8 +91,14 @@ public class StartupScript : MonoBehaviour {
                     {
                         playerControl.FallSpeed = 0;
                         playerControl.FallingCount = 0;
-                        mask = 172032;
+                        mask = 163840;
                         playerControl.gameObject.transform.position = new Vector3(this.transform.position.x, ground.point.y + heightsDict[mask.value], this.transform.position.z);
+                        messageLog.text.text = "Initial terrain generation completed";
+                        foreach (GameObject item in starterItems)
+                        {
+                            item.SetActive(true);
+                        }
+                        this.enabled = false;
                     }
                     else if (ground.collider.gameObject.name == "Chunk4(Clone)")
                     {
@@ -117,8 +123,14 @@ public class StartupScript : MonoBehaviour {
                     {
                         playerControl.FallSpeed = 0;
                         playerControl.FallingCount = 0;
-                        //playerControl.enabled = false;
+                        mask = 163840;
                         playerControl.gameObject.transform.position = new Vector3(this.transform.position.x, ground.point.y + heightsDict[mask.value], this.transform.position.z);
+                        messageLog.text.text = "Initial terrain generation completed";
+                        foreach (GameObject item in starterItems)
+                        {
+                            item.SetActive(true);
+                        }
+                        this.enabled = false;
                     }
                     else if (ground.collider.gameObject.name == "Chunk4(Clone)")
                     {
