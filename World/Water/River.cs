@@ -389,7 +389,7 @@ public class River : MonoBehaviour
             roughMeshData = new MeshData();
             newNodeObject = Instantiate<GameObject>(nodePrefab, this.transform);
             newNode = newNodeObject.GetComponent<RiverNode>();
-            newNode.startIdx = Mathf.Max(i,1);
+            newNode.startIdx = i;
             newNode.endIdx = i + Mathf.Min(100, left.Count - i);
             newNode.river = this;
             nodes.Add(newNode);
