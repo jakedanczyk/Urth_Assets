@@ -60,7 +60,7 @@ public class RiverNode : MonoBehaviour {
         Chunk16 nextChunk,currentChunk = world.GetChunk16((river.waypoints[startIdx].x + river.source.x), (river.waypoints[startIdx].y + river.source.y), (river.waypoints[startIdx].z + river.source.z));
         Block16 currentBlock = world.GetBlock16((river.waypoints[startIdx].x + river.source.x),(river.waypoints[startIdx].y + river.source.y), (river.waypoints[startIdx].z + river.source.z));
         List<Vector3> currBlockLeft = new List<Vector3> { river.left[startIdx - 1] + river.source - currentChunk.transform.position }, currBlockRight = new List<Vector3> { river.right[startIdx - 1] + river.source - currentChunk.transform.position };
-        for (int i = 1; i < endIdx - startIdx; i++)
+        for (int i = 1; i < endIdx - startIdx - 1; i++)
         {
             Block16 nextBlock = world.GetBlock16((river.waypoints[startIdx + i].x + river.source.x), (river.waypoints[startIdx + i].y + river.source.y), (river.waypoints[startIdx + i].z + river.source.z));
             if (currentBlock == nextBlock)
@@ -103,13 +103,18 @@ public class RiverNode : MonoBehaviour {
                 }
                 currBlockLeft.Add(river.left[startIdx - 1 + i] + river.source - currentChunk.transform.position);
                 currBlockRight.Add(river.right[startIdx - 1 + i] + river.source - currentChunk.transform.position);
+                currBlockLeft.Add(river.left[startIdx + i] + river.source - currentChunk.transform.position);
+                currBlockRight.Add(river.right[startIdx + i] + river.source - currentChunk.transform.position);
                 world.SetBlock16((river.waypoints[startIdx + i - 1].x + river.source.x), (river.waypoints[startIdx + i - 1].y + river.source.y), (river.waypoints[startIdx + i - 1].z + river.source.z), new Block16RiverGrass(currBlockLeft.ToArray(), currBlockRight.ToArray(),up * 16));
                 currentBlock = nextBlock;
                 currentChunk = world.GetChunk16((river.waypoints[startIdx + i].x + river.source.x), (river.waypoints[startIdx + i].y + river.source.y), (river.waypoints[startIdx + i].z + river.source.z));
                 currBlockLeft.Clear();
                 currBlockRight.Clear();
-                //currBlockLeft.Add(river.left[startIdx + i - 3] + river.source - currentChunk.transform.position);
-                //currBlockRight.Add(river.right[startIdx + i - 3] + river.source - currentChunk.transform.position);
+                if (startIdx + i > 2)
+                {
+                    currBlockLeft.Add(river.left[startIdx + i - 3] + river.source - currentChunk.transform.position);
+                    currBlockRight.Add(river.right[startIdx + i - 3] + river.source - currentChunk.transform.position);
+                }
                 currBlockLeft.Add(river.left[startIdx + i - 2] + river.source - currentChunk.transform.position);
                 currBlockRight.Add(river.right[startIdx + i - 2] + river.source - currentChunk.transform.position);
                 currBlockLeft.Add(river.left[startIdx + i - 1] + river.source - currentChunk.transform.position);
