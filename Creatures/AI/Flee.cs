@@ -7,7 +7,7 @@ public class Flee : MonoBehaviour
 {
 
     public Transform player;
-    private NavMeshAgent myNMagent;
+    public NavMeshAgent myNMagent;
     private float nextTurnTime;
     private Transform startTransform;
 
@@ -53,7 +53,7 @@ public class Flee : MonoBehaviour
         NavMeshHit hit;    // stores the output in a variable called hit
 
         // 5 is the distance to check, assumes you use default for the NavMesh Layer name
-        NavMesh.SamplePosition(runTo, out hit, 5, 1 << NavMesh.GetNavMeshLayerFromName("Default"));
+        NavMesh.SamplePosition(runTo, out hit, 5, 1 << NavMesh.GetAreaFromName("Walkable"));
         //Debug.Log("hit = " + hit + " hit.position = " + hit.position);
 
         // just used for testing - safe to ignore
@@ -62,8 +62,8 @@ public class Flee : MonoBehaviour
         // reset the transform back to our start transform
         transform.position = startTransform.position;
         transform.rotation = startTransform.rotation;
-
-        // And get it to head towards the found NavMesh position
-        myNMagent.SetDestination(hit.position);
+            // And get it to head towards the found NavMesh position
+        if(myNMagent.isOnNavMesh)
+            myNMagent.SetDestination(hit.position);
     }
 }

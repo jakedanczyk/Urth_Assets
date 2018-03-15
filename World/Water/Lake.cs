@@ -13,7 +13,7 @@ public class Lake : MonoBehaviour
     public float depth, volume, size, maxSize;
     HashSet<Vector2> grid = new HashSet<Vector2>(); // hashset for O(1) existence checking
     public List<Vector2> gridList = new List<Vector2>(); // list for ordered insertion
-    TerrainGen terrainGen;
+    TerrainGen terrainGen = new TerrainGen();
     public int gridStep = 1;
     public int rewind = 0;
     public Vector2 lead = Vector2.zero;
@@ -22,16 +22,20 @@ public class Lake : MonoBehaviour
     GameObject waterManagerObject;
     WaterManager waterManager;
 
+    int attempts = 0;
+
     private void Awake()
     {
-        terrainGen = new TerrainGen();
+        waterManagerObject = WaterManager.waterManagerObject;
+        waterManager = waterManagerObject.GetComponent<WaterManager>();
+        if (LevelSerializer.IsDeserializing) return;
+        waterManager.lakesHash.Add(this);
+        waterManager.lakes.Add(this);
     }
 
     private void Start()
     {
-        waterManagerObject = WaterManager.waterManagerObject;
-        waterManager = waterManagerObject.GetComponent<WaterManager>();
-        waterManager.lakesHash.Add(this);
+
     }
 
     public void Generate()
@@ -86,16 +90,28 @@ public class Lake : MonoBehaviour
 
     private void OnDestroy()
     {
-        waterManagerObject.GetComponent<WaterManager>().lakesHash.Remove(this);
+        waterManager.lakes.Remove(this);
+        waterManager.lakesHash.Remove(this);
     }
-
     IEnumerator VolumeFill()
     {
+        attempts += 1;
+        if (attempts > 10)
+        {
+            StopAllCoroutines();
+            Destroy(this.gameObject);
+        }
         bool done = false;
         for (int i = 0; i < 100; i++)
         {
             if (!done)
             {
+                attempts += 1;
+                if (attempts > 100)
+                {
+                    StopAllCoroutines();
+                    Destroy(this.gameObject);
+                }
                 grid.Clear();
                 gridList.Clear();
                 grid.Add(lead);
@@ -332,8 +348,14 @@ public class Lake : MonoBehaviour
 
     IEnumerator FinalFill()
     {
+        float introDepth = depth;
+        attempts += 1;
+        if (attempts > 100)
+        {
+            StopAllCoroutines();
+            Destroy(this.gameObject);
+        }
         StopCoroutine(volumeFill);
-
 
         //else if ((depth - 2) < 0.1)
         //{
@@ -589,6 +611,14 @@ public class Lake : MonoBehaviour
                 foreach(River river in sources)
                 {
                     river.Extend();
+                }
+                Destroy(this.gameObject);
+            }
+            else if(Mathf.Abs(depth - introDepth) < .005f)
+            {
+                foreach (River river in sources)
+                {
+                    river.endLake = null;
                 }
                 Destroy(this.gameObject);
             }
@@ -2030,6 +2060,7 @@ public class Lake : MonoBehaviour
                 lead = Vector2.zero;
                 grid.Clear();
                 gridList.Clear();
+
                 grid.Add(lead);
                 gridList.Add(lead);
                 size = 0;
@@ -2178,6 +2209,18 @@ public class Lake : MonoBehaviour
         }
         StopCoroutine(finalFill);
         yield return null;
+    }
+
+    void ClearGrid()
+    {
+        attempts++;
+        if (attempts > 100)
+        {
+            StopAllCoroutines();
+            Destroy(this.gameObject);
+        }
+        grid.Clear();
+        gridList.Clear();
     }
 
     void Render()

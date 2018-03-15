@@ -235,7 +235,7 @@ AvatarMask:
   - m_Path: M3DMale/hip/abdomenLower/abdomenUpper/chestLower/chestUpper/neckLower/neckUpper/head/upperTeeth
     m_Weight: 0
   - m_Path: M3DMale/hip/abdomenLower/abdomenUpper/chestLower/chestUpper/rCollar
-    m_Weight: 0
+    m_Weight: 1
   - m_Path: M3DMale/hip/abdomenLower/abdomenUpper/chestLower/chestUpper/rCollar/rShldrBend
     m_Weight: 1
   - m_Path: M3DMale/hip/abdomenLower/abdomenUpper/chestLower/chestUpper/rCollar/rShldrBend/rShldrTwist
@@ -245,7 +245,7 @@ AvatarMask:
   - m_Path: M3DMale/hip/abdomenLower/abdomenUpper/chestLower/chestUpper/rCollar/rShldrBend/rShldrTwist/rForearmBend/rForearmTwist
     m_Weight: 1
   - m_Path: M3DMale/hip/abdomenLower/abdomenUpper/chestLower/chestUpper/rCollar/rShldrBend/rShldrTwist/rForearmBend/rForearmTwist/rHand
-    m_Weight: 0
+    m_Weight: 1
   - m_Path: M3DMale/hip/abdomenLower/abdomenUpper/chestLower/chestUpper/rCollar/rShldrBend/rShldrTwist/rForearmBend/rForearmTwist/rHand/rCarpal1
     m_Weight: 0
   - m_Path: M3DMale/hip/abdomenLower/abdomenUpper/chestLower/chestUpper/rCollar/rShldrBend/rShldrTwist/rForearmBend/rForearmTwist/rHand/rCarpal1/rIndex1

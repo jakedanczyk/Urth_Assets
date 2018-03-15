@@ -4,21 +4,23 @@ using UnityEngine;
 
 public class River : MonoBehaviour
 {
-    public List<Vector3> waypoints, left, right;
+    public List<Vector3> waypoints, left, right; //these points are relative to river origin
     public List<float> speeds = new List<float>();
     public List<float> widths = new List<float>();
     public Vector3 source;
     public float sourceFlow;
     public List<float> turns;
     float radius = 3f;
+
+    int attempts = 0;
     
     public GameObject lakePrefab;
     public IEnumerator initialGenerate, generate, findJunction, joinLake, generateFromLake;
     public RiverGenLeader riverGenLeader;
     public List<River> tributaries;
     public River parentStem;
-    public Lake endLake;
-    public List<RiverNode> nodes;
+    public Lake endLake,sourceLake;
+    public List<RiverNode> nodes = new List<RiverNode>();
 
     public GameObject nodePrefab;
     GameObject waterManagerObject;
@@ -42,6 +44,12 @@ public class River : MonoBehaviour
 
     IEnumerator InitialGenerate()
     {
+        attempts += 1;
+        if(attempts > 10)
+        {
+            StopAllCoroutines();
+            Destroy(this.gameObject);
+        }
         var terrainGen = new TerrainGen();
         this.gameObject.transform.position = source;
         waypoints.Add(Vector3.zero);
@@ -73,17 +81,14 @@ public class River : MonoBehaviour
                         moveZ = radius * Mathf.Sin(turn);
                     }
                 }
-
-                float drop = terrainGen.StoneHeight256(source.x + waypoints[waypoints.Count - 1].x + moveX, 0, source.z + waypoints[waypoints.Count - 1].z + moveZ) - source.y; 
-                if (drop - waypoints[waypoints.Count - 1].y > 0)
-                {
-                    doneForNow = true;
-                    //in a depression, form a pond/lake
+                if (turns.Count > 1 && Mathf.Abs(Mathf.Abs(turn - turns[turns.Count - 1]) - Mathf.PI) < 0.1)
+                {// if we've doubled back, form a lake
+                    DoneForNow = true;
                     Render();
                     GameObject lake = Instantiate(lakePrefab);
                     lake.transform.position = waypoints[waypoints.Count - 1] + source;
                     endLake = lake.GetComponent<Lake>();
-                    if(!endLake.sources.Contains(this))
+                    if (!endLake.sources.Contains(this))
                         endLake.sources.Add(this);
                     endLake.Generate();
                     riverGenLeader.transform.position = waypoints[waypoints.Count - 1] + source;
@@ -93,16 +98,65 @@ public class River : MonoBehaviour
                     StopCoroutine(initialGenerate);
                     yield return null;
                 }
-                else if (drop - waypoints[waypoints.Count - 1].y > -.1)
-                {
-
-                }
+                float drop = terrainGen.StoneHeight256(source.x + waypoints[waypoints.Count - 1].x + moveX, 0, source.z + waypoints[waypoints.Count - 1].z + moveZ) - source.y;
                 turns.Add(turn);
                 waypoints.Add(new Vector3(waypoints[waypoints.Count - 1].x + moveX, drop, waypoints[waypoints.Count - 1].z + moveZ));
                 speeds.Add(10 * (waypoints[waypoints.Count - 2].y - drop) / 16);
                 widths.Add(Mathf.Min(0.5f * sourceFlow / speeds[speeds.Count - 1], 10 * Mathf.Sqrt(sourceFlow)));
                 left.Add(new Vector3(waypoints[waypoints.Count - 1].x - (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z + (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
                 right.Add(new Vector3(waypoints[waypoints.Count - 1].x + (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z - (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
+                if (terrainGen.CaveCheck(source.x + waypoints[waypoints.Count - 1].x + moveX, source.y + drop, source.z + waypoints[waypoints.Count - 1].z + moveZ))
+                {   //over a cave, fall in
+                    for(int d = 0; d < 10000; d++)
+                    {
+                        if (!terrainGen.CaveCheck(source.x + waypoints[waypoints.Count - 1].x + moveX, source.y + drop - d, source.z + waypoints[waypoints.Count - 1].z + moveZ))
+                        {// found cave floor, add waypoints at waterfall bottom, then back to top for reverse face
+                            turns.Add(turn);
+                            waypoints.Add(new Vector3(waypoints[waypoints.Count - 1].x, drop-d, waypoints[waypoints.Count - 1].z));
+                            speeds.Add(10 * (waypoints[waypoints.Count - 2].y - drop) / 16);
+                            widths.Add(Mathf.Min(0.5f * sourceFlow / speeds[speeds.Count - 1], 10 * Mathf.Sqrt(sourceFlow)));
+                            left.Add(new Vector3(waypoints[waypoints.Count - 1].x - (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop - d, waypoints[waypoints.Count - 1].z + (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
+                            right.Add(new Vector3(waypoints[waypoints.Count - 1].x + (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop - d, waypoints[waypoints.Count - 1].z - (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
+                            turns.Add(turn);
+                            waypoints.Add(new Vector3(waypoints[waypoints.Count - 1].x, drop, waypoints[waypoints.Count - 1].z));
+                            speeds.Add(10 * (waypoints[waypoints.Count - 2].y - drop) / 16);
+                            widths.Add(Mathf.Min(0.5f * sourceFlow / speeds[speeds.Count - 1], 10 * Mathf.Sqrt(sourceFlow)));
+                            left.Add(new Vector3(waypoints[waypoints.Count - 1].x - (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z + (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
+                            right.Add(new Vector3(waypoints[waypoints.Count - 1].x + (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z - (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
+                            turns.Add(turn);
+                            waypoints.Add(new Vector3(waypoints[waypoints.Count - 1].x, drop - d, waypoints[waypoints.Count - 1].z));
+                            speeds.Add(10 * (waypoints[waypoints.Count - 2].y - drop) / 16);
+                            widths.Add(Mathf.Min(0.5f * sourceFlow / speeds[speeds.Count - 1], 10 * Mathf.Sqrt(sourceFlow)));
+                            left.Add(new Vector3(waypoints[waypoints.Count - 1].x - (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop - d, waypoints[waypoints.Count - 1].z + (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
+                            right.Add(new Vector3(waypoints[waypoints.Count - 1].x + (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop - d, waypoints[waypoints.Count - 1].z - (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
+                            StopCoroutine(initialGenerate);
+                            WaterManager.waterManagerObject.GetComponent<WaterManager>().SpawnCaveRiver(new Vector3(waypoints[waypoints.Count - 2].x + source.x, source.y + waypoints[waypoints.Count - 2].y, waypoints[waypoints.Count - 2].z + source.z),this);
+                            DoneForNow = true;
+                            Render();
+                            yield return null;
+                        }
+                    }
+                }
+                else if (drop - waypoints[waypoints.Count - 1].y > 0)
+                { //in a depression, form a pond/lake
+                    DoneForNow = true;
+                    Render();
+                    GameObject lake = Instantiate(lakePrefab);
+                    lake.transform.position = waypoints[waypoints.Count - 1] + source;
+                    endLake = lake.GetComponent<Lake>();
+                    if (!endLake.sources.Contains(this))
+                        endLake.sources.Add(this);
+                    endLake.Generate();
+                    riverGenLeader.transform.position = waypoints[waypoints.Count - 1] + source;
+                    findJunction = FindJunction(riverGenLeader.touchedRiver);
+                    StartCoroutine(findJunction);
+                    JoinLake(riverGenLeader.touchedLake);
+                    StopCoroutine(initialGenerate);
+                    yield return null;
+                }
+                else
+                { //normal situation, proceed
+                }
             }
             riverGenLeader.transform.position = waypoints[waypoints.Count - 1] + source;
             yield return null;
@@ -117,6 +171,12 @@ public class River : MonoBehaviour
 
     IEnumerator GenerateFromLake()
     {
+        attempts += 1;
+        if (attempts > 10)
+        {
+            StopAllCoroutines();
+            Destroy(this.gameObject);
+        }
         var terrainGen = new TerrainGen();
         this.gameObject.transform.position = source;
         waypoints.Add(Vector3.zero);
@@ -151,7 +211,7 @@ public class River : MonoBehaviour
                 float drop = low - source.y; // - waypoints[waypoints.Count - 1].y + terrainGen.StoneHeight(source.x + waypoints[waypoints.Count - 1].x + moveX, 0, source.z + waypoints[waypoints.Count - 1].z + moveZ);
                 if (drop - waypoints[waypoints.Count - 1].y > 0)
                 {
-                    doneForNow = true;
+                    DoneForNow = true;
                     //in a depression, form a pond/lake
                     GameObject lake = Instantiate(lakePrefab);
                     lake.transform.position = waypoints[waypoints.Count - 1] + source;
@@ -187,6 +247,12 @@ public class River : MonoBehaviour
 
     IEnumerator Generate()
     {
+        attempts += 1;
+        if (attempts > 10)
+        {
+            StopAllCoroutines();
+            Destroy(this.gameObject);
+        }
         var terrainGen = new TerrainGen();
         float theta = 45f * Mathf.PI / 180f;
         float low;
@@ -219,7 +285,7 @@ public class River : MonoBehaviour
                 if (drop - waypoints[waypoints.Count - 1].y > 0)
                 {
                     //in a depression, form a pond/lake
-                    doneForNow = true;
+                    DoneForNow = true;
                     GameObject lake = Instantiate(lakePrefab);
                     lake.transform.position = waypoints[waypoints.Count - 1] + source;
                     endLake = lake.GetComponent<Lake>();
@@ -313,6 +379,7 @@ public class River : MonoBehaviour
             if(oldNode != null)
                 Destroy(oldNode.gameObject);
         }
+        nodes.Clear();
         MeshData fineMeshData, roughMeshData;
         GameObject newNodeObject;
         RiverNode newNode;
@@ -322,6 +389,9 @@ public class River : MonoBehaviour
             roughMeshData = new MeshData();
             newNodeObject = Instantiate<GameObject>(nodePrefab, this.transform);
             newNode = newNodeObject.GetComponent<RiverNode>();
+            newNode.startIdx = Mathf.Max(i,1);
+            newNode.endIdx = i + Mathf.Min(100, left.Count - i);
+            newNode.river = this;
             nodes.Add(newNode);
             if (i + 50 < waypoints.Count)
                 newNodeObject.transform.localPosition = waypoints[i + 50];
@@ -329,10 +399,6 @@ public class River : MonoBehaviour
                 newNodeObject.transform.localPosition = waypoints[i];
             for (int j = 0; j < 100 && (j + i < left.Count - 1); j++)
             {
-                newNode.waypoints.Add(waypoints[i + j] - newNodeObject.transform.localPosition);
-                newNode.left.Add(left[i + j] - newNodeObject.transform.localPosition);
-                newNode.right.Add(right[i + j] - newNodeObject.transform.localPosition);
-                newNode.widths.Add(widths[i + j]);
                 fineMeshData.AddVertex(right[i + j] - newNodeObject.transform.localPosition);
                 fineMeshData.AddVertex(left[i + j] - newNodeObject.transform.localPosition);
                 fineMeshData.AddVertex(left[i + j + 1] - newNodeObject.transform.localPosition);
@@ -437,12 +503,12 @@ public class River : MonoBehaviour
         }
     }
 
-
     private bool doneForNow = false;
     public bool DoneForNow { get; set; }
 
     private void OnDestroy()
     {
+        waterManager.rivers.Remove(this);
         waterManager.riversHash.Remove(this);
     }
 }

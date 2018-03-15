@@ -45,10 +45,11 @@ public class PauseScript : MonoBehaviour {
                 helptext.text = helptext.text + txt + "\n";   
             }
         }
+        Time.timeScale = 1;
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update () {
         if (paused)
         {
             Time.timeScale = 0f;
@@ -101,7 +102,7 @@ public class PauseScript : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.LeftBracket))
         {
             print(Time.timeScale);
-            if (!paused && Time.timeScale > 1)
+            if (!paused)// && Time.timeScale > 1)
             {
                 Time.timeScale = Time.timeScale * .5f;
                 Time.fixedDeltaTime = .02f * Time.timeScale;

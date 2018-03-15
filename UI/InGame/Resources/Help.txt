@@ -9,6 +9,7 @@ E - Interact. Equip/Unequip if inventory or loot panel is open and item is selec
 R - Raise/lower weapon. Drop selected item if inventory or loot panel is open and item is selected.
 T - Transfer selected item to/from loot container.
 
+Tab - Open/close all menus
 I - Inventory
 O - Chacter overview
 K - Crafting

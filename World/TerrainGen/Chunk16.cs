@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.AI;
 using System.Collections;
 
 [RequireComponent(typeof(MeshFilter))]
@@ -24,6 +25,8 @@ public class Chunk16 : MonoBehaviour
 
     public MeshFilter filter;
     public MeshCollider coll;
+
+    public NavMeshSurface navMesh;
 
     public World16 world16;
     public WorldPos pos;
@@ -89,9 +92,18 @@ public class Chunk16 : MonoBehaviour
                 }
             }
         }
-        if (isWalkable && GetComponent<NavMeshSourceTag>() == null)
-            gameObject.AddComponent<NavMeshSourceTag>();
         RenderMesh(meshData);
+        if (isWalkable)
+        {
+            gameObject.AddComponent<NavMeshSourceTag>();
+        }
+        //if (isWalkable && GetComponent<UnityEngine.AI.NavMeshSurface>() == null)
+        //{
+        //    navMesh = gameObject.AddComponent<UnityEngine.AI.NavMeshSurface>();
+        //    navMesh.collectObjects = CollectObjects.Children;
+        //    navMesh.layerMask = 8192;
+        //    navMesh.BuildNavMesh();
+        //}
     }
 
     // Sends the calculated mesh information

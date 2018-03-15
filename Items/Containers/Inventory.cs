@@ -47,6 +47,7 @@ public class Inventory : MonoBehaviour {
         newItem.itemUIelement.GetComponent<RectTransform>().localScale = Vector3.one;
         newItem.itemUIElementScript.parentInventory = this;
         newItem.itemUIElementScript.panel = inventoryUIPanel;
+        newItem.itemUIelement.SetActive(true);
         newItem.loose = false;
         newItem.gameObject.SetActive(false);
         inventoryContents.Add(newItem);
@@ -106,11 +107,7 @@ public class Inventory : MonoBehaviour {
             selectedItem = clickedItem;
             if (modelViewUI != null)
             {
-                GameObject model = Instantiate(clickedItem.itemModel);
-                modelViewUI.ChangeModel(model);
-                model.transform.SetParent(modelViewUI.gameObject.transform);
-                model.transform.localPosition = Vector3.zero;
-                //model.transform.localScale = Vector3.one * 10;
+                modelViewUI.ChangeModel(selectedItem);
             }
         }
     }

@@ -8,6 +8,7 @@ namespace DigitalRuby.RainMaker
         public RainScript RainScript;
         public UnityEngine.UI.Toggle MouseLookToggle;
         public UnityEngine.UI.Toggle FlashlightToggle;
+        public UnityEngine.UI.Slider RainSlider;
         public Light Flashlight;
         public GameObject Sun;
 
@@ -58,7 +59,7 @@ namespace DigitalRuby.RainMaker
             {
                 Camera.main.transform.Translate(0.0f, 0.0f, -speed);
             }
-            else if (Input.GetKey(KeyCode.A))
+            if (Input.GetKey(KeyCode.A))
             {
                 Camera.main.transform.Translate(-speed, 0.0f, 0.0f);
             }
@@ -66,7 +67,7 @@ namespace DigitalRuby.RainMaker
             {
                 Camera.main.transform.Translate(speed, 0.0f, 0.0f);
             }
-            else if (Input.GetKeyDown(KeyCode.F))
+            if (Input.GetKeyDown(KeyCode.F))
             {
                 FlashlightToggle.isOn = !FlashlightToggle.isOn;
             }
@@ -136,10 +137,17 @@ namespace DigitalRuby.RainMaker
             Sun.transform.rotation = Quaternion.Euler(val, 0.0f, 0.0f);
         }
 
+        public void FollowCameraChanged(bool val)
+        {
+            RainScript.FollowCamera = val;
+        }
+
         // Use this for initialization
         private void Start()
         {
             originalRotation = transform.localRotation;
+            RainScript.RainIntensity = RainSlider.value = 0.5f;
+            RainScript.EnableWind = true;
         }
 
         // Update is called once per frame

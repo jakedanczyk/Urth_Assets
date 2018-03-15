@@ -6,7 +6,10 @@ public class ActivateChunk64 : MonoBehaviour {
 
     void OnTriggerEnter(Collider col)
     {
-            col.gameObject.GetComponent<MeshRenderer>().enabled = true;
+        Chunk64 chunk64 = col.gameObject.GetComponent<Chunk64>();
+        if (chunk64 != null)
+        {
+            chunk64.GetComponent<MeshRenderer>().enabled = true;
             col.gameObject.layer = 11;
             if (col.gameObject.GetComponent<Chunk64>().isSubChunked)
             {
@@ -17,5 +20,6 @@ public class ActivateChunk64 : MonoBehaviour {
                 }
             }
             //col.gameObject.GetComponent<MeshCollider>().enabled = true;
+        }
     }
 }

@@ -7,7 +7,7 @@ public class Item_Stack_GreenBoughs : Item_Stack {
 	// Use this for initialization
 	void Start () {
         weightPerItem = 50;
-        WeightCalc();
+        TotalProperties();
     }
 
     // Update is called once per frame
@@ -18,7 +18,7 @@ public class Item_Stack_GreenBoughs : Item_Stack {
     public Item_Stack_GreenBoughs(int num)
     {
         numItems = num;
-        WeightCalc();
+        TotalProperties();
     }
 
 

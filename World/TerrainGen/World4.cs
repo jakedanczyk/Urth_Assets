@@ -124,6 +124,11 @@ public class World4 : MonoBehaviour {
 
     }
 
+    public Block4 GetBlock4(Vector3 position)
+    {
+        return GetBlock4(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y), Mathf.RoundToInt(position.z));
+    }
+
     public void SetBlock4(int x, int y, int z, Block4 block4)
     {
         Chunk4 chunk4 = GetChunk4(x, y, z);

@@ -159,6 +159,12 @@ public class HumanDefaultStats : CreatureStats
         carryWeight.UpdateLinkers();
         carryWeight.SetCurrentValueToMax();
 
+        var surfaceArea = CreateOrGetStat<RPGDerived>(RPGStatType.SurfaceArea);
+        surfaceArea.StatName = "Body Surface Area";
+        surfaceArea.StatBaseValue = 0; //square mm, 202000 for a 1 meter tall person 1 kg in weight...
+        surfaceArea.RPGStatLinkerBodySurfaceArea(new RPGStatLinkerBodySurfaceArea(CreateOrGetStat<RPGAttribute>(RPGStatType.Weight), CreateOrGetStat<RPGAttribute>(RPGStatType.Height), 202000, .001f, .001f, .425f, .725f));
+        surfaceArea.UpdateBodySurfaceArea();
+        surfaceArea.SetCurrentValueToMax();
 
         var stamina = CreateOrGetStat<RPGVital>(RPGStatType.Stamina);
         stamina.StatName = "Stamina";

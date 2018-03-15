@@ -15,7 +15,7 @@ public class Item : MonoBehaviour {
     public int currQuality;
     public bool loose;
 
-    public ItemMaterialType primaryMaterialType;
+    public MaterialType primaryMaterialType;
     public GameObject itemModel;
     public List<ItemAttribute> itemAttributes;
     public List<Item> componentItems;
@@ -26,17 +26,9 @@ public class Item : MonoBehaviour {
 
     public void Awake()
     {
-        if (itemUIelement == null)
-        {
-            itemUIelement = Instantiate(Resources.Load("ItemUI_Element") as GameObject);
-            itemUIElementScript = itemUIelement.GetComponent<ItemUI_ButtonScript>();
-            itemUIElementScript.parentItem = this;
-            itemUIElementScript.thisButton.GetComponentInChildren<Text>().text = itemUIElementScript.parentItem.itemName;
-        }
-        else
-        {
-            itemUIElementScript = itemUIelement.GetComponent<ItemUI_ButtonScript>();
-        }
+        itemUIelement = Instantiate(Resources.Load("ItemUI_Element") as GameObject);
+        itemUIElementScript = itemUIelement.GetComponent<ItemUI_ButtonScript>();
+        itemUIElementScript.parentItem = this;  
     }
 
     public bool HasAttributeType(ItemAttribute attribute)

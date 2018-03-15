@@ -10,6 +10,6 @@ public class BodyPartColliderScript : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        parentBody = GetComponentInParent<BodyManager>();
+        parentBody = transform.root.GetComponent<BodyManager>();
 	}
 }

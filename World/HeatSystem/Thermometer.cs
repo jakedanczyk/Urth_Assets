@@ -8,7 +8,7 @@ public class Thermometer : MonoBehaviour {
     public float temperature;
     public float radiatorTemp;
     public WeatherControl weatherSystem;
-    public List<HeatZone> heatZones;
+    public List<HeatZone> heatZones = new List<HeatZone>();
     public List<HeatRadiator> heatRadiators;
     public Collider col;
 
@@ -24,13 +24,8 @@ public class Thermometer : MonoBehaviour {
         }
         float altitude = this.transform.position.y;
         print("thermo " + temperature);
-        temperature += weatherSystem.weathers[weatherSystem.schedule[0]].globalTemperature - (.0064f * (altitude - 2000)) + heatZones.Sum(temp => temp.temperatureDifference);
+        temperature += weatherSystem.weathers[weatherSystem.currentWeatherIndex].globalTemperature - (.0064f * (altitude - 2000)) + heatZones.Sum(temp => temp.temperatureDifference);
         InvokeRepeating("ReadTemp", 6, 6);
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
 	}
 
     public float ReadTemp()
@@ -39,9 +34,9 @@ public class Thermometer : MonoBehaviour {
         for (int i = 0; i < heatRadiators.Count; i++)
         {
             float dist = Vector3.Distance(heatRadiators[i].gameObject.transform.position, this.transform.position);
-            temperature = Mathf.Max(heatRadiators[i].power / (dist * dist), heatRadiators[i].coreTemp);
+            temperature = Mathf.Min(heatRadiators[i].power / (dist * dist), heatRadiators[i].coreTemp);
         }
         float altitude = this.transform.position.y;
-        return temperature += weatherSystem.weathers[weatherSystem.schedule[0]].globalTemperature - (.0064f * (altitude - 2000)) + heatZones.Sum(temp => temp.temperatureDifference);
+        return temperature += weatherSystem.weathers[weatherSystem.currentWeatherIndex].globalTemperature - (.0064f * (altitude - 2000)) + heatZones.Sum(temp => temp.temperatureDifference);
     }
 }

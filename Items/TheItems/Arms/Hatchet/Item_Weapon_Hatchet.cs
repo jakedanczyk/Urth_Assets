@@ -9,6 +9,7 @@ public class Item_Weapon_Hatchet : Item_Weapon {
     public Item_Haft component_Haft;
 
     public Collider edgeCollider;
+    public int woodChopBonus, woodSplitBonus;
 
     // Use this for initialization
     void Start ()
@@ -21,9 +22,8 @@ public class Item_Weapon_Hatchet : Item_Weapon {
 
     }
 
-    void Chop() 
+    public override float TreeChopRateFactor()
     {
-        edgeCollider.isTrigger = true;
-
+        return base.TreeChopRateFactor() + woodChopBonus;
     }
 }

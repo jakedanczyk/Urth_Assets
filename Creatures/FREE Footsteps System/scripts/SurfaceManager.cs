@@ -46,7 +46,28 @@ public class SurfaceManager : MonoBehaviour {
 		return temp;
 	}
 
-	public string[] GetAllSurfaceNames() {
+    public AudioClip GetFootstep(Collider groundCollider)
+    {
+        int surfaceIndex = GetSurfaceIndex(groundCollider);
+
+        if (surfaceIndex == -1)
+        {
+            return null;
+        }
+
+        // Getting the footstep sounds based on surface index.
+        AudioClip[] footsteps = definedSurfaces[surfaceIndex].footsteps;
+        n = Random.Range(1, footsteps.Length);
+
+        // Move picked sound to index 0 so it's not picked next time.
+        AudioClip temp = footsteps[n];
+        footsteps[n] = footsteps[0];
+        footsteps[0] = temp;
+
+        return temp;
+    }
+
+    public string[] GetAllSurfaceNames() {
 		string[] names = new string[definedSurfaces.Length];
 
 		for(int i = 0;i < names.Length;i ++) names[i] = definedSurfaces[i].name;
@@ -106,7 +127,23 @@ public class SurfaceManager : MonoBehaviour {
 		return -1;
 	}
 
-	string GetMeshMaterialAtPoint(Vector3 worldPosition, Ray ray) {
+    int GetSurfaceIndex(Collider col)
+    {
+        string textureName = col.GetComponent<Renderer>().materials[0].mainTexture.name;
+
+        // Searching for the found texture / material name in registered materials.
+        foreach (var material in registeredTextures)
+        {
+            if (material.texture.name == textureName)
+            {
+                return material.surfaceIndex;
+            }
+        }
+
+        return -1;
+    }
+
+    string GetMeshMaterialAtPoint(Vector3 worldPosition, Ray ray) {
 		if(ray.direction == Vector3.zero) {
 			ray = new Ray(worldPosition + Vector3.up * 0.01f, Vector3.down);
 		}

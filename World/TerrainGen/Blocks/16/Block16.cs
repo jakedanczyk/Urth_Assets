@@ -18,10 +18,8 @@ public class Block16
 
     }
 
-    public virtual MeshData Blockdata
-     (Chunk16 chunk16, int x, int y, int z, MeshData meshData)
+    public virtual MeshData Blockdata(Chunk16 chunk16, int x, int y, int z, MeshData meshData)
     {
-
         meshData.useRenderDataForCol = true;
         if (!chunk16.isWalkable)
         {

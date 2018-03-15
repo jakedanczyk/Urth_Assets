@@ -3,6 +3,7 @@ using System.Collections;
 using UnityStandardAssets.CrossPlatformInput;
 using UnityStandardAssets.Utility;
 using Random = UnityEngine.Random;
+using UnityEngine.AI;
 
 namespace UnityStandardAssets.Characters.FirstPerson
 {
@@ -12,16 +13,16 @@ namespace UnityStandardAssets.Characters.FirstPerson
     public class PlayerControls : MonoBehaviour
     {
         public static GameObject playerControlsGameObject;
-
+        public HUDManager hud;
         public World thisWorld;
-        public BodyManager_Human_Player player_bodyManager;
+        public BodyManager_Human_Player playerBodyManager;
         //public RPGCreature player;
         public RPGStatCollection playerStats;
         public RPGStat jump;
         public bool crouching, autoMove, aboveDetailedChunk;
         public Rigidbody m_Rigidbody;
         public Animator anim;
-        public GameObject shoulderGirdle;
+        public Transform rightShoulderTransform,leftShoulderTransform;
         public GameObject craftingUI, fireUIPanel;
         public GameObject playerObject;
         public Transform playerTransform;
@@ -30,8 +31,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         GameObject _tooltip;
         GameObject _character;
         GameObject _dropBox;
-        public bool showInventory = false;
-        public bool terrainMode = false;
+        public bool showInventory,terrainMode, menusOpen;
         public Block setBlock;
         public Item_TerrainBlock buildingBlock;
 
@@ -49,7 +49,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public bool inventoryActive, lootActive;
         public LootInventoryFocusPanel lootPanelScript;
 
-        GameObject modelViewObject;
+        public GameObject modelViewObject;
         public RectTransform modelViewUI;
         public GameObject butcheringUI;
         public RectTransform lootingUI;
@@ -112,6 +112,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public PlayerAudio_Manager playerAudioManager;
 
         public bool e_down;
+        public Camera cam;
         Camera m_Camera;
         public Collider cameraBubble;
 
@@ -124,22 +125,21 @@ namespace UnityStandardAssets.Characters.FirstPerson
             crouching = false;
             lastPosition = this.transform.position;
             playerControlsGameObject = this.gameObject;
+            m_Camera = cam;
         }
 
         // Use this for initialization
         private void Start()
         {
-            modelViewObject = ModelViewer.modelViewObject;
-            modelViewUI = ModelViewer.modelViewerObject.GetComponent<ModelViewer>().parentCanvas;
             m_AudioSource = GetComponent<AudioSource>();
             if (LevelSerializer.IsDeserializing) return;
 
-            m_Camera = Camera.main.GetComponent<Camera>();
+                //Camera.main.GetComponent<Camera>();
             characterController = GetComponent<CharacterController>();
             jump = playerStats.GetStat<RPGDerived>(RPGStatType.JumpHeight);
-            m_JumpSpeed = (float)(jump.StatValue)/10f;
+            m_JumpSpeed = (float)(jump.StatValue) / 10f;
             m_CharacterController = GetComponent<CharacterController>();
-            m_Camera = Camera.main;
+            //m_Camera = Camera.main;
             m_OriginalCameraPosition = m_Camera.transform.localPosition;
             m_FovKick.Setup(m_Camera);
             m_HeadBob.Setup(m_Camera, m_StepInterval);
@@ -149,7 +149,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_MouseLook.Init(transform, m_Camera.transform);
             m_CharacterControllerHeight = m_CharacterController.height;
             m_CharacterControllerCenter = m_CharacterController.center;
-            inventory = player_bodyManager.baseInventory;
+            inventory = playerBodyManager.baseInventory;
             InvokeRepeating("SetJumpSpeed", 1.1f, 1.1f);
         }
 
@@ -160,6 +160,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
         float fallTime,fallSpeed;
         public float FallSpeed { get { return fallSpeed; } set { fallSpeed = value; } }
         public int requiredFallTime;
+
+        public LayerMask eLayerMask = 2796033;
         // Update is called once per frame
         private void Update()
         {
@@ -193,30 +195,42 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 fallSpeed = 0;
             }
 
-
-            if (!showInventory)
+            if (menusOpen)
             {
+                Cursor.lockState = CursorLockMode.None;
+                m_MouseLook.lockCursor = false;
+            }
+            //if (!showInventory)
+            else
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+
                 RotateView();
 
-                if (Input.GetKeyDown(KeyCode.Mouse0))
+                if (Input.GetKeyDown(KeyCode.Mouse0)) //
                 {
-                    if (player_bodyManager.meleeWeaponDrawn)
+                    if (playerBodyManager.weaponsReadied && !playerBodyManager.isAttackingPrimary)
                     {
-                        player_bodyManager.MainAttack();
+                        playerBodyManager.PrimaryAttack();
                     }
 
-                    if (player_bodyManager.rangedWeaponDrawn)
+                    else if (playerBodyManager.drawingBow)
                     {
-                        player_bodyManager.KnockArrow();
+                        playerBodyManager.FireBow();
+                    }
+
+                    else if (playerBodyManager.rangedWeaponDrawn)
+                    { // TODO change to generic draw action
+                        playerBodyManager.KnockArrow();
                     }
 
                     if (terrainMode)
                     {
                         RaycastHit hit;
-                        if (Physics.Raycast(player_bodyManager.aimPoint.position, player_bodyManager.aimPoint.forward, out hit, 12f))
+                        if (Physics.Raycast(playerBodyManager.aimPoint.position, playerBodyManager.aimPoint.forward, out hit, 12f))
                         {
                             WorldPosFloat pos1 = EditTerrain.GetBlockPos(hit);
-                            Vector3 direction = player_bodyManager.aimPoint.position - hit.point;
+                            Vector3 direction = playerBodyManager.aimPoint.position - hit.point;
                             direction = direction.normalized;
                             WorldPos pos2 = new WorldPos((int)(pos1.x + (2 * direction.x)), (int)(pos1.y + (2 * direction.y)), (int)(pos1.z + (2 * direction.z)));
                             Chunk chunk = thisWorld.GetChunk(pos2.x, pos2.y, pos2.z);
@@ -234,60 +248,58 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     }
                 }
 
-                if (Input.GetKeyDown(KeyCode.Mouse1) && player_bodyManager.wieldingBow && player_bodyManager.arrowKnocked && !player_bodyManager.bowDrawn)
+                if (Input.GetKeyDown(KeyCode.Mouse1))
                 {
-                    player_bodyManager.DrawBow();
+                    if (playerBodyManager.wieldingBow && playerBodyManager.arrowKnocked && !playerBodyManager.bowDrawn)
+                    {
+                        playerBodyManager.DrawBow();
+                    }
+                    else if (playerBodyManager.weaponsReadied && !playerBodyManager.isAttackingSecondary && (playerBodyManager.offHandWeapon != null || (!playerBodyManager.isAttackingPrimary)))
+                    { //if wielding melee and not already swinging offhand or two-handed primary
+                        playerBodyManager.OffHandAttack();
+                    }
                 }
-
-                if (Input.GetKeyUp(KeyCode.Mouse1) && player_bodyManager.drawingBow)
+                else if (Input.GetKeyUp(KeyCode.Mouse1))
                 {
-                    player_bodyManager.ReleaseBow();
-                }
-
-                if (Input.GetKeyDown(KeyCode.Mouse0) && player_bodyManager.drawingBow)
-                {
-                    player_bodyManager.FireBow();
+                    if (playerBodyManager.wieldingBow && playerBodyManager.drawingBow)
+                    {
+                        playerBodyManager.ReleaseBow(); //release tension on bow
+                    }
                 }
 
                 if (Input.GetKeyDown(KeyCode.E)) //pickup, interact
                 {
                     e_down = true;
                     RaycastHit hit;
-                    if (Physics.Raycast(m_Camera.transform.position, m_Camera.transform.forward, out hit, 20f))
+                    if (Physics.Raycast(m_Camera.transform.position, m_Camera.transform.forward, out hit, 20f, eLayerMask))
                     {
-                        string s = hit.collider.gameObject.tag;
-                        print(s);
-                        print(player_bodyManager.rHandWeapon);
                         if (hit.collider.gameObject.tag == "Item")
                         {
-                            Item hitItem = hit.collider.gameObject.GetComponent<Item>();
+                            Item hitItem = hit.collider.gameObject.GetComponentInParent<Item>();
                             if (hitItem is Item_Weapon)
                             {
                                 Item_Weapon hitWeapon = (Item_Weapon)hitItem;
-                                if (hitWeapon.wielded)
+                                if (hitWeapon.isWielded)
                                 { }
                                 else
-                                    player_bodyManager.PickupItem(hitItem);
-
+                                    playerBodyManager.PickupItem(hitItem);
                             }
                             else
-                                player_bodyManager.PickupItem(hitItem);
+                                playerBodyManager.PickupItem(hitItem);
                             //Destroy(hit.collider.gameObject);
                         }
-                        else if (hit.collider.gameObject.tag == "Tree" && (player_bodyManager.rHandWeapon is Item_Weapon_Axe || player_bodyManager.rHandWeapon is Item_Weapon_Hatchet))
+                        else if (hit.collider.gameObject.tag == "Tree")
                         {
-                            Tree hitTree = hit.collider.gameObject.GetComponent<Tree>();
-                            player_bodyManager.FellTree(hitTree, (Item_Weapon_Axe)player_bodyManager.rHandWeapon);
+                            Tree hitTree = hit.collider.gameObject.GetComponentInParent<Tree>();
+                            if (hitTree.standing)
+                                playerBodyManager.FellTree(hitTree);
+                            else
+                                playerBodyManager.ProcessDownedTree(hitTree);
                         }
-                        else if (hit.collider.gameObject.tag == "Perennial")// && player_bodyManager.rHandWeapon.gameObject == null)
+                        else if (hit.collider.gameObject.tag == "Perennial")// && playerBodyManager.rHandWeapon.gameObject == null)
                         {
                             Perennial hitPerennial = hit.collider.gameObject.GetComponent<Perennial>();
-                            player_bodyManager.GatherPlant(hitPerennial);
-                        }
-                        else if (hit.collider.gameObject.tag == "FelledTree" && player_bodyManager.rHandWeapon is Item_Weapon_Axe)
-                        {
-                            Tree hitTree = hit.collider.gameObject.GetComponent<Tree>();
-                            player_bodyManager.ProcessDownedTree(hitTree, (Item_Weapon_Axe)player_bodyManager.rHandWeapon);
+                            playerBodyManager.GatherPlant(hitPerennial);
                         }
                         else if (hit.collider.gameObject.tag == "StackContainer")
                         {
@@ -298,11 +310,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
                         //else if (hit.collider.gameObject.tag == "UnlitFire")
                         //{
                         //  Fire hitFire = hit.collider.gameObject.GetComponentInParent<Fire>();
-                        //  player_bodyManager.StartFire(hitFire, 1);
+                        //  playerBodyManager.StartFire(hitFire, 1);
                         //}
                         else if (hit.collider.gameObject.tag == "BodyPart")
                         {
-                            BodyManager parentBody = hit.collider.gameObject.GetComponentInParent<BodyManager> ();
+                            BodyManager parentBody = hit.collider.gameObject.GetComponentInParent<BodyManager>();
                             print(parentBody.name);
                             print(parentBody.tag);
                             if (parentBody.gameObject.tag == "DeadCreature")
@@ -324,7 +336,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                         }
                         else if (hit.collider.gameObject.tag == "Water")
                         {
-                            if(inventory.waterVesselItems.Count > 0)
+                            if (inventory.waterVesselItems.Count > 0)
                             {
                                 for (int i = 0; i < inventory.waterVesselItems.Count; i++)
                                 {
@@ -334,11 +346,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
                                 }
                             }
                             else
-                                player_bodyManager.hydration += (100*500/ playerStats.GetStat<RPGAttribute>(RPGStatType.Weight).StatValue);
+                                playerBodyManager.hydration += (100 * 500 / playerStats.GetStat<RPGAttribute>(RPGStatType.Weight).StatValue);
                         }
                         else if (hit.collider.gameObject.tag == "LitFire" || hit.collider.gameObject.tag == "UnlitFire")
                         {
-                            //  player_bodyManager.StartFire(hitFire, 1);
+                            //  playerBodyManager.StartFire(hitFire, 1);
                             Fire fire = hit.collider.gameObject.GetComponentInParent<Fire>();
                             fireUIPanel.SetActive(true);
                             fireButton.currentFire = fire;
@@ -351,14 +363,27 @@ namespace UnityStandardAssets.Characters.FirstPerson
                             showInventory = true;
                             lootPanelScript.attachedInventory = fire.fireLoot;
                         }
+                        //else if(hit.collider.gameObject.tag == "Terrain")
+                        //{
+                        //    print("terrain");
+                        //    Chunk16 chunk16 = hit.collider.gameObject.GetComponent<Chunk16>();
+                        //    if (chunk16 && chunk16.navMesh == null)
+                        //    {
+                        //        chunk16.navMesh = chunk16.gameObject.AddComponent<NavMeshSurface>();
+                        //        chunk16.navMesh.collectObjects = CollectObjects.Children;
+                        //        chunk16.navMesh.layerMask = 13;
+                        //    }
+                        //    if (chunk16 && chunk16.navMesh != null)
+                        //    {
+                        //        chunk16.navMesh.BuildNavMesh();
+                        //    }
+                        //}
                     }
                 }
 
                 if (Input.GetKeyDown(KeyCode.R))
                 {
-                    player_bodyManager.weaponReadied = !player_bodyManager.weaponReadied;
-                    player_bodyManager.meleeWeaponDrawn = !player_bodyManager.meleeWeaponDrawn;
-                    anim.SetBool("ArmsRaised", !anim.GetBool("ArmsRaised"));
+                    playerBodyManager.DrawWeapons();
                 }
             }//--^^--inventory UI closed--^^--
 
@@ -367,8 +392,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 autoMove = !autoMove;
                 if (autoMove)
                 {
-                    player_bodyManager.moving = true;
-                    if (player_bodyManager.gait <= 1)
+                    playerBodyManager.moving = true;
+                    if (playerBodyManager.gait <= 1)
                     {
                         anim.SetBool("isWalking", true);
                         anim.SetBool("isRunning", false);
@@ -381,9 +406,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 }
 
             }
-            if (Input.GetKeyDown(KeyCode.W))
+            if (Input.GetKey(KeyCode.W))
             {
-                if (player_bodyManager.gait <= 1)
+                if (playerBodyManager.gait <= 1)
                 {
                     anim.SetBool("isWalking", true);
                     anim.SetBool("isRunning", false);
@@ -393,28 +418,29 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     anim.SetBool("isWalking", true);
                     anim.SetBool("isRunning", true);
                 }
-                player_bodyManager.moving = true;
+                playerBodyManager.moving = true;
                 autoMove = false;
             }
             if (Input.GetKeyUp(KeyCode.W))
             {
                 anim.SetBool("isWalking", false);
                 anim.SetBool("isRunning", false);
-                player_bodyManager.moving = false;
+                playerBodyManager.moving = false;
+                autoMove = false;
             }
-            if (Input.GetKeyDown(KeyCode.LeftShift))
+            if (Input.GetKey(KeyCode.LeftShift))
             {
                 anim.SetBool("isRunning", true);
                 anim.SetBool("isSprinting", true);
-                player_bodyManager.sprinting = true;
-                player_bodyManager.SprintTime = Time.time;
+                playerBodyManager.sprinting = true;
+                playerBodyManager.SprintTime = Time.time;
             }
             if (Input.GetKeyUp(KeyCode.LeftShift))
             {
                 anim.SetBool("isRunning", false);
                 anim.SetBool("isSprinting", false);
-                player_bodyManager.sprinting = false;
-                float sprintTime = Time.time - player_bodyManager.SprintTime;
+                playerBodyManager.sprinting = false;
+                float sprintTime = Time.time - playerBodyManager.SprintTime;
                 playerStats.GetStat<RPGAttribute>(RPGStatType.Strength).TrainingValue += (int)(sprintTime / 3f);
                 playerStats.GetStat<RPGAttribute>(RPGStatType.Speed).TrainingValue += (int)(sprintTime);
             }
@@ -423,7 +449,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 print("crouch");
                 crouching = !crouching;
-                player_bodyManager.crouching = crouching;
+                playerBodyManager.crouching = crouching;
                 anim.SetBool("isCrouching", crouching);
                 //ScaleCapsuleForCrouching(crouching);
                 //if (!crouching)
@@ -442,7 +468,23 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             if (Input.GetKeyDown(KeyCode.CapsLock))
             {
-                player_bodyManager.NextGait();
+                playerBodyManager.NextGait();
+            }
+            if (Input.GetKeyDown(KeyCode.Tab))
+            {
+                menusOpen = !menusOpen;
+                inventoryActive = menusOpen;
+                inventoryUIPanel.gameObject.SetActive(menusOpen);
+                lootPanel.gameObject.SetActive(menusOpen);
+                characterUI.SetActive(menusOpen);
+                playerCrafting.isCrafting = menusOpen;
+                if (fireUIPanel.activeSelf)
+                    fireUIPanel.SetActive(false);
+
+                if (menusOpen) { }
+                else
+                {
+                }
             }
 
             if (!m_PreviouslyGrounded && m_CharacterController.isGrounded)
@@ -464,35 +506,35 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 if (inventoryActive)
                 {
-                    if (Input.GetKey(KeyCode.E) && Input.GetMouseButtonDown(0))
+                    if (Input.GetKey(KeyCode.E) && Input.GetKeyDown(KeyCode.Mouse0))
                     {
                         if (inventory.selectedItem is Item_Weapon)
                         {
                             Item_Weapon selectedItem = (Item_Weapon)inventory.selectedItem;
 
-                            if (!selectedItem.wielded)
+                            if (!selectedItem.isWielded)
                             {
-                                player_bodyManager.DrawWeapon(selectedItem);
+                                playerBodyManager.DrawWeapon(selectedItem);
                             }
-                            else if (selectedItem.wielded)
+                            else if (selectedItem.isWielded)
                             {
-                                player_bodyManager.SheatheWeapon(selectedItem);
+                                playerBodyManager.SheatheWeapon(selectedItem);
                             }
                         }
                     }
-                    if (Input.GetKey(KeyCode.E) && Input.GetMouseButtonDown(1))
+                    if (Input.GetKey(KeyCode.E) && Input.GetKeyDown(KeyCode.Mouse1))
                     {
                         if (inventory.selectedItem is Item_Weapon)
                         {
                             Item_Weapon selectedItem = (Item_Weapon)inventory.selectedItem;
 
-                            if (!selectedItem.wielded)
+                            if (!selectedItem.isWielded)
                             {
-                                player_bodyManager.OffHandDrawWeapon(selectedItem);
+                                playerBodyManager.OffHandDrawWeapon(selectedItem);
                             }
-                            else if (selectedItem.wielded)
+                            else if (selectedItem.isWielded)
                             {
-                                player_bodyManager.SheatheWeapon(selectedItem);
+                                playerBodyManager.SheatheWeapon(selectedItem);
                             }
                         }
                     }
@@ -507,62 +549,54 @@ namespace UnityStandardAssets.Characters.FirstPerson
                             if (!selectedItem.equipped)
                             {
                                 m_AudioSource.PlayOneShot(playerAudioManager.equip);
-                                player_bodyManager.EquipWearable(selectedItem);
+                                playerBodyManager.EquipWearable(selectedItem);
                             }
                             else if (selectedItem.equipped)
                             {
                                 m_AudioSource.PlayOneShot(playerAudioManager.equip);
-                                player_bodyManager.RemoveGarment(selectedItem);
+                                playerBodyManager.RemoveGarment(selectedItem);
                             }
                         }
                         else if (inventory.selectedItem is Item_Weapon)
-                        {
+                        { //TODO on ui: equip/unequip
                             Item_Weapon selectedItem = (Item_Weapon)inventory.selectedItem;
 
-                            if (selectedItem.wielded)
+                            if (selectedItem.isWielded)
                             {
-                                player_bodyManager.SheatheWeapon(selectedItem);
+                                playerBodyManager.SheatheWeapon(selectedItem);
                             }
                             else
                             {
-                                if (player_bodyManager.rHandWeapon != null)
-                                {
-                                    player_bodyManager.DropItem(player_bodyManager.rHandWeapon);
-                                }
-                                if (!selectedItem.wielded)
-                                {
-                                    player_bodyManager.DrawWeapon(selectedItem);
-                                }
-                                else if (selectedItem.wielded)
-                                {
-                                    player_bodyManager.SheatheWeapon(selectedItem);
-                                }
+                                playerBodyManager.DrawWeapon(selectedItem);
                             }
                         }
                         else if (inventory.selectedItem is Item_Food)
                         {
                             Item_Food selectedFood = (Item_Food)inventory.selectedItem;
-                            player_bodyManager.Eat(selectedFood);
+                            playerBodyManager.Eat(selectedFood);
                         }
-
-                        if (inventory.selectedItem is Item_Ammo)
+                        else if(inventory.selectedItem is ItemStackFood)
+                        {
+                            ItemStackFood selectedFood = (ItemStackFood)inventory.selectedItem;
+                            playerBodyManager.Eat(selectedFood);
+                        }
+                        else if(inventory.selectedItem is Item_Ammo)
                         {
                             Item_Ammo selectedAmmo = inventory.selectedItem.GetComponent<Item_Ammo>();
-                            player_bodyManager.currentAmmo = selectedAmmo;
-                            player_bodyManager.currentAmmoPrefab = selectedAmmo.itemPrefab;
+                            playerBodyManager.currentAmmo = selectedAmmo;
+                            playerBodyManager.currentAmmoPrefab = selectedAmmo.itemPrefab;
                         }
                         //if (inventory.selectedItem.GetType().IsAssignableFrom(typeof(Item_WaterVessel)))
-                        if (inventory.selectedItem is Item_WaterVessel)
+                        else if (inventory.selectedItem is Item_WaterVessel)
                         {
                             Item_WaterVessel vessel = (Item_WaterVessel)inventory.selectedItem;
                             float x = vessel.content;
                             vessel.Fill(-500);
                             x = x - vessel.content;
-                            player_bodyManager.hydration += (100 * x / playerStats.GetStat<RPGAttribute>(RPGStatType.Weight).StatValue);
+                            playerBodyManager.hydration += (100 * x / playerStats.GetStat<RPGAttribute>(RPGStatType.Weight).StatValue);
                             m_AudioSource.PlayOneShot(playerAudioManager.drink);
                         }
-
-                        if (inventory.selectedItem is Item_TerrainBlock)
+                        else if (inventory.selectedItem is Item_TerrainBlock)
                         {
                             terrainMode = true;
                             Item_TerrainBlock setItem = (Item_TerrainBlock)inventory.selectedItem;
@@ -572,14 +606,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     }
                     if (Input.GetKeyDown(KeyCode.R))
                     {
-                        player_bodyManager.DropItem(inventory.selectedItem);
+                        playerBodyManager.DropItem(inventory.selectedItem);
                     }
                     if (Input.GetKeyDown(KeyCode.T))
                     {
                         if (inventory.selectedItem == null || !lootingUI.gameObject.activeSelf)
                             return;
                         Item anItem = inventory.selectedItem;
-                        player_bodyManager.DropItem(inventory.selectedItem);
+                        playerBodyManager.DropItem(inventory.selectedItem);
                         lootInventory.AddItem(anItem);
                         anItem.itemUIElementScript.panel = (RectTransform)lootInventory.inventoryUIPanel;
                         anItem.itemUIElementScript.playerControls = this;
@@ -602,13 +636,13 @@ namespace UnityStandardAssets.Characters.FirstPerson
                             Item_Weapon selectedItem = (Item_Weapon)lootInventory.selectedItem;
                             lootInventory.selectedItem = null;
 
-                            if (!selectedItem.wielded)
+                            if (!selectedItem.isWielded)
                             {
-                                player_bodyManager.DrawWeapon(selectedItem);
+                                playerBodyManager.DrawWeapon(selectedItem);
                             }
-                            else if (selectedItem.wielded)
+                            else if (selectedItem.isWielded)
                             {
-                                player_bodyManager.SheatheWeapon(selectedItem);
+                                playerBodyManager.SheatheWeapon(selectedItem);
                             }
 
                         }
@@ -619,13 +653,13 @@ namespace UnityStandardAssets.Characters.FirstPerson
                         {
                             Item_Weapon selectedItem = (Item_Weapon)lootInventory.selectedItem;
 
-                            if (!selectedItem.wielded)
+                            if (!selectedItem.isWielded)
                             {
-                                player_bodyManager.OffHandDrawWeapon(selectedItem);
+                                playerBodyManager.OffHandDrawWeapon(selectedItem);
                             }
-                            else if (selectedItem.wielded)
+                            else if (selectedItem.isWielded)
                             {
-                                player_bodyManager.SheatheWeapon(selectedItem);
+                                playerBodyManager.SheatheWeapon(selectedItem);
                             }
                         }
                     }
@@ -642,12 +676,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
                             Item_Garment selectedItem = (Item_Garment)lootInventory.selectedItem;
                             if (!selectedItem.equipped)
                             {
-                                player_bodyManager.EquipWearable(selectedItem);
+                                playerBodyManager.EquipWearable(selectedItem);
                                 m_AudioSource.PlayOneShot(playerAudioManager.equip);
                             }
                             else if (selectedItem.equipped)
                             {
-                                player_bodyManager.RemoveGarment(selectedItem);
+                                playerBodyManager.RemoveGarment(selectedItem);
                                 m_AudioSource.PlayOneShot(playerAudioManager.equip);
                             }
                         }
@@ -656,35 +690,35 @@ namespace UnityStandardAssets.Characters.FirstPerson
                         {
                             Item_Weapon selectedItem = (Item_Weapon)lootInventory.selectedItem;
 
-                            if (selectedItem.wielded)
+                            if (selectedItem.isWielded)
                             {
-                                player_bodyManager.SheatheWeapon(selectedItem);
+                                playerBodyManager.SheatheWeapon(selectedItem);
                                 m_AudioSource.PlayOneShot(playerAudioManager.sheathe);
                             }
 
-                            else if (player_bodyManager.rHandWeapon == null)
+                            else if (playerBodyManager.primaryWeapon == null)
                             {
-                                if (!selectedItem.wielded)
+                                if (!selectedItem.isWielded)
                                 {
-                                    player_bodyManager.DrawWeapon(selectedItem);
+                                    playerBodyManager.DrawWeapon(selectedItem);
                                     m_AudioSource.PlayOneShot(playerAudioManager.draw);
                                 }
-                                else if (selectedItem.wielded)
+                                else if (selectedItem.isWielded)
                                 {
-                                    player_bodyManager.SheatheWeapon(selectedItem);
+                                    playerBodyManager.SheatheWeapon(selectedItem);
                                     m_AudioSource.PlayOneShot(playerAudioManager.sheathe);
                                 }
                             }
-                            else if (player_bodyManager.lHandWeapon == null)
+                            else if (playerBodyManager.offHandWeapon == null)
                             {
-                                if (!selectedItem.wielded)
+                                if (!selectedItem.isWielded)
                                 {
-                                    player_bodyManager.OffHandDrawWeapon(selectedItem);
+                                    playerBodyManager.OffHandDrawWeapon(selectedItem);
                                     m_AudioSource.PlayOneShot(playerAudioManager.draw);
                                 }
-                                else if (selectedItem.wielded)
+                                else if (selectedItem.isWielded)
                                 {
-                                    player_bodyManager.SheatheWeapon(selectedItem);
+                                    playerBodyManager.SheatheWeapon(selectedItem);
                                     m_AudioSource.PlayOneShot(playerAudioManager.sheathe);
                                 }
                             }
@@ -693,8 +727,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
                         if (lootInventory.selectedItem is Item_Ammo)
                         {
                             Item_Ammo selectedAmmo = lootInventory.selectedItem.GetComponent<Item_Ammo>();
-                            player_bodyManager.currentAmmo = selectedAmmo;
-                            player_bodyManager.currentAmmoPrefab = selectedAmmo.itemPrefab;
+                            playerBodyManager.currentAmmo = selectedAmmo;
+                            playerBodyManager.currentAmmoPrefab = selectedAmmo.itemPrefab;
                         }
 
                         if (lootInventory.selectedItem is Item_TerrainBlock)
@@ -706,7 +740,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                         }
                         Destroy(lootInventory.selectedItem.itemUIelement.GetComponent<LootInventoryFocusPanel>());
                         lootInventory.RemoveItem(lootInventory.selectedItem);
-                        player_bodyManager.PickupItem(lootInventory.selectedItem);
+                        playerBodyManager.PickupItem(lootInventory.selectedItem);
                         terrainMode = false;
                     }
                     if (Input.GetKeyDown(KeyCode.R))
@@ -729,7 +763,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                         Item anItem = lootInventory.selectedItem;
                         Destroy(anItem.itemUIelement.GetComponent<LootInventoryFocusPanel>());
                         lootInventory.RemoveItem(lootInventory.selectedItem);
-                        player_bodyManager.PickupItem(lootInventory.selectedItem);
+                        playerBodyManager.PickupItem(lootInventory.selectedItem);
                         InventoryFocusPanel ifp = anItem.itemUIelement.AddComponent<InventoryFocusPanel>();
                         ifp.attachedInventory = inventory;
                         ifp.panel = (RectTransform)inventory.inventoryUIPanel;
@@ -745,7 +779,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 {
                     modelViewObject.SetActive(false);
                     modelViewUI.gameObject.SetActive(false);
-                    player_bodyManager.baseInventory.selectedItem = null;
+                    playerBodyManager.baseInventory.selectedItem = null;
                     inventoryUIPanel.gameObject.SetActive(false);
                     lootInventory = null;
                     lootingUI.gameObject.SetActive(false);
@@ -764,7 +798,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     showInventory = true;
                     m_AudioSource.PlayOneShot(playerAudioManager.openInventory);
                     Cursor.lockState = CursorLockMode.None;
-
+                    Cursor.visible = true;
+                    m_MouseLook.lockCursor = false;
                 }
             }
 
@@ -879,35 +914,39 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private void LateUpdate()
         {
-            //m_Camera = Camera.main.GetComponent<Camera>();
+            m_Camera = Camera.main.GetComponent<Camera>();
 
-            shoulderGirdle.transform.Rotate(m_Camera.transform.rotation.eulerAngles.x, 0, 0);
+            if(playerBodyManager.isAttackingPrimary || playerBodyManager.isAttackingSecondary)
+            {
+                rightShoulderTransform.transform.Rotate(m_Camera.transform.rotation.eulerAngles.x, 0, 0);
+                leftShoulderTransform.transform.Rotate(m_Camera.transform.rotation.eulerAngles.x, 0, 0);
+            }
         }
 
-            //Debug.DrawLine(this.transform.position, hit.point, Color.blue);
-            //    if (!falling)
-            //    {
-            //        falling = true;
-            //        m_Rigidbody.constraints = RigidbodyConstraints.None;
-            //        m_GravityMultiplier = 3;
-            //    }
-            //}
-            //else
-            //{
-            //    if (falling)
-            //    {
-            //        falling = false;
-            //        m_Rigidbody.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ;
-            //        m_GravityMultiplier = 0;
-            //    }
-            //}
+        //Debug.DrawLine(this.transform.position, hit.point, Color.blue);
+        //    if (!falling)
+        //    {
+        //        falling = true;
+        //        m_Rigidbody.constraints = RigidbodyConstraints.None;
+        //        m_GravityMultiplier = 3;
+        //    }
+        //}
+        //else
+        //{
+        //    if (falling)
+        //    {
+        //        falling = false;
+        //        m_Rigidbody.constraints = RigidbodyConstraints.FreezePositionX | RigidbodyConstraints.FreezePositionY | RigidbodyConstraints.FreezePositionZ;
+        //        m_GravityMultiplier = 0;
+        //    }
+        //}
 
 
         void OnGUI()
             {
-                for(int i = 0; i< player_bodyManager.outfit.Count; i++)
+                for(int i = 0; i< playerBodyManager.outfit.Count; i++)
                 {
-                    GUI.Label(new Rect(800, 375 + i*25, 500, 500), player_bodyManager.outfit[i].itemName);
+                    GUI.Label(new Rect(800, 375 + i*25, 500, 500), playerBodyManager.outfit[i].itemName);
                 }
             }
 
@@ -1060,7 +1099,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_IsNotSprinting = !Input.GetKey(KeyCode.LeftShift);
 #endif
             // set the desired speed to be walking or running
-            speed = m_IsNotSprinting ? player_bodyManager.speed : m_RunSpeed;
+            speed = m_IsNotSprinting ? playerBodyManager.speed : m_RunSpeed;
             //speed = falling ? speed : 0;
             m_Input = new Vector2(horizontal, vertical);
 
@@ -1114,10 +1153,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             if (lootInventory.selectedItem != null)
             {
-                GameObject model = Instantiate(lootInventory.selectedItem.itemModel);
-                modelViewer.ChangeModel(model);
-                model.transform.SetParent(modelViewUI.gameObject.transform);
-                model.transform.localPosition = Vector3.zero;
+                modelViewer.ChangeModel(lootInventory.selectedItem);
             }
             lootActive = true;
             inventoryActive = false;
@@ -1127,10 +1163,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             if (inventory.selectedItem != null)
             {
-                GameObject model = Instantiate(inventory.selectedItem.itemModel);
-                modelViewer.ChangeModel(model);
-                model.transform.SetParent(modelViewUI.gameObject.transform);
-                model.transform.localPosition = Vector3.zero;
+                modelViewer.ChangeModel(inventory.selectedItem);
             }
             inventoryActive = true;
             lootActive = false;
@@ -1140,6 +1173,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             jump = playerStats.GetStat<RPGDerived>(RPGStatType.JumpHeight);
             m_JumpSpeed = (float)(jump.StatValue)/10;
+        }
+
+        void ToggleMenus()
+        {
+
         }
 
         public void RevertCam()

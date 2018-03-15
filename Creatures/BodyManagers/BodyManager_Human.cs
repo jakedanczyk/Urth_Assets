@@ -80,17 +80,6 @@ public class BodyManager_Human : BodyManager {
         }
     }
 
-    private void FixedUpdate()
-    {
-
-    }
-
-
-    private void OnTriggerEnter(Collider other)
-    {
-        collisionList.Add(other);
-    }
-
     void OnStatValueChange(object sender, EventArgs args)
     {
         print("stat change");
@@ -157,14 +146,14 @@ public class BodyManager_Human : BodyManager {
 
     public Dictionary<WeaponType, string> mainAttackDict = new Dictionary<WeaponType, string>
     {
-        { WeaponType.Axe_1H, "AxeChop" }, { WeaponType.Axe_2H, "AxeChop" }, { WeaponType.Arm, "RightPunch" }, { WeaponType.Bow, "FireBow" },
+        { WeaponType.Axe, "AxeChop" }, { WeaponType.Arm, "RightPunch" }, { WeaponType.Bow, "FireBow" },
         { WeaponType.Pick, "PickSwing" }
     };
        
-    public override void MainAttack()
+    public override void PrimaryAttack()
     {
-        if (attacking) { return; }
-        collisionList.Clear();
+        if (isAttackingPrimary) { return; }
+        primaryAttackCollisionList.Clear();
         print("main attack");
 
         Invoke(mainAttackDict[rHandWeapon.weaponType], 0);
@@ -184,14 +173,14 @@ public class BodyManager_Human : BodyManager {
         print("chop");
         anim.SetTrigger("AxeChop");
         //yield return new WaitForSeconds(anim.GetCurrentAnimatorClipInfo.length);
-        if (collisionList.Count >= 0)
+        if (primaryAttackCollisionList.Count >= 0)
         {
             int cut = rHandWeapon.baseCut * (1 + (stats.GetStat(RPGStatType.Axe).StatValue / 10));
             int blunt = rHandWeapon.itemWeight * stats.GetStat(RPGStatType.Dexterity).StatValue * stats.GetStat(RPGStatType.Strength).StatValue;
-            if (collisionList[0].transform.root.tag == "Tree")
+            if (primaryAttackCollisionList[0].transform.root.tag == "Tree")
             {
                 Debug.LogWarning("2");
-                collisionList[0].transform.root.GetComponent<Tree>().health -= (cut * blunt + 10);
+                primaryAttackCollisionList[0].transform.root.GetComponent<Tree>().health -= (cut * blunt + 10);
             }
         }
         rHandWeapon.collList[0].isTrigger = false;
@@ -283,7 +272,7 @@ public class BodyManager_Human : BodyManager {
             bp.parentBody.stats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue -= 4 * (int)(bp.parentBody.stats.GetStat<RPGBodyPart>(bp.bodyPartType).damageModifer * ((o[0] / d[0]) + (o[1] / d[1]) + (o[2] / d[2])));
         }
         print(bp.parentBody.stats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue);
-        collisionList.Clear();
+        primaryAttackCollisionList.Clear();
         //defense: defense skills, armor, encumbrance, stamina, energy, agility, strength, toughness
     }
 
@@ -782,30 +771,17 @@ public class BodyManager_Human : BodyManager {
         float chopRate = (anAxe.baseBlunt + anAxe.baseCut + anAxe.woodChopBonus) * stats.GetStat<RPGAttribute>(RPGStatType.Strength).StatValue * stats.GetStat<RPGSkill>(RPGStatType.WoodWorking).StatValue;
         print(chopRate.ToString());
 
-        coroutine = DamageTree(aTree, chopRate);
+        coroutine = ChopTree(aTree, chopRate);
         StartCoroutine(coroutine);
     }
 
 
     // every 3 seconds damage the tree
-    private IEnumerator DamageTree(Tree aTree, float dam)
+    private IEnumerator ChopTree(Tree aTree, float dam)
     {
-        print("Start");
         while (true)
         {
-            print("stage2");
             aTree.TakeDamage(dam);
-            yield return new WaitForSeconds(3);
-        }
-    }
-
-    private IEnumerator ProcessTree(Tree aTree, float dam)
-    {
-        print("Start");
-        while (true)
-        {
-            print("stage2");
-            aTree.TakeDamage2(dam);
             yield return new WaitForSeconds(3);
         }
     }
@@ -820,7 +796,7 @@ public class BodyManager_Human : BodyManager {
             print("harvesting");
             float chopRate = (anAxe.baseBlunt + anAxe.baseCut + anAxe.woodChopBonus) * stats.GetStat<RPGAttribute>(RPGStatType.Strength).StatValue * stats.GetStat<RPGSkill>(RPGStatType.WoodWorking).StatValue;
             print(chopRate.ToString());
-            coroutine = ProcessTree(aTree, chopRate);
+            coroutine = ChopTree(aTree, chopRate);
             StartCoroutine(coroutine);
         }
     }

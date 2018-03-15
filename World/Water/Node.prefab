@@ -23,10 +23,10 @@ GameObject:
   - component: {fileID: 205929284856571750}
   m_Layer: 4
   m_Name: Node
-  m_TagString: Untagged
+  m_TagString: Water
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!1 &1384515421520854
 GameObject:
@@ -41,9 +41,10 @@ GameObject:
   - component: {fileID: 23724204784573440}
   - component: {fileID: 82170310326820564}
   - component: {fileID: 54068742457673850}
+  - component: {fileID: 114186817722500682}
   m_Layer: 4
   m_Name: Lod0
-  m_TagString: Untagged
+  m_TagString: Water
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
@@ -293,6 +294,17 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+--- !u!114 &114186817722500682
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1384515421520854}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49accea927b37b54382aac19daed2add, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114235660482966262
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -304,9 +316,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70bb3d0413616d443bd622b4f7c7f5b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  river: {fileID: 0}
   roughFilter: {fileID: 33549684278182336}
   fineFilter: {fileID: 33260202819813872}
   coll: {fileID: 64895921340619074}
+  startIdx: 0
+  endIdx: 0
+  erosionTrigger: {fileID: 0}
+  lod0: {fileID: 1384515421520854}
 --- !u!205 &205929284856571750
 LODGroup:
   m_ObjectHideFlags: 1

@@ -5,14 +5,13 @@ using UnityEngine;
 public class WaterManager : MonoBehaviour {
 
     public static GameObject waterManagerObject;
-    public GameObject riverPrefab;
-    public GameObject lakePrefab;
+    public GameObject riverPrefab,lakePrefab,caveRiverPrefab;
     Vector3 playerPos;
     public List<Chunk256> chunks;
     IEnumerator generate,erode256;
     public List<River> rivers;
     public HashSet<River> riversHash = new HashSet<River>();
-    public List<Lake> lakesList;
+    public List<Lake> lakes;
     public HashSet<Lake> lakesHash = new HashSet<Lake>();
     public List<AudioSource> riverAudioSources;
 
@@ -32,9 +31,9 @@ public class WaterManager : MonoBehaviour {
     IEnumerator Generate()
     {
         var terrainGen = new TerrainGen();
-        while (rivers.Count < 20)
+        while (rivers.Count < 100)
         {
-            if (rivers.Count >= 1 && rivers[rivers.Count - 1].endLake == null) { yield return null; continue; }
+            if (rivers.Count >= 1 && !rivers[rivers.Count - 1].DoneForNow) { yield return null; continue; }
             Vector3 newSpawn = new Vector3(playerPos.x + Random.Range(-16000, 16000), 0, playerPos.z + Random.Range(-16000, 16000));
             newSpawn.y = terrainGen.StoneHeight256(newSpawn.x, 0, newSpawn.z);
             if (newSpawn.y > 4880)
@@ -49,8 +48,7 @@ public class WaterManager : MonoBehaviour {
             River newRiver = Instantiate(riverPrefab).GetComponent<River>();
             newRiver.source = newSpawn;
             newRiver.StartCoroutine(newRiver.initialGenerate);
-            rivers.Add(newRiver);
-            if(newRiver.endLake == null) { yield return null; continue; }
+            if(!newRiver.DoneForNow) { yield return null; continue; }
             yield return null;
         }
         bool lakesSettled = false;
@@ -65,17 +63,28 @@ public class WaterManager : MonoBehaviour {
             yield return null;
         }
         //StartCoroutine(ErodeChunk256());
+        StopCoroutine(generate);
         yield return null;
     }
 
-    public River SpawnRiverFromLake(Vector3 vector3,Lake lake)
+    public River SpawnRiverFromLake(Vector3 origin,Lake lake)
     {
+        if (rivers.Count > 150)
+            return null;
         River newRiver = Instantiate(riverPrefab).GetComponent<River>();
-        newRiver.source = vector3;
+        newRiver.source = origin;
+        newRiver.sourceLake = lake;
         foreach (River river in lake.sources)
             newRiver.sourceFlow += river.sourceFlow;
         newRiver.StartCoroutine(newRiver.generateFromLake);
         return newRiver;
+    }
+
+    public void SpawnCaveRiver(Vector3 origin, River source)
+    {
+        CaveRiver newCaveRiver = Instantiate(caveRiverPrefab).GetComponent<CaveRiver>();
+        newCaveRiver.source = source;
+        newCaveRiver.gameObject.transform.position = origin;
     }
 
     IEnumerator ErodeChunk256()

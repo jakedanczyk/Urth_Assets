@@ -36,7 +36,9 @@ public class WeatherControl : MonoBehaviour {
     public List<int> durations;
 
     //Clouds
-    public LazyClouds lazyClouds;
+    public LazyClouds lazyCloudsCirrus;
+    public SCS cumulus;
+    public GameObject lowClouds;
 
     private void Awake()
     {
@@ -50,7 +52,17 @@ public class WeatherControl : MonoBehaviour {
         currentDuration = 300 + Random.Range(0, 36000);
         precipRate = weathers[currentWeatherIndex].precipRate;
         windSpeed = weathers[currentWeatherIndex].windSpeed;
-        lazyClouds.LS_CloudScattering = weathers[currentWeatherIndex].LS_CloudScattering;
+        if (weathers[currentWeatherIndex].areLowClouds)
+        {
+            lazyCloudsCirrus.gameObject.SetActive(false);
+            lowClouds.SetActive(true);
+        }
+        else
+        {
+            lazyCloudsCirrus.LS_CloudScattering = weathers[currentWeatherIndex].LS_CloudScattering;
+            lowClouds.SetActive(false);
+        }
+        RenderSettings.fogDensity = weathers[currentWeatherIndex].globalFog;
     }
 
     // Use this for initialization
@@ -142,11 +154,21 @@ public class WeatherControl : MonoBehaviour {
         currentDuration = durations[0];
         precipRate = weathers[schedule[0]].precipRate;
         windSpeed = weathers[schedule[0]].windSpeed;
-        lazyClouds.LS_CloudScattering = weathers[currentWeatherIndex].LS_CloudScattering;
+        if (weathers[currentWeatherIndex].areLowClouds)
+        {
+            lazyCloudsCirrus.gameObject.SetActive(false);
+            lowClouds.SetActive(true);
+        }
+        else
+        {
+            lazyCloudsCirrus.LS_CloudScattering = weathers[currentWeatherIndex].LS_CloudScattering;
+            lowClouds.SetActive(false);
+        }
         schedule.RemoveAt(0);
         durations.RemoveAt(0);
         schedule.Add(Random.Range(0, 4));
         durations.Add(300 + Random.Range(0, 36000));
+        RenderSettings.fogDensity = weathers[currentWeatherIndex].globalFog;
     }
 
     void UpdateSun()

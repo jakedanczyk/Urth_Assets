@@ -11,6 +11,9 @@ namespace DigitalRuby.RainMaker
         [Tooltip("Camera the rain should hover over, defaults to main camera")]
         public Camera Camera;
 
+        [Tooltip("Whether rain should follow the camera. If false, rain must be moved manually and will not follow the camera.")]
+        public bool FollowCamera = true;
+
         [Tooltip("Light rain looping clip")]
         public AudioClip RainSoundLight;
 
@@ -24,13 +27,12 @@ namespace DigitalRuby.RainMaker
         [Range(0.0f, 1.0f)]
         public float RainIntensity;
 
-        [SerializeField]
         [Tooltip("Rain particle system")]
         public ParticleSystem RainFallParticleSystem;
-        [SerializeField]
+
         [Tooltip("Particles system for when rain hits something")]
         public ParticleSystem RainExplosionParticleSystem;
-        [SerializeField]
+
         [Tooltip("Particle system to use for rain mist")]
         public ParticleSystem RainMistParticleSystem;
 
@@ -73,7 +75,10 @@ namespace DigitalRuby.RainMaker
             if (EnableWind && WindZone != null && WindSpeedRange.y > 1.0f)
             {
                 WindZone.gameObject.SetActive(true);
-                WindZone.transform.position = Camera.transform.position;
+                if (FollowCamera)
+                {
+                    WindZone.transform.position = Camera.transform.position;
+                }
                 if (!Camera.orthographic)
                 {
                     WindZone.transform.Translate(0.0f, WindZone.radius, 0.0f);
@@ -164,10 +169,10 @@ namespace DigitalRuby.RainMaker
                         {
                             RainFallParticleSystem.Play();
                         }
-                        ParticleSystem.MinMaxCurve rate = e.rate;
+                        ParticleSystem.MinMaxCurve rate = e.rateOverTime;
                         rate.mode = ParticleSystemCurveMode.Constant;
                         rate.constantMin = rate.constantMax = RainFallEmissionRate();
-                        e.rate = rate;
+                        e.rateOverTime = rate;
                     }
                     if (RainMistParticleSystem != null)
                     {
@@ -187,10 +192,10 @@ namespace DigitalRuby.RainMaker
                             // must have RainMistThreshold or higher rain intensity to start seeing mist
                             emissionRate = MistEmissionRate();
                         }
-                        ParticleSystem.MinMaxCurve rate = e.rate;
+                        ParticleSystem.MinMaxCurve rate = e.rateOverTime;
                         rate.mode = ParticleSystemCurveMode.Constant;
                         rate.constantMin = rate.constantMax = emissionRate;
-                        e.rate = rate;
+                        e.rateOverTime = rate;
                     }
                 }
             }
@@ -200,7 +205,6 @@ namespace DigitalRuby.RainMaker
         {
 
 #if DEBUG
-            if (LevelSerializer.IsDeserializing) return;
 
             if (RainFallParticleSystem == null)
             {
@@ -280,12 +284,12 @@ namespace DigitalRuby.RainMaker
 
         protected virtual float RainFallEmissionRate()
         {
-            return (RainFallParticleSystem.maxParticles / RainFallParticleSystem.startLifetime) * RainIntensity;
+            return (RainFallParticleSystem.main.maxParticles / RainFallParticleSystem.main.startLifetime.constant) * RainIntensity;
         }
 
         protected virtual float MistEmissionRate()
         {
-            return (RainMistParticleSystem.maxParticles / RainMistParticleSystem.startLifetime) * RainIntensity * RainIntensity;
+            return (RainMistParticleSystem.main.maxParticles / RainMistParticleSystem.main.startLifetime.constant) * RainIntensity * RainIntensity;
         }
 
         protected virtual bool UseRainMistSoftParticles
@@ -310,6 +314,8 @@ namespace DigitalRuby.RainMaker
             AudioSource = script.gameObject.AddComponent<AudioSource>();
             AudioSource.loop = true;
             AudioSource.clip = clip;
+            AudioSource.playOnAwake = false;
+            AudioSource.volume = 0.0f;
             AudioSource.Stop();
             TargetVolume = 1.0f;
         }

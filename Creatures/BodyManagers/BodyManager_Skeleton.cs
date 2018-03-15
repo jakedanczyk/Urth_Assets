@@ -22,8 +22,9 @@ public class BodyManager_Skeleton : BodyManager {
 
     public float stamina, maxStamina;
 
-    private void Awake()
+    private new void Awake()
     {
+        base.Awake();
         //stats = GetComponentInParent<SkeletonStats>();
     }
 
@@ -31,7 +32,7 @@ public class BodyManager_Skeleton : BodyManager {
     {
         if (LevelSerializer.IsDeserializing) return;
 
-        attacking = guardRaised = sneaking = false;
+        isAttackingPrimary = guardRaised = sneaking = false;
         var health = stats.GetStat<RPGVital>(RPGStatType.Health);
         health.OnCurrentValueChange += OnStatValueChange;
         navMeshAgent = GetComponent<NavMeshAgent>();
@@ -51,20 +52,9 @@ public class BodyManager_Skeleton : BodyManager {
         if (vital.StatCurrentValue <= 0)
         {
             StopCoroutine(Claw());
-            alive = false;
-            anim.SetBool("isAlive", false);
-            anim.SetBool("isDead", true);
-            aiControl.enabled = false;
-            chaseScript.CancelInvoke();
-            chaseScript.enabled = false;
-            this.tag = "DeadCreature";
             StopAllCoroutines();
+            Death();
         }
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        collisionList.Add(other);
     }
 
     void SheatheWeapon()
@@ -99,7 +89,7 @@ public class BodyManager_Skeleton : BodyManager {
 
     public void SheatheWeapon(Item_Weapon aWeapon)
     {
-        if (!aWeapon.wielded)
+        if (!aWeapon.isWielded)
             return;
         Debug.LogWarning("Sheate weapon: " + aWeapon.itemName);
         aWeapon.GetComponent<Rigidbody>().isKinematic = false;
@@ -117,14 +107,14 @@ public class BodyManager_Skeleton : BodyManager {
     [DoNotSerialize]
     public Dictionary<WeaponType, string> mainAttackDict = new Dictionary<WeaponType, string>
     {
-        { WeaponType.Axe_1H, "AxeChop" }, { WeaponType.Axe_2H, "AxeChop" }, { WeaponType.Arm, "RightPunch" }, { WeaponType.Bow, "FireBow" },
+        { WeaponType.Axe, "AxeChop" }, { WeaponType.Arm, "RightPunch" }, { WeaponType.Bow, "FireBow" },
         { WeaponType.Pick, "PickSwing" }
     };
 
-    public override void MainAttack()
+    public override void PrimaryAttack()
     {
-        if (attacking) { return; }
-        collisionList.Clear();
+        if (isAttackingPrimary) { return; }
+        primaryAttackCollisionList.Clear();
         if (rHandWeapon)
         {
             Invoke(mainAttackDict[rHandWeapon.weaponType], 0);
@@ -141,18 +131,18 @@ public class BodyManager_Skeleton : BodyManager {
         yield return new WaitForSeconds(.2f);
         rHandCollider.isTrigger = true;
 
-        if (collisionList.Count > 0)
+        if (primaryAttackCollisionList.Count > 0)
         {
-            if (collisionList[0] is CharacterController)
+            if (primaryAttackCollisionList[0] is CharacterController)
             {
-                collisionList.RemoveAt(0);
+                primaryAttackCollisionList.RemoveAt(0);
             }
 
-            if (collisionList[0].tag == "BodyPart")
+            if (primaryAttackCollisionList[0].gameObject.tag == "BodyPart")
             {
                 int cut = 1 + (stats.GetStat(RPGStatType.ArmStrike).StatValue);
                 int blunt = (int)(1 + (stats.GetStat(RPGStatType.ArmStrike).StatValue + stats.GetStat(RPGStatType.Strength).StatValue) * .1f);
-                BodyPartColliderScript bp = collisionList[0].GetComponent<BodyPartColliderScript>();
+                BodyPartColliderScript bp = primaryAttackCollisionList[0].gameObject.GetComponent<BodyPartColliderScript>();
                 print(bp.name);
                 int[] d = new int[] { 0, 0, 0 }; int[] o = new int[] { cut, blunt, 0 };
                 d = bp.parentBody.SendArmorNumbers(bp.bodyPartType);
@@ -168,15 +158,15 @@ public class BodyManager_Skeleton : BodyManager {
         rHandWeapon.collList[0].isTrigger = true;
         anim.SetTrigger("AxeChop");
         //yield return new WaitForSeconds(anim.GetCurrentAnimatorClipInfo.length);
-        if (collisionList.Count >= 0)
+        if (primaryAttackCollisionList.Count >= 0)
         {
             int cut = rHandWeapon.baseCut * (1 + (stats.GetStat(RPGStatType.Axe).StatValue / 10));
             int blunt = rHandWeapon.itemWeight * stats.GetStat(RPGStatType.Dexterity).StatValue * stats.GetStat(RPGStatType.Strength).StatValue;
-            if (collisionList[0].transform.root.tag == "Tree")
+            if (primaryAttackCollisionList[0].transform.root.tag == "Tree")
             {
                 Debug.LogWarning("2");
 
-                collisionList[0].transform.root.GetComponent<Tree>().health -= (cut * blunt + 10);
+                primaryAttackCollisionList[0].transform.root.GetComponent<Tree>().health -= (cut * blunt + 10);
             }
         }
     }
@@ -377,6 +367,12 @@ public class BodyManager_Skeleton : BodyManager {
         }
         outfit.Remove(thisWearable);
         thisWearable.equipped = false;
+    }
+
+    public new void Death()
+    {
+        base.Death();
+        GetComponent<UndeadAI>().enabled = false;
     }
 
     public override void ProcessThisBody()

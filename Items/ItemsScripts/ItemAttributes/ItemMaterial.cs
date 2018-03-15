@@ -3,13 +3,13 @@ using System.Collections;
 
 public class ItemMaterial {
 
-    public ItemMaterialType itemMaterialID;
+    public MaterialType itemMaterialID;
     public Material unityMaterial;
     public float density;
     public int tensileYield;
     public int compressiveYield;
 
-    public ItemMaterial(ItemMaterialType thisMaterialID, Material thisMaterial, float newDensity, int newTY, int newCY) {
+    public ItemMaterial(MaterialType thisMaterialID, Material thisMaterial, float newDensity, int newTY, int newCY) {
         itemMaterialID = thisMaterialID;
         unityMaterial = thisMaterial;
         density = newDensity; //g per cubic cm

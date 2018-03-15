@@ -17,6 +17,7 @@ public enum RPGStatType {
     Muscle = 6, //g
     Bodyfat = 7, //g
     CarryWeight = 8, //g
+    SurfaceArea = 9,
 
     JumpHeight = 10,
     SprintSpeed = 11,

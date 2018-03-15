@@ -4,24 +4,25 @@ using UnityEngine;
 
 public class Item_Stack : Item {
 
-    public int weightPerItem;
+    public int weightPerItem, volumePerItem;
     public int numItems;
 
     void Start()
     {
-        WeightCalc();
+        TotalProperties();
     }
 
     public void ChangeNum(int num)
     {
         numItems += num;
         if(numItems > 0)
-        WeightCalc();
+        TotalProperties();
         else DestroyObject(this.gameObject);
     }
 
-    public void WeightCalc()
+    public void TotalProperties()
     {
         itemWeight = numItems * weightPerItem;
+        itemVolume = numItems * volumePerItem;
     }
 }

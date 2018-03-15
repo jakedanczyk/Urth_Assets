@@ -2,16 +2,17 @@
 http://www.digitalruby.com
 Created by Jeff Johnson
 
-Version 2.0.3
+Version 2.1.0 (2017-02-17)
 
 --------------------
 Change Log:
 --------------------
-1.0.3	-	Fix prefab material references
-2.0		-	Added 2D mode
-2.0.1	-	Remove deprecated methods
-2.0.2	-	A few small bug fixes
+2.1.0	-	Add follow camera option
 2.0.3	-	Fix 2D collision
+2.0.2	-	A few small bug fixes
+2.0.1	-	Remove deprecated methods
+2.0.0	-	Added 2D mode
+1.0.3	-	Fix prefab material references
 --------------------
 
 **** NOTE *****

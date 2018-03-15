@@ -5,7 +5,7 @@ using System;
 
 public class Tree : MonoBehaviour {
 
-    public float health;
+    public float health,startinghealth;
     public float size; 
     public bool standing;
     public GameObject treeModel;
@@ -29,32 +29,21 @@ public class Tree : MonoBehaviour {
         size = UnityEngine.Random.Range(.2f, 5f);
         transform.localScale = new Vector3(size, size, size);
         standing = true;
-        health = 100 * size * size;
-        treeRigidBody.mass = (100 * size) * (size) * (size);
-	}
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (standing && health <= 0)
-        { Fall(); }
-        if (!standing && downedHealth < 0)
-        { TurnToWoodPile(); }
+        health = 1000 * size * size;
+        startinghealth = health;
+        treeRigidBody.mass = (10000 * size) * (size) * (size);
+        CalculateWoodContent();
     }
 
     public void Fall()
     {
         standing = false;
-        GetComponent<Rigidbody>().mass = size;
         GetComponent<Rigidbody>().isKinematic = false;
-        this.tag = "FelledTree";
-        treeModel.tag = "FelledTree";
-        WoodContent();
     }
 
     public int kindling, sticks, greenBoughs, logs;
 
-    void WoodContent()
+    void CalculateWoodContent()
     {
         logs = (int)(size * size * .1);
         greenBoughs = (int)(size * size);
@@ -65,7 +54,21 @@ public class Tree : MonoBehaviour {
 
     public void TakeDamage(float dam)
     {
-        health -= dam;
+        if (health > 0)
+        {
+            health -= dam;
+            if (health < 0)
+            {
+                Fall();
+                health = -1;
+            }
+        }
+        else
+        {
+            health -= dam;
+            if (health < -startinghealth)
+                TurnToWoodPile();
+        }
     }
 
     public float downedHealth;
@@ -84,12 +87,15 @@ public class Tree : MonoBehaviour {
         var newLogPile = Instantiate(logPilePrefab);
         newLogPile.transform.position = this.transform.position;
         newLogPile.GetComponent<LogPile>().stackCount = logs;
+        newLogPile.GetComponent<Rigidbody>().mass = treeRigidBody.mass * 0.5f;
         var newPineBoughPile = Instantiate(pineBoughPilePrefab);
         newPineBoughPile.transform.position = this.transform.position;
         newPineBoughPile.GetComponent<PineBoughPile>().stackCount = greenBoughs;
+        newPineBoughPile.GetComponent<Rigidbody>().mass = treeRigidBody.mass * 0.25f;
         var newKindlingPile = Instantiate(kindlingPilePrefab);
         newKindlingPile.transform.position = this.transform.position + new Vector3(0,0,1);
         newKindlingPile.GetComponent<KindlingPile>().stackCount = kindling;
+        newKindlingPile.GetComponent<Rigidbody>().mass = treeRigidBody.mass * 0.25f;
 
         Destroy(this.gameObject);
     }

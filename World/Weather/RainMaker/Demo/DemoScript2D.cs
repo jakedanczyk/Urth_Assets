@@ -5,11 +5,13 @@ namespace DigitalRuby.RainMaker
 {
     public class DemoScript2D : MonoBehaviour
     {
+        public UnityEngine.UI.Slider RainSlider;
         public RainScript2D RainScript;
 
         private void Start()
         {
-
+            RainScript.RainIntensity = RainSlider.value = 0.5f;
+            RainScript.EnableWind = true;
         }
 
         private void Update()

@@ -15,16 +15,6 @@ public class Perennial : MonoBehaviour {
     public GameObject fruitPrefab;
     public GameObject ripeModel, harvestedModel;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
     public void SetHarvested()
     {
         ripeModel.SetActive(false);

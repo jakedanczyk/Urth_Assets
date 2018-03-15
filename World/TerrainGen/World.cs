@@ -106,6 +106,11 @@ public class World : MonoBehaviour {
         return containerChunk;
     }
 
+    public Block GetBlock(Vector3 position)
+    {
+        return GetBlock(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y), Mathf.RoundToInt(position.z));
+    }
+
     public Block GetBlock(float x, float y, float z)
     {
         Chunk containerChunk = GetChunk(Mathf.FloorToInt(x), Mathf.FloorToInt(y), Mathf.FloorToInt(z));

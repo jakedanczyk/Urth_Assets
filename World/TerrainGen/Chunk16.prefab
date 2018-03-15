@@ -42,7 +42,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_MotionVectors: 1
-  m_LightProbeUsage: 0
+  m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
   - {fileID: 2100000, guid: 56d58eecd2e93af4ea355ad1741cf39e, type: 2}
@@ -126,6 +126,7 @@ MonoBehaviour:
   subChunkList: []
   filter: {fileID: 3300000}
   coll: {fileID: 6400000}
+  navMesh: {fileID: 0}
   world16: {fileID: 0}
   pos:
     x: 0

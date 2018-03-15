@@ -279,7 +279,8 @@ MonoBehaviour:
   itemUIElementScript: {fileID: 0}
   matDict: {fileID: 0}
   capacity: 5000
-  fill: 0
+  content: 0
+  full: 0
 --- !u!136 &136487775010388474
 CapsuleCollider:
   m_ObjectHideFlags: 1

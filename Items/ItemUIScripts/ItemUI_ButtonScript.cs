@@ -13,6 +13,7 @@ public class ItemUI_ButtonScript : MonoBehaviour, ISelectHandler, IPointerDownHa
     public Button thisButton;
     public RectTransform panel;
     public UnityStandardAssets.Characters.FirstPerson.PlayerControls playerControls;
+    public Text nameText, weightText, volumeText, infoText;
     //void Awake()
     //{
     //parentItem = GetComponentInParent<Item>();
@@ -26,7 +27,9 @@ public class ItemUI_ButtonScript : MonoBehaviour, ISelectHandler, IPointerDownHa
         playerControls = UnityStandardAssets.Characters.FirstPerson.PlayerControls.playerControlsGameObject.GetComponent<UnityStandardAssets.Characters.FirstPerson.PlayerControls>();
         if (parentItem == null)
             parentItem = this.GetComponentInParent<Item>();
-        thisButton.GetComponentInChildren<Text>().text = parentItem.itemName;
+        nameText.text = parentItem.itemName;
+        weightText.text = parentItem.itemWeight + "g";
+        volumeText.text = parentItem.itemVolume + "mL";
     }
 
     // Update is called once per frame

@@ -8,7 +8,7 @@ Shader "Custom/RainShader"
 		_TintColor ("Tint Color (RGB)", Color) = (1, 1, 1, 1)
 		_PointSpotLightMultiplier ("Point/Spot Light Multiplier", Range (0, 10)) = 2
 		_DirectionalLightMultiplier ("Directional Light Multiplier", Range (0, 10)) = 1
-		_InvFade ("Soft Particles Factor", Range(0.01, 3.0)) = 1.0
+		_InvFade ("Soft Particles Factor", Range(0.01, 100.0)) = 1.0
 		_AmbientLightMultiplier ("Ambient light multiplier", Range(0, 1)) = 0.25
     }
 
@@ -128,12 +128,12 @@ Shader "Custom/RainShader"
 			
 			sampler2D _MainTex;
   
-            fixed4 frag (v2f i) : COLOR {
-            
+            fixed4 frag (v2f i) : COLOR
+			{
 				#if defined(SOFTPARTICLES_ON)
-                float sceneZ = LinearEyeDepth(UNITY_SAMPLE_DEPTH(tex2Dproj(_CameraDepthTexture, UNITY_PROJ_COORD(i.projPos))));
-                float partZ = i.projPos.z;
-                i.color.a *= saturate (_InvFade * (sceneZ - partZ));
+				float sceneZ = LinearEyeDepth(UNITY_SAMPLE_DEPTH(tex2Dproj(_CameraDepthTexture, UNITY_PROJ_COORD(i.projPos))));
+				float partZ = i.projPos.z;
+				i.color.a *= saturate(_InvFade * (sceneZ - partZ));
 				#endif
 
 				return tex2D(_MainTex, i.uv_MainTex) * i.color;

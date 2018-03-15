@@ -11,6 +11,6 @@ public class PlayerAudio_Manager : MonoBehaviour {
     public AudioClip draw;
     public AudioClip sheathe;
     public AudioClip swing,equip,hitBody;
-    public AudioClip drink;
-    public AudioClip fall;
+    public AudioClip drink,eat;
+    public AudioClip fall, teethChatter;
 }

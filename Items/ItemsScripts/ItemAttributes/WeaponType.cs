@@ -9,9 +9,10 @@ public enum WeaponType
 
     None = 0,
 
-    Axe_1H = 1,
+    Axe = 1,
+    //Axe_1H = 1,
 
-    Axe_2H = 2,
+    //Axe_2H = 2,
 
     Knife = 3,
 

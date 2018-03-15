@@ -15,5 +15,16 @@ MonoBehaviour:
   weatherName: CalmRainCool
   globalTemperature: 5
   windSpeed: 0
-  precipRate: 0
+  precipRate: 5
   weatherFX: {fileID: 1272952391633778, guid: 369d228ac04832c4483136d0624616b0, type: 2}
+  LS_CloudTimeScale: 2
+  LS_CloudScale: 4
+  LS_CloudScattering: 0.6
+  LS_CloudIntensity: 4
+  LS_CloudSharpness: 0.75
+  LS_CloudThickness: 1
+  LS_ShadowScale: 0.75
+  LS_DistScale: 10
+  LS_CloudColor: {x: 1, y: 0.9, z: 0.95}
+  globalFog: 0.0021
+  areLowClouds: 1

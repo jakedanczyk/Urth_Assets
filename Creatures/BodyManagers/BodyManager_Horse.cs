@@ -10,7 +10,7 @@ public class BodyManager_Horse : BodyManager {
 
     void Start()
     {
-        attacking = guardRaised = sneaking = true;
+        isAttackingPrimary = guardRaised = sneaking = true;
         var health = stats.GetStat<RPGVital>(RPGStatType.Health);
         print(stats.GetStat<RPGVital>(RPGStatType.Health).StatName);
         health.OnCurrentValueChange += OnStatValueChange;
@@ -27,17 +27,7 @@ public class BodyManager_Horse : BodyManager {
         }
         if (vital.StatCurrentValue <= 0)
         {
-            alive = false;
-            anim.SetBool("isAlive", false);
-            anim.SetBool("isDead", true);
-            fleeScript.CancelInvoke();
-            fleeScript.enabled = false;
-            GetComponent<Animator>().enabled = false;
-            this.tag = "DeadCreature";
-            StopAllCoroutines();
-            lootInventory.AddItem(Instantiate(hidePrefab).GetComponent<Item>());
-            for (int i = 0; i < stats.GetStat(RPGStatType.Weight).StatValue/5000; i++)
-                lootInventory.AddItem(Instantiate(meatPrefab).GetComponent<Item>());
+            Death();
         }
     }
 
@@ -50,11 +40,9 @@ public class BodyManager_Horse : BodyManager {
     {
     }
 
-
-
     public void SheatheWeapon(Item_Weapon aWeapon)
     {
-        if (!aWeapon.wielded)
+        if (!aWeapon.isWielded)
             return;
         Debug.LogWarning("Sheate weapon: " + aWeapon.itemName);
         aWeapon.GetComponent<Rigidbody>().isKinematic = false;
@@ -62,10 +50,10 @@ public class BodyManager_Horse : BodyManager {
         aWeapon.gameObject.SetActive(false);
     }
 
-    public override void MainAttack()
+    public override void PrimaryAttack()
     {
-        if (attacking) { return; }
-        collisionList.Clear();
+        if (isAttackingPrimary) { return; }
+        primaryAttackCollisionList.Clear();
         print("main attack");
         Kick();
     }
@@ -74,5 +62,14 @@ public class BodyManager_Horse : BodyManager {
     void Kick()
     {
 
+    }
+
+    public new void Death()
+    {
+        base.Death();
+        GetComponent<PreyAI>().enabled = false;
+        lootInventory.AddItem(Instantiate(hidePrefab).GetComponent<Item>());
+        for (int i = 0; i < stats.GetStat(RPGStatType.Weight).StatValue / 5000; i++)
+            lootInventory.AddItem(Instantiate(meatPrefab).GetComponent<Item>());
     }
 }

@@ -229,6 +229,20 @@ public class LoadChunk16s : MonoBehaviour
                 updateList.RemoveAt(0);
             }
         }
+
+
+        //if (world16.chunk16s.Count > 0 && buildList.Count == 0 && updateList.Count == 0)
+        //{
+        //    GameObject[] chunks = new GameObject[world16.chunk16s.Count];
+        //    int i = 0;
+        //    foreach (KeyValuePair<WorldPos, Chunk16> entry in world16.chunk16s)
+        //    {
+        //        chunks[i] = entry.Value.gameObject;
+        //        i++;
+        //    }
+        //    StaticBatchingUtility.Combine(chunks, chunks[0]);
+        //    this.enabled = false;
+        //}
     }
 
     void BuildChunk16(WorldPos pos)

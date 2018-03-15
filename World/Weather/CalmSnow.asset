@@ -15,5 +15,16 @@ MonoBehaviour:
   weatherName: CalmHeavySnow
   globalTemperature: -3
   windSpeed: 0
-  precipRate: 0
+  precipRate: 5
   weatherFX: {fileID: 1190884417351162, guid: d2bd4d823ac517f41bf00cf1622081c6, type: 2}
+  LS_CloudTimeScale: 2
+  LS_CloudScale: 4
+  LS_CloudScattering: 0.6
+  LS_CloudIntensity: 4
+  LS_CloudSharpness: 0.75
+  LS_CloudThickness: 1
+  LS_ShadowScale: 0.75
+  LS_DistScale: 10
+  LS_CloudColor: {x: 1, y: 0.9, z: 0.95}
+  globalFog: 0.003
+  areLowClouds: 1

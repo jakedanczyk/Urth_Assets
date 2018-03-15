@@ -107,6 +107,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - PixelSnap: 0
+    - _AmbientLightMultiplier: 0.25
     - _Brightness: 1
     - _BumpScale: 1
     - _ColorMask: 15
@@ -116,7 +117,7 @@ Material:
     - _DstBlend: 10
     - _EmissionScaleUI: 1
     - _Glossiness: 0.5
-    - _InvFade: 1
+    - _InvFade: 10
     - _Metallic: 0
     - _Mode: 2
     - _OcclusionStrength: 1

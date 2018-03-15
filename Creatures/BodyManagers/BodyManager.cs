@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System;
+using UnityStandardAssets.Characters.ThirdPerson;
+using UnityEngine.AI;
 
 public abstract class BodyManager : MonoBehaviour {
 
@@ -12,16 +14,21 @@ public abstract class BodyManager : MonoBehaviour {
     public Transform aimPoint, arrowReleasePoint;
 
     public Animator anim;
-    public Weapon mainWeapon;
+    public Item_Weapon primaryWeapon;
     public CreatureStats stats;
-
-    public List<Collider> collisionList;
+    public AudioManager audioManager;
+    public AudioSource audioSource;
+    public List<Collision> primaryAttackCollisionList = new List<Collision>();
+    public List<Collision> offHandAttackCollisionList = new List<Collision>();
+    public AudioClip deathGasp;
 
     //status bools
-    public bool attacking, guardRaised, sneaking;
+    public bool isAttackingPrimary, isAttackingSecondary, guardRaised, sneaking;
     public bool alive = true;
     public bool butchered = false;
-    
+    int mainWeaponAnimationLayer = 5;
+    public IEnumerator onCompleteMainWeaponAttackAnimation;
+    public GameObject ragdollPrefab,bodyModel;
 
     //Attack pseudo-code
     //calc damage, speed from:(weapon, attributes, status, skill)
@@ -32,12 +39,28 @@ public abstract class BodyManager : MonoBehaviour {
     //      object type... Terrain, Construction, Item, SmallPlant, Tree, BodyPart ?
     //Terrain... Hard, Compact, Loose
 
+    public void Awake()
+    {
+        onCompleteMainWeaponAttackAnimation = OnCompleteMainWeaponAttackAnimation();
+    }
+
     void Start()
     {
-        attacking = guardRaised = sneaking = true;
+        audioManager = AudioManager.audioManagerGameObject.GetComponent<AudioManager>();
         var health = stats.GetStat<RPGVital>(RPGStatType.Health);
         print(stats.GetStat<RPGVital>(RPGStatType.Health).StatName);
         health.OnCurrentValueChange += OnStatValueChange;
+    }
+
+    public IEnumerator OnCompleteMainWeaponAttackAnimation()
+    {
+        while(anim.GetCurrentAnimatorStateInfo(mainWeaponAnimationLayer).loop)
+            yield return null;
+        while (!anim.GetCurrentAnimatorStateInfo(mainWeaponAnimationLayer).loop)
+            yield return null;
+        isAttackingPrimary = false;
+        primaryWeapon.weaponCollList[0].isActive = false;
+        yield return null;
     }
 
     void OnStatValueChange(object sender, EventArgs args)
@@ -104,5 +127,45 @@ public abstract class BodyManager : MonoBehaviour {
     public int butcherTime; // seconds
     public int butcherSkillFactor; // how variable is quality?
     public abstract void ProcessThisBody();
-    public abstract void MainAttack();
+    public abstract void PrimaryAttack();
+
+    public void Run()
+    {
+        anim.SetBool("isRunning", true);
+    }
+
+    public void Walk()
+    {
+        anim.SetBool("isWalking", true);
+        anim.SetBool("isRunning", false);
+    }
+
+    public void Idle()
+    {
+        anim.SetBool("isWalking", false);
+        anim.SetBool("isRunning", false);
+    }
+
+    public virtual void Death()
+    {
+        GetComponent<LocalNavMeshBuilder>().enabled = false;
+        GetComponent<AICharacterControl>().enabled = false;
+        GetComponent<NavMeshAgent>().enabled = false;
+        GetComponent<ThirdPersonCharacter>().enabled = false;
+        this.tag = "DeadCreature";
+        alive = false;
+        anim.enabled = false;
+        audioSource.PlayOneShot(deathGasp);
+        bodyModel.SetActive(false);
+        GetComponentInParent<Rigidbody>().useGravity = false;
+        Instantiate(ragdollPrefab, transform);
+        StopAllCoroutines();
+    }
+
+
+    public AudioClip aggressiveBellow;
+    public virtual void AggressiveBellow()
+    {
+        audioSource.PlayOneShot(aggressiveBellow);
+    }
 }

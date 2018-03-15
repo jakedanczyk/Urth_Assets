@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class FPCamControl : MonoBehaviour {
 
-    public GameObject player;
-    
+    public Transform head;
+    public Vector3 offset;
+
     void LateUpdate()
     {
-        transform.position = new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z);
+        transform.position = head.position;
+        transform.localPosition += offset;
     }
 }

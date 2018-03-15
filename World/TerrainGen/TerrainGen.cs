@@ -189,6 +189,7 @@ public class TerrainGen
             }
         }
     }
+
     public float StoneHeight(float x, float y, float z)
     {
         stoneHeight = stoneBaseHeight;
@@ -202,6 +203,19 @@ public class TerrainGen
 
         if (cliffHeight > 20)
             stoneHeight += cliffHeight;
+
+        stoneHeight += GetNoiseF(x, 0, z, stoneMinorNoise, stoneMinorHeight);
+        stoneHeight += GetNoiseF(x, 0, z, stoneBaseNoise, stoneBaseNoiseHeight);
+        return stoneHeight;
+    }
+    public float StoneHeight256(float x, float y, float z)
+    {
+        stoneHeight = stoneBaseHeight;
+
+        stoneHeight += GetNoiseF(x, 0, z, stoneMountainFrequency, stoneMountainHeight);
+
+        if (stoneHeight < stoneMinHeight)
+            stoneHeight = stoneMinHeight;
 
         stoneHeight += GetNoiseF(x, 0, z, stoneMinorNoise, stoneMinorHeight);
         stoneHeight += GetNoiseF(x, 0, z, stoneBaseNoise, stoneBaseNoiseHeight);
@@ -221,6 +235,22 @@ public class TerrainGen
 
         if (cliffHeight > 20)
             stoneHeight += cliffHeight;
+
+        stoneHeight += GetNoiseF(x, 0, z, stoneMinorNoise, stoneMinorHeight);
+        stoneHeight += GetNoiseF(x, 0, z, stoneBaseNoise, stoneBaseNoiseHeight);
+
+        dirtHeight = stoneHeight + dirtBaseHeight;
+        dirtHeight += GetNoiseF(x, 100, z, dirtNoise, dirtNoiseHeight);
+        return dirtHeight;
+    }
+    public float DirtHeight256(float x, float y, float z)
+    {
+        stoneHeight = stoneBaseHeight;
+
+        stoneHeight += GetNoiseF(x, 0, z, stoneMountainFrequency, stoneMountainHeight);
+
+        if (stoneHeight < stoneMinHeight)
+            stoneHeight = stoneMinHeight;
 
         stoneHeight += GetNoiseF(x, 0, z, stoneMinorNoise, stoneMinorHeight);
         stoneHeight += GetNoiseF(x, 0, z, stoneBaseNoise, stoneBaseNoiseHeight);
@@ -253,37 +283,6 @@ public class TerrainGen
 
         return snowHeight;
     }
-    public float StoneHeight256(float x, float y, float z)
-    {
-        stoneHeight = stoneBaseHeight;
-
-        stoneHeight += GetNoiseF(x, 0, z, stoneMountainFrequency, stoneMountainHeight);
-
-        if (stoneHeight < stoneMinHeight)
-            stoneHeight = stoneMinHeight;
-
-        stoneHeight += GetNoiseF(x, 0, z, stoneMinorNoise, stoneMinorHeight);
-        stoneHeight += GetNoiseF(x, 0, z, stoneBaseNoise, stoneBaseNoiseHeight);
-        return stoneHeight;
-    }
-
-    public float DirtHeight256(float x, float y, float z)
-    {
-        stoneHeight = stoneBaseHeight;
-
-        stoneHeight += GetNoiseF(x, 0, z, stoneMountainFrequency, stoneMountainHeight);
-
-        if (stoneHeight < stoneMinHeight)
-            stoneHeight = stoneMinHeight;
-
-        stoneHeight += GetNoiseF(x, 0, z, stoneMinorNoise, stoneMinorHeight);
-        stoneHeight += GetNoiseF(x, 0, z, stoneBaseNoise, stoneBaseNoiseHeight);
-
-        dirtHeight = stoneHeight + dirtBaseHeight;
-        dirtHeight += GetNoiseF(x, 100, z, dirtNoise, dirtNoiseHeight);
-        return dirtHeight;
-    }
-
     public float SnowHeight256(float x, float y, float z)
     {
         stoneHeight = stoneBaseHeight;
@@ -300,6 +299,17 @@ public class TerrainGen
         snowHeight += GetNoiseF(x, 100, z, snowNoise, snowNoiseHeight);
 
         return snowHeight;
+    }
+
+    //returns true if the given point is within a cave;
+    public bool CaveCheck(int x, int y, int z)
+    {
+        int caveChance = GetNoise(x, y, z, caveFrequency, 100);
+        return (caveChance < caveSize);
+    }
+    public bool CaveCheck(float x, float y, float z)
+    {
+        return CaveCheck((int)x, (int)y, (int)z);
     }
 
     public Chunk ChunkGen(Chunk chunk)
@@ -549,7 +559,7 @@ public class TerrainGen
             int goldChance = GetNoise(x, y, z, goldFrequency, 100);
             int copperChance = GetNoise(x, y, z, copperFrequency, 100);
 
-            if (y <= stoneHeight && caveSize < caveChance)
+            if (y <= stoneHeight - 16 && caveSize < caveChance)
             {
                 //if(goldSize > goldChance)
                 //{
@@ -562,6 +572,10 @@ public class TerrainGen
                 //else { SetBlock(x, y, z, new Block(), chunk); }
                 SetBlock16(x, y, z, new Block16(), chunk16);
             }
+            else if (y <= stoneHeight && caveSize < caveChance)
+            {
+                SetBlock16(x, y, z, new Block16Surface(), chunk16);
+            }
             else if (y < shrubline && y - 15 <= (dirtHeight) && caveSize < caveChance)
             {
                 SetBlock16(x, y, z, new Block16Grass(), chunk16);
@@ -569,10 +583,11 @@ public class TerrainGen
                 //{
                 if (y <= treeline && GetNoise(x, 0, z, forestFrequency, 400) < forestDensity)
                 {
-                    var terrainGen = new TerrainGen();
-                    chunk16.hasTree = true;
-                    for (int i = 0; i < 1; i++)
+                    int r = UnityEngine.Random.Range(0, 4);
+                    if (r == 0)
                     {
+                        var terrainGen = new TerrainGen();
+                        chunk16.hasTree = true;
                         int tx = UnityEngine.Random.Range(-8, 8);
                         int tz = UnityEngine.Random.Range(-8, 8);
                         float ty = terrainGen.DirtHeight(x + tx, dirtHeight, z + tz);
@@ -584,7 +599,11 @@ public class TerrainGen
                     if (GetNoise(x, 0, z, huckFrequency, 100) < huckDensity)
                     {
                         chunk16.hasBush = true;
-                        chunk16.bushList.Add(new Vector3(x, y, z));
+                        var terrainGen = new TerrainGen();
+                        int tx = UnityEngine.Random.Range(-8, 8);
+                        int tz = UnityEngine.Random.Range(-8, 8);
+                        float ty = terrainGen.DirtHeight(x + tx, dirtHeight, z + tz);
+                        chunk16.bushList.Add(new Vector3(x + tx, dirtHeight, z + tz));
                     }
                     if (GetNoise(x, 0, z, boneFrequency, 100) < boneDensity)
                     {

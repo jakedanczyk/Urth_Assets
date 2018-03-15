@@ -235,7 +235,15 @@ public class LoadChunk256s : MonoBehaviour
 
         if(buildList.Count == 0 && updateList.Count == 0)
         {
-            startupScript.ready = true;
+            GameObject[] chunks = new GameObject[world256.chunk256s.Count];
+            int i = 0;
+            foreach(KeyValuePair<WorldPos,Chunk256> entry in  world256.chunk256s)
+            {
+                chunks[i] = entry.Value.gameObject;
+                i++;
+            }
+            StaticBatchingUtility.Combine(chunks,chunks[0]);
+            this.enabled = false;
         }
     }
 

@@ -12,10 +12,8 @@ public class Block16Grass : Block16
     {
     }
 
-    public override MeshData Blockdata
- (Chunk16 chunk16, int x, int y, int z, MeshData meshData)
+    public override MeshData Blockdata (Chunk16 chunk16, int x, int y, int z, MeshData meshData)
     {
-
         meshData.useRenderDataForCol = true;
         if (!chunk16.isWalkable)
         {
@@ -113,15 +111,15 @@ public class Block16Grass : Block16
     (Chunk16 chunk16, int x, int y, int z, MeshData meshData)
     {
         var terrainGen = new TerrainGen();
-        float nw = terrainGen.DirtHeight(16 * x - 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z + 8f + chunk16.pos.z) - chunk16.pos.y;
-        float ne = terrainGen.DirtHeight(16 * x + 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z + 8f + chunk16.pos.z) - chunk16.pos.y;
-        float se = terrainGen.DirtHeight(16 * x + 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z - 8f + chunk16.pos.z) - chunk16.pos.y;
-        float sw = terrainGen.DirtHeight(16 * x - 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z - 8f + chunk16.pos.z) - chunk16.pos.y;
+        float nw = terrainGen.StoneHeight(16 * x - 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z + 8f + chunk16.pos.z) - chunk16.pos.y;
+        float ne = terrainGen.StoneHeight(16 * x + 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z + 8f + chunk16.pos.z) - chunk16.pos.y;
+        float se = terrainGen.StoneHeight(16 * x + 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z - 8f + chunk16.pos.z) - chunk16.pos.y;
+        float sw = terrainGen.StoneHeight(16 * x - 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z - 8f + chunk16.pos.z) - chunk16.pos.y;
 
-        meshData.AddVertex(new Vector3(16f * x - 8f, sw - .4f, 16 * z - 8f));
-        meshData.AddVertex(new Vector3(16f * x + 8f, se - .4f, 16 * z - 8f));
-        meshData.AddVertex(new Vector3(16f * x + 8f, ne - .4f, 16 * z + 8f));
-        meshData.AddVertex(new Vector3(16f * x - 8f, nw - .4f, 16 * z + 8f));
+        meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
+        meshData.AddVertex(new Vector3(16f * x + 8f, se, 16 * z - 8f));
+        meshData.AddVertex(new Vector3(16f * x + 8f, ne, 16 * z + 8f));
+        meshData.AddVertex(new Vector3(16f * x - 8f, nw, 16 * z + 8f));
 
         meshData.AddQuadTriangles();
         meshData.uv.AddRange(FaceUVs(Direction.down));
@@ -131,207 +129,243 @@ public class Block16Grass : Block16
     protected override MeshData FaceDataNorth
      (Chunk16 chunk16, int x, int y, int z, MeshData meshData)
     {
-        float bottom = 16 * y - 8f;
         var terrainGen = new TerrainGen();
-        float nw = terrainGen.DirtHeight(16 * x - 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z + 8f + chunk16.pos.z) - chunk16.pos.y;
+        float neLow = terrainGen.StoneHeight(16 * x + 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z + 8f + chunk16.pos.z) - chunk16.pos.y;
         float ne = terrainGen.DirtHeight(16 * x + 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z + 8f + chunk16.pos.z) - chunk16.pos.y;
+        float nw = terrainGen.DirtHeight(16 * x - 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z + 8f + chunk16.pos.z) - chunk16.pos.y;
+        float nwLow = terrainGen.StoneHeight(16 * x - 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z + 8f + chunk16.pos.z) - chunk16.pos.y;
 
-        if (bottom > ne)
-        {
-            meshData.AddVertex(new Vector3(16f * x + 8f, ne, 16 * z + 8f));
-            meshData.AddVertex(new Vector3(16f * x + 8f, ne, 16 * z + 8f));
-            if (bottom > nw)
-            {
-                meshData.AddVertex(new Vector3(16f * x - 8f, nw, 16 * z + 8f));
-                meshData.AddVertex(new Vector3(16f * x - 8f, nw, 16 * z + 8f));
-                meshData.AddQuadTriangles();
-                meshData.uv.AddRange(FaceUVs(Direction.north));
-                return meshData;
-            }
-            else
-            {
-                meshData.AddVertex(new Vector3(16f * x - 8f, nw, 16 * z + 8f));
-                meshData.AddVertex(new Vector3(16f * x - 8f, bottom, 16 * z + 8f));
-                meshData.AddQuadTriangles();
-                meshData.uv.AddRange(FaceUVs(Direction.north));
-                return meshData;
-            }
-        }
-        else if (bottom > nw)
-        {
-            meshData.AddVertex(new Vector3(16f * x + 8f, bottom, 16 * z + 8f));
-            meshData.AddVertex(new Vector3(16f * x + 8f, ne, 16 * z + 8f));
-            meshData.AddVertex(new Vector3(16f * x - 8f, nw, 16 * z + 8f));
-            meshData.AddVertex(new Vector3(16f * x - 8f, nw, 16 * z + 8f));
-            meshData.AddQuadTriangles();
-            meshData.uv.AddRange(FaceUVs(Direction.north));
-            return meshData;
-        }
-        else
-        {
-            meshData.AddVertex(new Vector3(16f * x + 8f, bottom, 16 * z + 8f));
-            meshData.AddVertex(new Vector3(16f * x + 8f, ne, 16 * z + 8f));
-            meshData.AddVertex(new Vector3(16f * x - 8f, nw, 16 * z + 8f));
-            meshData.AddVertex(new Vector3(16f * x - 8f, bottom, 16 * z + 8f));
-            meshData.AddQuadTriangles();
-            meshData.uv.AddRange(FaceUVs(Direction.north));
-            return meshData;
-        }
+        meshData.AddVertex(new Vector3(16f * x + 8f, neLow, 16 * z + 8f));
+        meshData.AddVertex(new Vector3(16f * x + 8f, ne, 16 * z + 8f));
+        meshData.AddVertex(new Vector3(16f * x - 8f, nw, 16 * z + 8f));
+        meshData.AddVertex(new Vector3(16f * x - 8f, nwLow, 16 * z + 8f));
+        meshData.AddQuadTriangles();
+        meshData.uv.AddRange(FaceUVs(Direction.north));
+        return meshData;
+
+        //if (bottom > ne)
+        //{
+        //    meshData.AddVertex(new Vector3(16f * x + 8f, ne, 16 * z + 8f));
+        //    meshData.AddVertex(new Vector3(16f * x + 8f, ne, 16 * z + 8f));
+        //    if (bottom > nw)
+        //    {
+        //        meshData.AddVertex(new Vector3(16f * x - 8f, nw, 16 * z + 8f));
+        //        meshData.AddVertex(new Vector3(16f * x - 8f, nwLow, 16 * z + 8f));
+        //        meshData.AddQuadTriangles();
+        //        meshData.uv.AddRange(FaceUVs(Direction.north));
+        //        return meshData;
+        //    }
+        //    else
+        //    {
+        //        meshData.AddVertex(new Vector3(16f * x - 8f, nw, 16 * z + 8f));
+        //        meshData.AddVertex(new Vector3(16f * x - 8f, nwLow, 16 * z + 8f));
+        //        meshData.AddQuadTriangles();
+        //        meshData.uv.AddRange(FaceUVs(Direction.north));
+        //        return meshData;
+        //    }
+        //}
+        //else if (bottom > nw)
+        //{
+        //    meshData.AddVertex(new Vector3(16f * x + 8f, neLow, 16 * z + 8f));
+        //    meshData.AddVertex(new Vector3(16f * x + 8f, ne, 16 * z + 8f));
+        //    meshData.AddVertex(new Vector3(16f * x - 8f, nw, 16 * z + 8f));
+        //    meshData.AddVertex(new Vector3(16f * x - 8f, nw, 16 * z + 8f));
+        //    meshData.AddQuadTriangles();
+        //    meshData.uv.AddRange(FaceUVs(Direction.north));
+        //    return meshData;
+        //}
+        //else
+        //{
+        //    meshData.AddVertex(new Vector3(16f * x + 8f, neLow, 16 * z + 8f));
+        //    meshData.AddVertex(new Vector3(16f * x + 8f, ne, 16 * z + 8f));
+        //    meshData.AddVertex(new Vector3(16f * x - 8f, nw, 16 * z + 8f));
+        //    meshData.AddVertex(new Vector3(16f * x - 8f, nwLow, 16 * z + 8f));
+        //    meshData.AddQuadTriangles();
+        //    meshData.uv.AddRange(FaceUVs(Direction.north));
+        //    return meshData;
+        //}
     }
 
     protected override MeshData FaceDataEast
         (Chunk16 chunk16, int x, int y, int z, MeshData meshData)
     {
         var terrainGen = new TerrainGen();
-        float ne = terrainGen.DirtHeight(16 * x + 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z + 8f + chunk16.pos.z) - chunk16.pos.y;
+        float seLow = terrainGen.StoneHeight(16 * x + 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z - 8f + chunk16.pos.z) - chunk16.pos.y;
         float se = terrainGen.DirtHeight(16 * x + 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z - 8f + chunk16.pos.z) - chunk16.pos.y;
-        float bottom = 16 * y - 8f;
+        float ne = terrainGen.DirtHeight(16 * x + 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z + 8f + chunk16.pos.z) - chunk16.pos.y;
+        float neLow = terrainGen.StoneHeight(16 * x + 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z + 8f + chunk16.pos.z) - chunk16.pos.y;
 
-        if (bottom > se)
-        {
-            meshData.AddVertex(new Vector3(16f * x + 8f, se, 16 * z - 8f));
-            meshData.AddVertex(new Vector3(16f * x + 8f, se, 16 * z - 8f));
-            if (bottom > ne)
-            {
-                meshData.AddVertex(new Vector3(16f * x + 8f, ne, 16 * z + 8f));
-                meshData.AddVertex(new Vector3(16f * x + 8f, ne, 16 * z + 8f));
-                meshData.AddQuadTriangles();
-                meshData.uv.AddRange(FaceUVs(Direction.east));
-                return meshData;
-            }
-            else
-            {
-                meshData.AddVertex(new Vector3(16f * x + 8f, ne, 16 * z + 8f));
-                meshData.AddVertex(new Vector3(16f * x + 8f, bottom, 16 * z + 8f));
-                meshData.AddQuadTriangles();
-                meshData.uv.AddRange(FaceUVs(Direction.east));
-                return meshData;
-            }
-        }
-        else if (bottom > ne)
-        {
-            meshData.AddVertex(new Vector3(16f * x + 8f, bottom, 16 * z - 8f));
-            meshData.AddVertex(new Vector3(16f * x + 8f, se, 16 * z - 8f));
-            meshData.AddVertex(new Vector3(16f * x + 8f, ne, 16 * z + 8f));
-            meshData.AddVertex(new Vector3(16f * x + 8f, ne, 16 * z + 8f));
-            meshData.AddQuadTriangles();
-            meshData.uv.AddRange(FaceUVs(Direction.east));
-            return meshData;
-        }
-        else
-        {
-            meshData.AddVertex(new Vector3(16f * x + 8f, bottom, 16 * z - 8f));
-            meshData.AddVertex(new Vector3(16f * x + 8f, se, 16 * z - 8f));
-            meshData.AddVertex(new Vector3(16f * x + 8f, ne, 16 * z + 8f));
-            meshData.AddVertex(new Vector3(16f * x + 8f, bottom, 16 * z + 8f));
-            meshData.AddQuadTriangles();
-            meshData.uv.AddRange(FaceUVs(Direction.east));
-            return meshData;
-        }
+        meshData.AddVertex(new Vector3(16f * x + 8f, seLow, 16 * z - 8f));
+        meshData.AddVertex(new Vector3(16f * x + 8f, se, 16 * z - 8f));
+        meshData.AddVertex(new Vector3(16f * x + 8f, ne, 16 * z + 8f));
+        meshData.AddVertex(new Vector3(16f * x + 8f, neLow, 16 * z + 8f));
+        meshData.AddQuadTriangles();
+        meshData.uv.AddRange(FaceUVs(Direction.east));
+        return meshData;
+
+        //if (bottom > se)
+        //{
+        //    meshData.AddVertex(new Vector3(16f * x + 8f, se, 16 * z - 8f));
+        //    meshData.AddVertex(new Vector3(16f * x + 8f, se, 16 * z - 8f));
+        //    if (bottom > ne)
+        //    {
+        //        meshData.AddVertex(new Vector3(16f * x + 8f, se, 16 * z - 8f));
+        //        meshData.AddVertex(new Vector3(16f * x + 8f, se, 16 * z - 8f));
+        //        meshData.AddQuadTriangles();
+        //        meshData.uv.AddRange(FaceUVs(Direction.east));
+        //        return meshData;
+        //    }
+        //    else
+        //    {
+        //        meshData.AddVertex(new Vector3(16f * x + 8f, ne, 16 * z + 8f));
+        //        meshData.AddVertex(new Vector3(16f * x + 8f, neLow, 16 * z + 8f));
+        //        meshData.AddQuadTriangles();
+        //        meshData.uv.AddRange(FaceUVs(Direction.east));
+        //        return meshData;
+        //    }
+        //}
+        //else if (bottom > ne)
+        //{
+        //    meshData.AddVertex(new Vector3(16f * x + 8f, seLow, 16 * z - 8f));
+        //    meshData.AddVertex(new Vector3(16f * x + 8f, se, 16 * z - 8f));
+        //    meshData.AddVertex(new Vector3(16f * x + 8f, ne, 16 * z + 8f));
+        //    meshData.AddVertex(new Vector3(16f * x + 8f, ne, 16 * z + 8f));
+        //    meshData.AddQuadTriangles();
+        //    meshData.uv.AddRange(FaceUVs(Direction.east));
+        //    return meshData;
+        //}
+        //else
+        //{
+        //    meshData.AddVertex(new Vector3(16f * x + 8f, seLow, 16 * z - 8f));
+        //    meshData.AddVertex(new Vector3(16f * x + 8f, se, 16 * z - 8f));
+        //    meshData.AddVertex(new Vector3(16f * x + 8f, ne, 16 * z + 8f));
+        //    meshData.AddVertex(new Vector3(16f * x + 8f, neLow, 16 * z + 8f));
+        //    meshData.AddQuadTriangles();
+        //    meshData.uv.AddRange(FaceUVs(Direction.east));
+        //    return meshData;
+        //}
     }
 
     protected override MeshData FaceDataSouth
         (Chunk16 chunk16, int x, int y, int z, MeshData meshData)
     {
         var terrainGen = new TerrainGen();
-        float se = terrainGen.DirtHeight(16 * x + 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z - 8f + chunk16.pos.z) - chunk16.pos.y;
+        float swLow = terrainGen.StoneHeight(16 * x - 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z - 8f + chunk16.pos.z) - chunk16.pos.y;
         float sw = terrainGen.DirtHeight(16 * x - 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z - 8f + chunk16.pos.z) - chunk16.pos.y;
-        float bottom = 16 * y - 8f;
+        float se = terrainGen.DirtHeight(16 * x + 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z - 8f + chunk16.pos.z) - chunk16.pos.y;
+        float seLow = terrainGen.StoneHeight(16 * x + 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z - 8f + chunk16.pos.z) - chunk16.pos.y;
 
-        if (bottom > se)
-        {
-            if (bottom > sw)
-            {
-                meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
-                meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
-                meshData.AddVertex(new Vector3(16f * x + 8f, se, 16 * z - 8f));
-                meshData.AddVertex(new Vector3(16f * x + 8f, se, 16 * z - 8f));
-                meshData.AddQuadTriangles();
-                meshData.uv.AddRange(FaceUVs(Direction.south));
-                return meshData;
-            }
-            else
-            {
-                meshData.AddVertex(new Vector3(16f * x - 8f, bottom, 16 * z - 8f));
-                meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
-                meshData.AddVertex(new Vector3(16f * x + 8f, se, 16 * z - 8f));
-                meshData.AddVertex(new Vector3(16f * x + 8f, se, 16 * z - 8f));
-                meshData.AddQuadTriangles();
-                meshData.uv.AddRange(FaceUVs(Direction.south));
-                return meshData;
-            }
-        }
-        else if (bottom > sw)
-        {
-            meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
-            meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
-            meshData.AddVertex(new Vector3(16f * x + 8f, se, 16 * z - 8f));
-            meshData.AddVertex(new Vector3(16f * x + 8f, bottom, 16 * z - 8f));
-            meshData.AddQuadTriangles();
-            meshData.uv.AddRange(FaceUVs(Direction.south));
-            return meshData;
-        }
-        else
-        {
-            meshData.AddVertex(new Vector3(16f * x - 8f, bottom, 16 * z - 8f));
-            meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
-            meshData.AddVertex(new Vector3(16f * x + 8f, se, 16 * z - 8f));
-            meshData.AddVertex(new Vector3(16f * x + 8f, bottom, 16 * z - 8f));
-            meshData.AddQuadTriangles();
-            meshData.uv.AddRange(FaceUVs(Direction.south));
-            return meshData;
-        }
+        meshData.AddVertex(new Vector3(16f * x - 8f, swLow, 16 * z - 8f));
+        meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
+        meshData.AddVertex(new Vector3(16f * x + 8f, se, 16 * z - 8f));
+        meshData.AddVertex(new Vector3(16f * x + 8f, seLow, 16 * z - 8f));
+        meshData.AddQuadTriangles();
+        meshData.uv.AddRange(FaceUVs(Direction.south));
+        return meshData;
+        //if (bottom > se)
+        //{
+        //    if (bottom > sw)
+        //    {
+        //        meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
+        //        meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
+        //        meshData.AddVertex(new Vector3(16f * x + 8f, se, 16 * z - 8f));
+        //        meshData.AddVertex(new Vector3(16f * x + 8f, se, 16 * z - 8f));
+        //        meshData.AddQuadTriangles();
+        //        meshData.uv.AddRange(FaceUVs(Direction.south));
+        //        return meshData;
+        //    }
+        //    else
+        //    {
+        //        meshData.AddVertex(new Vector3(16f * x - 8f, swLow, 16 * z - 8f));
+        //        meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
+        //        meshData.AddVertex(new Vector3(16f * x + 8f, se, 16 * z - 8f));
+        //        meshData.AddVertex(new Vector3(16f * x + 8f, se, 16 * z - 8f));
+        //        meshData.AddQuadTriangles();
+        //        meshData.uv.AddRange(FaceUVs(Direction.south));
+        //        return meshData;
+        //    }
+        //}
+        //else if (bottom > sw)
+        //{
+        //    meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
+        //    meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
+        //    meshData.AddVertex(new Vector3(16f * x + 8f, se, 16 * z - 8f));
+        //    meshData.AddVertex(new Vector3(16f * x + 8f, seLow, 16 * z - 8f));
+        //    meshData.AddQuadTriangles();
+        //    meshData.uv.AddRange(FaceUVs(Direction.south));
+        //    return meshData;
+        //}
+        //else
+        //{
+        //    meshData.AddVertex(new Vector3(16f * x - 8f, swLow, 16 * z - 8f));
+        //    meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
+        //    meshData.AddVertex(new Vector3(16f * x + 8f, se, 16 * z - 8f));
+        //    meshData.AddVertex(new Vector3(16f * x + 8f, seLow, 16 * z - 8f));
+        //    meshData.AddQuadTriangles();
+        //    meshData.uv.AddRange(FaceUVs(Direction.south));
+        //    return meshData;
+        //}
     }
 
     protected override MeshData FaceDataWest
         (Chunk16 chunk16, int x, int y, int z, MeshData meshData)
     {
         var terrainGen = new TerrainGen();
+        float nwLow = terrainGen.StoneHeight(16 * x - 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z + 8f + chunk16.pos.z) - chunk16.pos.y;
         float nw = terrainGen.DirtHeight(16 * x - 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z + 8f + chunk16.pos.z) - chunk16.pos.y;
         float sw = terrainGen.DirtHeight(16 * x - 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z - 8f + chunk16.pos.z) - chunk16.pos.y;
+        float swLow = terrainGen.StoneHeight(16 * x - 8f + chunk16.pos.x, 16 * y + chunk16.pos.y, 16 * z - 8f + chunk16.pos.z) - chunk16.pos.y;
         float bottom = 16 * y - 8f;
 
-        if (bottom > nw)
-        {
-            meshData.AddVertex(new Vector3(16f * x - 8f, nw, 16 * z + 8f));
-            meshData.AddVertex(new Vector3(16f * x - 8f, nw, 16 * z + 8f));
-            if (bottom > sw)
-            {
-                meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
-                meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
-                meshData.AddQuadTriangles();
-                meshData.uv.AddRange(FaceUVs(Direction.west));
-                return meshData;
-            }
-            else
-            {
-                meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
-                meshData.AddVertex(new Vector3(16f * x - 8f, bottom, 16 * z - 8f));
-                meshData.AddQuadTriangles();
-                meshData.uv.AddRange(FaceUVs(Direction.west));
-                return meshData;
-            }
-        }
-        else if (bottom > sw)
-        {
-            meshData.AddVertex(new Vector3(16f * x - 8f, bottom, 16 * z + 8f));
-            meshData.AddVertex(new Vector3(16f * x - 8f, nw, 16 * z + 8f));
-            meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
-            meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
-            meshData.AddQuadTriangles();
-            meshData.uv.AddRange(FaceUVs(Direction.west));
-            return meshData;
-        }
-        else
-        {
-            meshData.AddVertex(new Vector3(16f * x - 8f, bottom, 16 * z + 8f));
-            meshData.AddVertex(new Vector3(16f * x - 8f, nw, 16 * z + 8f));
-            meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
-            meshData.AddVertex(new Vector3(16f * x - 8f, bottom, 16 * z - 8f));
-            meshData.AddQuadTriangles();
-            meshData.uv.AddRange(FaceUVs(Direction.west));
-            return meshData;
-        }
+        meshData.AddVertex(new Vector3(16f * x - 8f, nwLow, 16 * z + 8f));
+        meshData.AddVertex(new Vector3(16f * x - 8f, nw, 16 * z + 8f));
+        meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
+        meshData.AddVertex(new Vector3(16f * x - 8f, swLow, 16 * z - 8f));
+        meshData.AddQuadTriangles();
+        meshData.uv.AddRange(FaceUVs(Direction.west));
+        return meshData;
+
+        //if (bottom > nw)
+        //{
+        //    meshData.AddVertex(new Vector3(16f * x - 8f, nw, 16 * z + 8f));
+        //    meshData.AddVertex(new Vector3(16f * x - 8f, nw, 16 * z + 8f));
+        //    if (bottom > sw)
+        //    {
+        //        meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
+        //        meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
+        //        meshData.AddQuadTriangles();
+        //        meshData.uv.AddRange(FaceUVs(Direction.west));
+        //        return meshData;
+        //    }
+        //    else
+        //    {
+        //        meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
+        //        meshData.AddVertex(new Vector3(16f * x - 8f, swLow, 16 * z - 8f));
+        //        meshData.AddQuadTriangles();
+        //        meshData.uv.AddRange(FaceUVs(Direction.west));
+        //        return meshData;
+        //    }
+        //}
+        //else if (bottom > sw)
+        //{
+        //    meshData.AddVertex(new Vector3(16f * x - 8f, nwLow, 16 * z + 8f));
+        //    meshData.AddVertex(new Vector3(16f * x - 8f, nw, 16 * z + 8f));
+        //    meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
+        //    meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
+        //    meshData.AddQuadTriangles();
+        //    meshData.uv.AddRange(FaceUVs(Direction.west));
+        //    return meshData;
+        //}
+        //else
+        //{
+        //    meshData.AddVertex(new Vector3(16f * x - 8f, nwLow, 16 * z + 8f));
+        //    meshData.AddVertex(new Vector3(16f * x - 8f, nw, 16 * z + 8f));
+        //    meshData.AddVertex(new Vector3(16f * x - 8f, sw, 16 * z - 8f));
+        //    meshData.AddVertex(new Vector3(16f * x - 8f, swLow, 16 * z - 8f));
+        //    meshData.AddQuadTriangles();
+        //    meshData.uv.AddRange(FaceUVs(Direction.west));
+        //    return meshData;
+        //}
     }
 
     public override Tile TexturePosition(Direction direction)

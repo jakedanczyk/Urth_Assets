@@ -225,6 +225,19 @@ public class LoadChunk64s : MonoBehaviour
                 updateList.RemoveAt(0);
             }
         }
+
+        if (world64.chunk64s.Count > 0 && buildList.Count == 0 && updateList.Count == 0)
+        {
+            GameObject[] chunks = new GameObject[world64.chunk64s.Count];
+            int i = 0;
+            foreach (KeyValuePair<WorldPos, Chunk64> entry in world64.chunk64s)
+            {
+                chunks[i] = entry.Value.gameObject;
+                i++;
+            }
+            StaticBatchingUtility.Combine(chunks, chunks[0]);
+            this.enabled = false;
+        }
     }
 
     void BuildChunk64(WorldPos pos)

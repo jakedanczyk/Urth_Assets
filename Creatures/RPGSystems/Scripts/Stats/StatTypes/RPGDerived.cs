@@ -24,6 +24,27 @@ public class RPGDerived : RPGStatModifiable, IStatScalable, IStatLinkable, IStat
     /// </summary>
     private List<RPGStatLinker> _statLinkers;
 
+    private RPGStatLinkerBodySurfaceArea _bodySurfaceAreaLinker;
+
+    /// <summary>
+    /// Add a linker to the stat and listen to it's valueChange event
+    /// </summary>
+    public void RPGStatLinkerBodySurfaceArea(RPGStatLinkerBodySurfaceArea linker)
+    {
+        _bodySurfaceAreaLinker = linker;
+        linker.OnValueChange += OnLinkerValueChange;
+    }
+
+    /// <summary>
+    /// Update the StatLinkerValue based of the currently applied stat linkers
+    /// </summary>
+    public void UpdateBodySurfaceArea()
+    {
+        _statLinkerValue = 0;
+        _statLinkerValue += _bodySurfaceAreaLinker.Value;
+        TriggerValueChange();
+    }
+
     private int _aptitude;
     private int _training;
 

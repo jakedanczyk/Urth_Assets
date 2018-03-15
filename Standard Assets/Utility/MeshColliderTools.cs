@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 using UnityEngine;
-using UnityEditor;
+//using UnityEditor;
 
 static public class MeshColliderTools
 {

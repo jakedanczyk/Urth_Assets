@@ -33,7 +33,7 @@ public class Chunk256 : MonoBehaviour
         filter = gameObject.GetComponent<MeshFilter>();
         coll = gameObject.GetComponent<MeshCollider>();
     }
-
+        
     //Update is called once per frame
     //void Update()
     //{
@@ -44,7 +44,7 @@ public class Chunk256 : MonoBehaviour
     //    }
     //}
 
-	public Block256 GetBlock256(int x, int y, int z)
+    public Block256 GetBlock256(int x, int y, int z)
 	{
         if (InRange(x) && InRange(y) && InRange(z))
             return block256s[x, y, z];

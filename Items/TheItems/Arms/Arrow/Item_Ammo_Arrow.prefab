@@ -27,7 +27,7 @@ GameObject:
   - component: {fileID: 114284950644044436}
   - component: {fileID: 114470467517205684}
   - component: {fileID: 82965417924874020}
-  m_Layer: 26
+  m_Layer: 0
   m_Name: Item_Ammo_Arrow
   m_TagString: Item
   m_Icon: {fileID: 0}
@@ -209,7 +209,7 @@ MonoBehaviour:
   rigid: {fileID: 54045615756437934}
   layerMask:
     serializedVersion: 2
-    m_Bits: 4227858431
+    m_Bits: 4030376649
   skinWidth: 0.1
   previousPosition: {x: 0, y: 0, z: 0}
 --- !u!114 &114470467517205684

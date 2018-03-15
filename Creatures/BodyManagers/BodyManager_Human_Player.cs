@@ -11,6 +11,7 @@ using System.Threading;
 public class BodyManager_Human_Player : BodyManager {
 
     public static GameObject playerObject;
+    public HUDManager hud;
 
     public BodyManager_Human_Player thisManager;
     public PlayerControls controls;
@@ -20,21 +21,19 @@ public class BodyManager_Human_Player : BodyManager {
     public Transform camTransform;
     public RectTransform outfittingUI;
 
-    public Collider rHandCollider; // headCollider, neckCollider, chestCollider, stomachCollider, pelvisCollider, upperBackCollider, lowerBackCollider,
+    public Collider rHandCollider, lHandCollider; // headCollider, neckCollider, chestCollider, stomachCollider, pelvisCollider, upperBackCollider, lowerBackCollider,
     //                leftThighCollider, rightThighCollider, leftLowerLegCollider, rightLowerLegCollider, leftFootCollider, rightFootCollider,
     //                lShoulderCollider, rShoulderCollider, lUpperArmCollider, rUpperArmCollider, lForearmCollider, rForearmCollider, lHandCollider, rHandCollider;
 
-    public bool meleeWeaponDrawn, rangedWeaponDrawn, weaponReadied;
-    public Transform rHandTransform, lHandTransform;
-    public Item_Weapon rHandWeapon;
-    public Item_Weapon lHandWeapon;
+    public bool meleeWeaponDrawn, rangedWeaponDrawn, weaponsReadied;
+    public Transform primaryHandTransform, offHandTransform;
+    public Item_Weapon_Fist rightFist, leftFist;
+    public Item_Weapon offHandWeapon;
     public Item_Ammo currentAmmo;
     public GameObject currentAmmoPrefab;
     public Item_Weapon_Fist fist;
 
-    public AudioSource audioSource;
     public AudioClip swing;
-    public PlayerAudio_Manager playerAudioManager;
 
     public Item rHandItem, lHandItem;
     //carried items
@@ -44,19 +43,24 @@ public class BodyManager_Human_Player : BodyManager {
     public Inventory[] bags;
     public M3DCharacterManager mcs, mcsUI;
     public List<Item_WaterVessel> waterVessels;
-    public new PlayerInventory baseInventory;
+    public PlayerInventory baseInventory;
 
     public bool crouching;
     public bool inTask;
 
     public bool gathering, treeFelling, treeProcessing;
     public String chararacterName, race;
+    MessageLog messageLog;
+    IEnumerator weaponSwing,teethChatter;
     //[SerializeField]
     //public GameObject weatherFX;
 
     //attach points... special slots for weapons and equipment. each boot, small of back, weapons belt, strap, back sling, etc...
-    private void Awake()
+    private new void Awake()
     {
+        base.Awake();
+        weaponSwing = PrimaryWeaponSwing();
+        teethChatter = TeethChatter();
         playerObject = this.gameObject;
         //mcs = GetComponent<M3DCharacterManager>();
     }
@@ -70,6 +74,7 @@ public class BodyManager_Human_Player : BodyManager {
         weatherSystem = WeatherControl.manager.GetComponent<WeatherControl>();
         speed = 1.25F + 1.25f * gait;
 
+        messageLog = MessageLog.messageLogGameObject.GetComponent<MessageLog>();
         InvokeRepeating("UpdateHeartRate", 1f, 1f);
         InvokeRepeating("ReadWeather", 1.5f, 300f);
         InvokeRepeating("UpdateCoreTemp", 1.5f, 1f);
@@ -102,10 +107,13 @@ public class BodyManager_Human_Player : BodyManager {
 
     private void Update()
     {
-        RaycastHit hit;
-        if (Physics.Raycast(aimPoint.position, aimPoint.forward, out hit, 540))
+        if (Application.isEditor)
         {
-            Debug.DrawLine(aimPoint.position, hit.point, Color.green);
+            RaycastHit hit;
+            if (Physics.Raycast(aimPoint.position, aimPoint.forward, out hit, 540))
+            {
+                Debug.DrawLine(aimPoint.position, hit.point, Color.green);
+            }
         }
         if (inTask)
         {
@@ -114,13 +122,6 @@ public class BodyManager_Human_Player : BodyManager {
         }
     }
 
-    /*
-     * Weapons and Combat 
-     */
-    private void OnTriggerEnter(Collider other)
-    {
-        collisionList.Add(other);
-    }
 
     void OnStatValueChange(object sender, EventArgs args)
     {
@@ -133,84 +134,141 @@ public class BodyManager_Human_Player : BodyManager {
         }
         if (vital.StatCurrentValue <= 0)
         {
-            alive = false;
-            anim.SetBool("isAlive", false);
-            anim.SetBool("isDead", true);
+            Death();
             controls.enabled = false;
         }
     }
 
     public void SheatheWeapon(Item_Weapon aWeapon)
     {
-        if (!aWeapon.wielded)
+        if (!aWeapon.isWielded)
             return;
-        aWeapon.wielded = false;
+        aWeapon.isWielded = false;
         Debug.LogWarning("Sheathe weapon: " + aWeapon.itemName);
         aWeapon.GetComponent<Rigidbody>().isKinematic = false;
         aWeapon.GetComponent<Rigidbody>().useGravity = true;
         aWeapon.gameObject.SetActive(false);
         anim.SetBool("ArmsRaised", false);
-        audioSource.PlayOneShot(playerAudioManager.sheathe);
+        audioSource.PlayOneShot(audioManager.sheathe);
         if (aWeapon is Item_Weapon_Bow)
         {
             wieldingBow = false;
             rangedWeaponDrawn = false;
-            lHandWeapon = null;
+            offHandWeapon = null;
         }
         else
         {
             meleeWeaponDrawn = false;
-            rHandWeapon = null;
+            primaryWeapon = null;
+        }
+    }
+
+    public void SetMainHandWeapon(Item_Weapon weapon)
+    {
+        primaryWeapon = weapon;
+    }
+
+    public void DrawWeapons()
+    {
+        if (weaponsReadied)
+        { //sheathe weapons
+            weaponsReadied = false;
+            anim.SetBool("RightFistRaised", false);
+            anim.SetBool("LeftFistRaised", false);
+            anim.SetBool("RightOneHandedRaised", false);
+            anim.SetBool("LeftOneHandedRaised", false);
+        }
+        else
+        { //draw weapons
+            weaponsReadied = true;
+            if (primaryWeapon is Item_Weapon_Fist || !primaryWeapon)
+            {
+                primaryWeapon = rightFist;
+                anim.SetBool("RightFistRaised", true);
+            }
+            else
+            {
+                anim.SetBool("RightOneHandedRaised", true);
+            }
+            if (offHandWeapon is Item_Weapon_Fist || !offHandWeapon)
+            {
+                offHandWeapon = leftFist;
+                anim.SetBool("LeftFistRaised", true);
+            }
+            else
+            {
+                anim.SetBool("LeftOneHandedRaised", true);
+            }
+            primaryWeapon.wielderBodyManager = this;
+            offHandWeapon.wielderBodyManager = this;
         }
     }
 
     public void DrawWeapon(Item_Weapon drawnWeapon)
     {
-        if (rHandWeapon != null)
+        bool drawingOffHand;
+        if (drawnWeapon.weaponType == WeaponType.Bow)
         {
-            Item_Weapon droppingItem = rHandWeapon;
-            SheatheWeapon(rHandWeapon);
-            DropItem(droppingItem);
-        }
-            
-        drawnWeapon.wielded = true;
-        Debug.LogWarning("Draw weapon: " + drawnWeapon.itemName);
-        drawnWeapon.GetComponent<Rigidbody>().isKinematic = true;
-        drawnWeapon.GetComponent<Rigidbody>().useGravity = false;
-        drawnWeapon.gameObject.SetActive(true);
-        if (drawnWeapon is Item_Weapon_Bow)
-        {
+            if (offHandWeapon != null && !(offHandWeapon is Item_Weapon_Fist))
+            {//if another weapon besides fist is already in off hand
+                DropItem(offHandWeapon);
+            }
             wieldingBow = true;
             rangedWeaponDrawn = true;
-            lHandWeapon = drawnWeapon;
-            drawnWeapon.gameObject.transform.SetParent(lHandTransform, false);
-            drawnWeapon.gameObject.transform.position = lHandTransform.position;
+            offHandWeapon = drawnWeapon;
+            drawnWeapon.gameObject.transform.SetParent(offHandTransform, false);
+            drawnWeapon.gameObject.transform.position = offHandTransform.position;
+        }
+        else if(!drawnWeapon.isTwoHand)
+        { //everything except bows and two handers
+            if (primaryWeapon == null || (primaryWeapon is Item_Weapon_Fist))
+            { // if primary hand is free, draw as primary weapon
+                primaryWeapon = drawnWeapon;
+                drawnWeapon.gameObject.transform.SetParent(primaryHandTransform, false);
+                drawnWeapon.gameObject.transform.position = primaryHandTransform.position;
+            }
+            else if (offHandWeapon == null || (offHandWeapon is Item_Weapon_Fist))
+            { // else if off hand is free, draw as off hand weapon
+                offHandWeapon = drawnWeapon;
+                drawnWeapon.gameObject.transform.SetParent(offHandTransform, false);
+                drawnWeapon.gameObject.transform.position = offHandTransform.position;
+            }
+            else
+            { // if both hands occupied, drop primary weapon and draw this as primary weapon
+                DropItem(primaryWeapon);
+                drawnWeapon.gameObject.transform.SetParent(primaryHandTransform, false);
+                drawnWeapon.gameObject.transform.position = primaryHandTransform.position;
+            }
+            meleeWeaponDrawn = true;
         }
         else
-        {
-            meleeWeaponDrawn = true;
-            rHandWeapon = drawnWeapon;
-            drawnWeapon.gameObject.transform.SetParent(rHandTransform, false);
-            //drawnWeapon.gameObject.transform.position = rHandTransform.position;
-            drawnWeapon.gameObject.transform.localPosition = Vector3.zero;
+        { // two handers
+            if (drawnWeapon.isTwoHand && (offHandWeapon != null && !(offHandWeapon is Item_Weapon_Fist)))
+            { // drop anything in off hand if two handed weapon
+                DropItem(offHandWeapon);
+            }
         }
-        audioSource.PlayOneShot(playerAudioManager.draw);
-        drawnWeapon.gameObject.transform.localRotation = Quaternion.Euler(drawnWeapon.gripOrientation);
-        //drawnWeapon.gameObject.transform.localRotation.Equals(drawnWeapon.gripOrientation);
+        //happens in all cases
+        drawnWeapon.isWielded = true;
+        drawnWeapon.GetComponent<Rigidbody>().isKinematic = true;
+        drawnWeapon.GetComponent<Rigidbody>().useGravity = false;
+        audioSource.PlayOneShot(audioManager.draw);
         drawnWeapon.gameObject.transform.localPosition = drawnWeapon.gripAdjust;
+        drawnWeapon.gameObject.transform.localRotation = Quaternion.Euler(drawnWeapon.gripOrientation + (offHandWeapon == drawnWeapon ? Vector3.right * 180 : Vector3.zero));
+        drawnWeapon.gameObject.SetActive(true);
         anim.SetBool("ArmsRaised", true);
     }
 
     public void OffHandDrawWeapon(Item_Weapon drawnWeapon)
     {
-        if (lHandWeapon != null)
+        if (offHandWeapon != null)
         {
-            Item_Weapon droppingItem = rHandWeapon;
-            SheatheWeapon(rHandWeapon);
+            Item_Weapon droppingItem = primaryWeapon;
+            SheatheWeapon(primaryWeapon);
             DropItem(droppingItem);
         }
 
-        drawnWeapon.wielded = true;
+        drawnWeapon.isWielded = true;
         Debug.LogWarning("OffHandDraw weapon: " + drawnWeapon.itemName);
         drawnWeapon.GetComponent<Rigidbody>().isKinematic = true;
         drawnWeapon.GetComponent<Rigidbody>().useGravity = false;
@@ -219,16 +277,16 @@ public class BodyManager_Human_Player : BodyManager {
         {
             wieldingBow = true;
             rangedWeaponDrawn = true;
-            lHandWeapon = drawnWeapon;
-            drawnWeapon.gameObject.transform.SetParent(lHandTransform, false);
-            drawnWeapon.gameObject.transform.position = lHandTransform.position;
+            offHandWeapon = drawnWeapon;
+            drawnWeapon.gameObject.transform.SetParent(offHandTransform, false);
+            drawnWeapon.gameObject.transform.position = offHandTransform.position;
         }
         else
         {
             meleeWeaponDrawn = true;
-            lHandWeapon = drawnWeapon;
-            drawnWeapon.gameObject.transform.SetParent(lHandTransform, false);
-            drawnWeapon.gameObject.transform.position = lHandTransform.position;
+            offHandWeapon = drawnWeapon;
+            drawnWeapon.gameObject.transform.SetParent(offHandTransform, false);
+            drawnWeapon.gameObject.transform.position = offHandTransform.position;
         }
         drawnWeapon.gameObject.transform.localRotation.Equals(0);
         drawnWeapon.gameObject.transform.localPosition.Equals(0);
@@ -239,7 +297,6 @@ public class BodyManager_Human_Player : BodyManager {
 
     void RaiseGuard()
     {
-
         if (guardRaised) { guardRaised = false; }
         else { guardRaised = true; }
     }
@@ -247,13 +304,12 @@ public class BodyManager_Human_Player : BodyManager {
     void LowerGuard()
     {
         anim.SetBool("ArmsRaised", false);
-
     }
 
     void RaiseWeapons()
     {
         anim.SetBool("ArmsRaised", true);
-        weaponReadied = !weaponReadied;
+        weaponsReadied = !weaponsReadied;
         //anim.RaiseWeapons
         //bodyStatus.weaponsStatus = raised
     }
@@ -261,60 +317,188 @@ public class BodyManager_Human_Player : BodyManager {
     [DoNotSerialize]
     public Dictionary<WeaponType, Tuple<string,RPGStatType>> mainAttackDict = new Dictionary<WeaponType, Tuple<string, RPGStatType>>
     {
-        { WeaponType.Axe_1H, new Tuple<string,RPGStatType>("AxeChop",RPGStatType.Axe)}, { WeaponType.Axe_2H, new Tuple<string,RPGStatType>("AxeChop",RPGStatType.Axe) },
-        { WeaponType.Arm, new Tuple<string,RPGStatType>("RightPunch",RPGStatType.ArmStrike) }, { WeaponType.Bow, new Tuple<string,RPGStatType>("FireBow",RPGStatType.Bow) },
-        { WeaponType.Pick, new Tuple<string,RPGStatType>("PickSwing",RPGStatType.Pick) }
+        { WeaponType.Axe, new Tuple<string,RPGStatType>("RightAxeChop",RPGStatType.Axe)}, { WeaponType.Arm, new Tuple<string,RPGStatType>("RightPunch",RPGStatType.ArmStrike) }, { WeaponType.Bow, new Tuple<string,RPGStatType>("FireBow",RPGStatType.Bow) },
+        { WeaponType.Pick, new Tuple<string,RPGStatType>("RightPickSwing",RPGStatType.Pick) }
     };
-       
-    public override void MainAttack()
+    [DoNotSerialize]
+    public Dictionary<WeaponType, Tuple<string, RPGStatType>> offHandAttackDict = new Dictionary<WeaponType, Tuple<string, RPGStatType>>
     {
-        if (attacking) { return; }
-        audioSource.PlayOneShot(playerAudioManager.swing);
-        collisionList.Clear();
-        if (rHandWeapon == null)
-            Invoke("RightPunch", 0);
-        else
-            Invoke(mainAttackDict[rHandWeapon.weaponType].first, 0);
+        { WeaponType.Axe, new Tuple<string,RPGStatType>("LeftAxeChop",RPGStatType.Axe)}, { WeaponType.Arm, new Tuple<string,RPGStatType>("LeftPunch",RPGStatType.ArmStrike) }, { WeaponType.Bow, new Tuple<string,RPGStatType>("FireBow",RPGStatType.Bow) },
+        { WeaponType.Pick, new Tuple<string,RPGStatType>("LeftPickSwing",RPGStatType.Pick) }
+    };
+
+    public override void PrimaryAttack()
+    {
+        if (isAttackingPrimary) { return; }
+        primaryAttackCollisionList.Clear();
+        if (primaryWeapon != null)
+        {
+            isAttackingPrimary = true;
+            primaryWeapon.weaponCollList[0].isActive = true;
+            StopCoroutine(OnCompleteMainWeaponAttackAnimation());
+            StartCoroutine(OnCompleteMainWeaponAttackAnimation());
+            Invoke(mainAttackDict[primaryWeapon.weaponType].first, 0);
+            audioSource.PlayOneShot(audioManager.swing);
+            StopCoroutine(PrimaryWeaponSwing());
+            StartCoroutine(PrimaryWeaponSwing());
+        }
     }
 
-    private IEnumerator WeaponSwing()
+    public void OffHandAttack()
     {
-        print("Start");
-        yield return new WaitForSeconds(0.5f);
-        if (collisionList.Count > 0)
+        if (isAttackingSecondary) { return; }
+        offHandAttackCollisionList.Clear();
+        if (offHandWeapon != null)
         {
-            print("collision");
-            print(collisionList[0].transform.tag);
-            int blunt = rHandWeapon.baseBlunt + rHandWeapon.itemWeight * stats.GetStat(RPGStatType.Dexterity).StatValue * stats.GetStat(RPGStatType.Strength).StatValue;
-            int cut = rHandWeapon.baseCut * (1 + (stats.GetStat(mainAttackDict[rHandWeapon.weaponType].second).StatValue / 10));
-            int pierce = rHandWeapon.basePierce * (1 + (stats.GetStat(mainAttackDict[rHandWeapon.weaponType].second).StatValue / 10));
+            isAttackingSecondary = true;
+            offHandWeapon.weaponCollList[0].isActive = true;
+            StopCoroutine(OnCompleteOffHandWeaponAttackAnimation());
+            StartCoroutine(OnCompleteOffHandWeaponAttackAnimation());
+            Invoke(offHandAttackDict[offHandWeapon.weaponType].first, 0);
+            audioSource.PlayOneShot(audioManager.swing);
+            StopCoroutine(OffHandWeaponSwing());
+            StartCoroutine(OffHandWeaponSwing());
+        }
+    }
 
-            if (collisionList[0].transform.root.tag == "Tree")
-            {
-                print(collisionList[0].transform.root.GetComponent<Tree>().health);
-                collisionList[0].transform.root.GetComponent<Tree>().health -= (cut * blunt + 10);
-                print(collisionList[0].transform.root.GetComponent<Tree>().health);
-                audioSource.PlayOneShot(playerAudioManager.metalOnWood);
-            }
-            else if (collisionList[0].transform.tag == "BodyPart")
-            {
+    int offHandWeaponAnimationLayer = 6;
 
-                BodyPartColliderScript bp = collisionList[0].GetComponent<BodyPartColliderScript>();
+    public IEnumerator OnCompleteOffHandWeaponAttackAnimation()
+    {
+        while (anim.GetCurrentAnimatorStateInfo(offHandWeaponAnimationLayer).loop)
+            yield return null;
+        while (!anim.GetCurrentAnimatorStateInfo(offHandWeaponAnimationLayer).loop)
+            yield return null;
+        isAttackingSecondary = false;
+        offHandWeapon.weaponCollList[0].isActive = false;
+        yield return null;
+    }
+
+    private IEnumerator PrimaryWeaponSwing(float swingTime = .5f)
+    {
+        while(isAttackingPrimary && primaryAttackCollisionList.Count == 0)
+            yield return null;
+        isAttackingPrimary = false;
+        foreach (Collision coll in primaryAttackCollisionList)
+        {
+            if (coll.gameObject.transform.root == this.gameObject)
+                continue;
+            int blunt = primaryWeapon.baseBlunt + primaryWeapon.itemWeight * stats.GetStat(RPGStatType.Dexterity).StatValue * stats.GetStat(RPGStatType.Strength).StatValue;
+            int cut = primaryWeapon.baseCut * (1 + (stats.GetStat(mainAttackDict[primaryWeapon.weaponType].second).StatValue / 10));
+            int pierce = primaryWeapon.basePierce * (1 + (stats.GetStat(mainAttackDict[primaryWeapon.weaponType].second).StatValue / 10));
+
+            if (coll.collider.transform.tag == "BodyPart")
+            {
+                BodyPartColliderScript bp = coll.collider.gameObject.GetComponent<BodyPartColliderScript>();
                 int[] z = new int[] { 0, 0, 0 }; int[] o = new int[] { blunt, cut, pierce };
                 z = bp.parentBody.SendArmorNumbers(bp.bodyPartType);
                 bp.parentBody.stats.GetStat<RPGBodyPart>(bp.bodyPartType).StatCurrentValue -= ((pierce / z[0]) + (blunt / z[1]));
-                print(o[0] + ","+ o[1] + "," + o[2]);
-                AttackResolution(bp, bp.parentBody.stats, stats.GetStat<RPGSkill>(mainAttackDict[rHandWeapon.weaponType].second), z, o);
+                print(o[0] + "," + o[1] + "," + o[2]);
+                AttackResolution(bp, bp.parentBody.stats, stats.GetStat<RPGSkill>(mainAttackDict[primaryWeapon.weaponType].second), z, o);
+                hud.UpdateTargetHealthBar(bp.parentBody.stats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue, bp.parentBody.stats.GetStat<RPGVital>(RPGStatType.Health).StatBaseValue);
+                yield return null;
             }
-            else if (collisionList[0].transform.tag == "Terrain")
+            else if (coll.transform.root.tag == "Tree")
             {
+                Tree hitTree = coll.transform.root.GetComponent<Tree>();
+                if (hitTree)
+                {
+                    float chopRate = primaryWeapon.TreeChopRateFactor() * stats.GetStat<RPGAttribute>(RPGStatType.Strength).StatValue * stats.GetStat<RPGSkill>(RPGStatType.WoodWorking).StatValue;
+                    if (hitTree.health > 0)
+                    {
+                        hitTree.TakeDamage(chopRate);
+                        hud.UpdateTargetHealthBar(hitTree.health, hitTree.startinghealth);
+                    }
+                    else
+                    {
+                        hitTree.TakeDamage(chopRate);
+                        hud.UpdateTargetHealthBar(hitTree.startinghealth + hitTree.health, hitTree.startinghealth);
+                    }
+                }
+                yield return null;
+            }
+            else if (coll.gameObject.tag == "Terrain")
+            {
+                if(coll.gameObject.layer == 13)
+                {
+                    World16 world = World16.worldGameObject.GetComponent<World16>();
+                    Block16 block = world.GetBlock16(Mathf.RoundToInt(coll.contacts[0].point.x), Mathf.RoundToInt(coll.contacts[0].point.y), Mathf.RoundToInt(coll.contacts[0].point.z));
+                    if(block is Block16Grass || block is Block16RiverGrass)
+                    {
+                        audioSource.PlayOneShot(audioManager.hitDirt);
+                    }
+                    else if(block is Block16)
+                        audioSource.PlayOneShot(audioManager.metalOnStone);
+                }
+                yield return null;
+            }
+        }
+        isAttackingPrimary = false;
+    }
 
+    private IEnumerator OffHandWeaponSwing(float swingTime = .5f)
+    {
+        while (isAttackingSecondary && offHandAttackCollisionList.Count == 0)
+            yield return null;
+        isAttackingSecondary = false;
+        foreach (Collision coll in offHandAttackCollisionList)
+        {
+            if (coll.gameObject.transform.root == this.gameObject)
+                continue;
+            int blunt = offHandWeapon.baseBlunt + offHandWeapon.itemWeight * stats.GetStat(RPGStatType.Dexterity).StatValue * stats.GetStat(RPGStatType.Strength).StatValue;
+            int cut = offHandWeapon.baseCut * (1 + (stats.GetStat(mainAttackDict[offHandWeapon.weaponType].second).StatValue / 10));
+            int pierce = offHandWeapon.basePierce * (1 + (stats.GetStat(mainAttackDict[offHandWeapon.weaponType].second).StatValue / 10));
+
+            if (coll.collider.transform.tag == "BodyPart")
+            {
+                BodyPartColliderScript bp = coll.collider.gameObject.GetComponent<BodyPartColliderScript>();
+                int[] z = new int[] { 0, 0, 0 }; int[] o = new int[] { blunt, cut, pierce };
+                z = bp.parentBody.SendArmorNumbers(bp.bodyPartType);
+                bp.parentBody.stats.GetStat<RPGBodyPart>(bp.bodyPartType).StatCurrentValue -= ((pierce / z[0]) + (blunt / z[1]));
+                print(o[0] + "," + o[1] + "," + o[2]);
+                AttackResolution(bp, bp.parentBody.stats, stats.GetStat<RPGSkill>(mainAttackDict[offHandWeapon.weaponType].second), z, o);
+                hud.UpdateTargetHealthBar(bp.parentBody.stats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue, bp.parentBody.stats.GetStat<RPGVital>(RPGStatType.Health).StatBaseValue);
+                yield return null;
+            }
+            else if (coll.transform.root.tag == "Tree")
+            {
+                Tree hitTree = coll.transform.root.GetComponent<Tree>();
+                if (hitTree)
+                {
+                    float chopRate = offHandWeapon.TreeChopRateFactor() * stats.GetStat<RPGAttribute>(RPGStatType.Strength).StatValue * stats.GetStat<RPGSkill>(RPGStatType.WoodWorking).StatValue;
+                    if (hitTree.health > 0)
+                    {
+                        hitTree.TakeDamage(chopRate);
+                        hud.UpdateTargetHealthBar(hitTree.health, hitTree.startinghealth);
+                    }
+                    else
+                    {
+                        hitTree.TakeDamage(chopRate);
+                        hud.UpdateTargetHealthBar(hitTree.startinghealth + hitTree.health, hitTree.startinghealth);
+                    }
+                }
+                yield return null;
+            }
+            else if (coll.gameObject.tag == "Terrain")
+            {
+                if (coll.gameObject.layer == 13)
+                {
+                    World16 world = World16.worldGameObject.GetComponent<World16>();
+                    Block16 block = world.GetBlock16(Mathf.RoundToInt(coll.contacts[0].point.x), Mathf.RoundToInt(coll.contacts[0].point.y), Mathf.RoundToInt(coll.contacts[0].point.z));
+                    if (block is Block16Grass || block is Block16RiverGrass)
+                    {
+                        audioSource.PlayOneShot(audioManager.hitDirt);
+                    }
+                    else if (block is Block16)
+                        audioSource.PlayOneShot(audioManager.metalOnStone);
+                }
+                yield return null;
             }
         }
         print("turning off trigger");
-        rHandWeapon.collList[0].isTrigger = false;
-        rHandCollider.isTrigger = false;
+        isAttackingSecondary = false;
     }
+
 
     void AttackResolution(BodyPartColliderScript bp, CreatureStats targetStats, RPGSkill attackSkill, int[] d, int[] o)
     {
@@ -338,7 +522,7 @@ public class BodyManager_Human_Player : BodyManager {
         else if (roll < (dodgeChance + deflectChance + absorbChance)) { bp.parentBody.Absorb(); print("absorb"); return; }
         else if (roll < (dodgeChance + deflectChance + absorbChance + hitChance))
         {
-            audioSource.PlayOneShot(playerAudioManager.hitBody);
+            audioSource.PlayOneShot(audioManager.hitBody);
             //bp.parentBody.stats.GetStat<RPGBodyPart>(bp.bodyPartType).StatCurrentValue -= ((o[0] / d[0]) + ( o[1] / d[1]) + (o[2] / d[2]));
             bp.parentBody.stats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue -= (int)(bp.parentBody.stats.GetStat<RPGBodyPart>(bp.bodyPartType).damageModifer * ((o[0] / d[0]) + (o[1] / d[1]) + (o[2] / d[2])));
             attackSkill.GainXP(10);
@@ -350,33 +534,39 @@ public class BodyManager_Human_Player : BodyManager {
             bp.parentBody.stats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue -= 4 * (int)(bp.parentBody.stats.GetStat<RPGBodyPart>(bp.bodyPartType).damageModifer * ((o[0] / d[0]) + (o[1] / d[1]) + (o[2] / d[2])));
         }
         print(bp.parentBody.stats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue);
-        collisionList.Clear();
+        primaryAttackCollisionList.Clear();
         //defense: defense skills, armor, encumbrance, stamina, energy, agility, strength, toughness
+    }
+
+    void MainPunch()
+    {
+        anim.SetTrigger("RightPunch");
     }
 
     void RightPunch()
     {
-        print("punch");
-        rHandWeapon = fist;
-        rHandCollider.isTrigger = true;
-        anim.SetTrigger("AxeChop"); //punch trigger
-        StartCoroutine(WeaponSwing());
+        anim.SetTrigger("RightPunch");
     }
 
-    void AxeChop()
+    void LeftPunch()
     {
-        print("chop");
-
-        rHandWeapon.collList[0].isTrigger = true;
-        anim.SetTrigger("AxeChop");
-        StartCoroutine(WeaponSwing());
-        //yield return new WaitForSeconds(anim.GetCurrentAnimatorClipInfo.length);
+        anim.SetTrigger("LeftPunch");
     }
 
-    void PickSwing()
+    void RightAxeChop()
     {
-        rHandWeapon.collList[0].isTrigger = true;
-        anim.SetTrigger("PickSwing");
+        anim.SetTrigger("RightAxeChop");
+    }
+
+    void LeftAxeChop()
+    {
+        anim.SetTrigger("LeftAxeChop");
+    }
+
+    void RightPickSwing()
+    {
+        anim.SetTrigger("RightAxeChop");
+        //StartCoroutine(PrimaryWeaponSwing());
         RaycastHit hit;
         if (Physics.Raycast(aimPoint.position, aimPoint.forward, out hit, 240f))
         {
@@ -389,8 +579,8 @@ public class BodyManager_Human_Player : BodyManager {
                 stats.GetStat<RPGAttribute>(RPGStatType.Toughness).TrainingValue += 10;
                 stats.GetStat<RPGAttribute>(RPGStatType.Endurance).TrainingValue += 10;
                 stats.GetStat<RPGAttribute>(RPGStatType.Dexterity).TrainingValue += 10;
-                int pierce = rHandWeapon.basePierce * (1 + (stats.GetStat(RPGStatType.Pick).StatValue / 10));
-                int blunt = (rHandWeapon.baseBlunt * 5 + rHandWeapon.itemWeight) * stats.GetStat(RPGStatType.Dexterity).StatValue * stats.GetStat(RPGStatType.Strength).StatValue;
+                int pierce = primaryWeapon.basePierce * (1 + (stats.GetStat(RPGStatType.Pick).StatValue / 10));
+                int blunt = (primaryWeapon.baseBlunt * 5 + primaryWeapon.itemWeight) * stats.GetStat(RPGStatType.Dexterity).StatValue * stats.GetStat(RPGStatType.Strength).StatValue;
                 Block block = EditTerrain.GetBlock(hit);
                 if (block is BlockAir)
                     print("air");
@@ -404,17 +594,17 @@ public class BodyManager_Human_Player : BodyManager {
 
                 else if (block is Block)
                 {
-                    audioSource.PlayOneShot(playerAudioManager.metalOnStone);
+                    audioSource.PlayOneShot(audioManager.metalOnStone);
                     EditTerrain.HitBlock(hit, pierce * blunt);
                     print(pierce * blunt);
                 }
             }
             else if (hit.collider.transform.tag == "BodyPart")
             {
-                audioSource.PlayOneShot(playerAudioManager.hitBody);
+                audioSource.PlayOneShot(audioManager.hitBody);
                 print(0);
-                int pierce = rHandWeapon.basePierce * (1 + (stats.GetStat(RPGStatType.Pick).StatValue / 10));
-                int blunt = (rHandWeapon.baseBlunt * 5 + rHandWeapon.itemWeight) * stats.GetStat(RPGStatType.Dexterity).StatValue * stats.GetStat(RPGStatType.Strength).StatValue;
+                int pierce = primaryWeapon.basePierce * (1 + (stats.GetStat(RPGStatType.Pick).StatValue / 10));
+                int blunt = (primaryWeapon.baseBlunt * 5 + primaryWeapon.itemWeight) * stats.GetStat(RPGStatType.Dexterity).StatValue * stats.GetStat(RPGStatType.Strength).StatValue;
                 print(1);
 
                 BodyPartColliderScript bp = hit.collider.GetComponent<BodyPartColliderScript>();
@@ -425,12 +615,67 @@ public class BodyManager_Human_Player : BodyManager {
 
                 AttackResolution(bp, bp.parentBody.stats, stats.GetStat<RPGSkill>(RPGStatType.Pick) , z, o);
                 print(4);
-
             }
         }
     }
 
-  
+    void LeftPickSwing()
+    {
+        anim.SetTrigger("LeftAxeChop");
+        //StartCoroutine(offHandWeaponSwing());
+        RaycastHit hit;
+        if (Physics.Raycast(aimPoint.position, aimPoint.forward, out hit, 240f))
+        {
+            print(hit.transform.tag);
+
+            if (hit.transform.gameObject.layer == 19)
+            {
+                stats.GetStat<RPGSkill>(RPGStatType.Mining).GainXP(10);
+                stats.GetStat<RPGAttribute>(RPGStatType.Strength).TrainingValue += 10;
+                stats.GetStat<RPGAttribute>(RPGStatType.Toughness).TrainingValue += 10;
+                stats.GetStat<RPGAttribute>(RPGStatType.Endurance).TrainingValue += 10;
+                stats.GetStat<RPGAttribute>(RPGStatType.Dexterity).TrainingValue += 10;
+                int pierce = offHandWeapon.basePierce * (1 + (stats.GetStat(RPGStatType.Pick).StatValue / 10));
+                int blunt = (offHandWeapon.baseBlunt * 5 + offHandWeapon.itemWeight) * stats.GetStat(RPGStatType.Dexterity).StatValue * stats.GetStat(RPGStatType.Strength).StatValue;
+                Block block = EditTerrain.GetBlock(hit);
+                if (block is BlockAir)
+                    print("air");
+                print(EditTerrain.GetBlockPos(hit).x + "," + EditTerrain.GetBlockPos(hit).y + "," + EditTerrain.GetBlockPos(hit).z);
+                if (block is BlockGrass)
+                {
+                    EditTerrain.HitBlock(hit, 100 * (pierce + (blunt / 2)));
+                    print(pierce + (blunt / 2));
+                    return;
+                }
+
+                else if (block is Block)
+                {
+                    audioSource.PlayOneShot(audioManager.metalOnStone);
+                    EditTerrain.HitBlock(hit, pierce * blunt);
+                    print(pierce * blunt);
+                }
+            }
+            else if (hit.collider.transform.tag == "BodyPart")
+            {
+                audioSource.PlayOneShot(audioManager.hitBody);
+                print(0);
+                int pierce = offHandWeapon.basePierce * (1 + (stats.GetStat(RPGStatType.Pick).StatValue / 10));
+                int blunt = (offHandWeapon.baseBlunt * 5 + offHandWeapon.itemWeight) * stats.GetStat(RPGStatType.Dexterity).StatValue * stats.GetStat(RPGStatType.Strength).StatValue;
+                print(1);
+
+                BodyPartColliderScript bp = hit.collider.GetComponent<BodyPartColliderScript>();
+                int[] z = new int[] { 0, 0, 0 }; int[] o = new int[] { 0, blunt, pierce };
+                z = bp.parentBody.SendArmorNumbers(bp.bodyPartType);
+                bp.parentBody.stats.GetStat<RPGBodyPart>(bp.bodyPartType).StatCurrentValue -= ((pierce / z[0]) + (blunt / z[1]));
+                print(2);
+
+                AttackResolution(bp, bp.parentBody.stats, stats.GetStat<RPGSkill>(RPGStatType.Pick), z, o);
+                print(4);
+            }
+        }
+    }
+
+
 
 
 
@@ -444,7 +689,7 @@ public class BodyManager_Human_Player : BodyManager {
         if (!drawingBow && !arrowKnocked && currentAmmo != null)
         {
             arrowKnocked = true;
-            Item_Weapon_Bow bow = (Item_Weapon_Bow)lHandWeapon;
+            Item_Weapon_Bow bow = (Item_Weapon_Bow)offHandWeapon;
             if (bow != null)
             {
                 loadedProjectile = Instantiate(currentAmmoPrefab, bow.nockPoint) as GameObject;
@@ -461,7 +706,7 @@ public class BodyManager_Human_Player : BodyManager {
     {
         anim.SetBool("DrawingBow", true);
         drawingBow = true;
-        Item_Weapon_Bow bow = (Item_Weapon_Bow)lHandWeapon;
+        Item_Weapon_Bow bow = (Item_Weapon_Bow)offHandWeapon;
         if(bow != null)
         {
             bow.Draw();
@@ -479,7 +724,7 @@ public class BodyManager_Human_Player : BodyManager {
     }
     public void ReleaseBow()
     {
-        Item_Weapon_Bow bow = (Item_Weapon_Bow)lHandWeapon;
+        Item_Weapon_Bow bow = (Item_Weapon_Bow)offHandWeapon;
         if (bow != null)
         {
             bow.Release();
@@ -509,7 +754,7 @@ public class BodyManager_Human_Player : BodyManager {
 
         if (drawingBow && bowDrawn && arrowKnocked)
         {
-            Item_Weapon_Bow bow = (Item_Weapon_Bow)lHandWeapon;
+            Item_Weapon_Bow bow = (Item_Weapon_Bow)offHandWeapon;
             if (bow != null)
             {
                 bow.Fire();
@@ -793,8 +1038,28 @@ public class BodyManager_Human_Player : BodyManager {
 
     public void NextGait()
     {
-        if (gait < 3) { gait++; }
-        else gait = 0;
+        gait++;
+        if (gait > 3)
+        {
+            gait = 0;
+            messageLog.NewMessage("Gait: Slow Walk");
+            anim.SetBool("isRunning", false);
+        }
+        else if (gait == 3)
+        {
+            anim.SetBool("isRunning", true);
+            messageLog.NewMessage("Gait: Run");
+        }
+        else if (gait == 2)
+        {
+            anim.SetBool("isRunning", true);
+            messageLog.NewMessage("Gait: Jog");
+        }
+        else if (gait == 1)
+        {
+            anim.SetBool("isRunning", false);
+            messageLog.NewMessage("Gait: Walk");
+        }
         speed = 1.25F + 1.25F * gait;
     }
 
@@ -813,7 +1078,7 @@ public class BodyManager_Human_Player : BodyManager {
         lastHeartCheckTime = now;
     }
 
-    public float coreTempBase = 37f;
+    float coreTempBase = 37f;
     public Thermometer thermometer;
     public ShelterCheck shelterCheck;
     public float localTemperature = 0;
@@ -821,18 +1086,35 @@ public class BodyManager_Human_Player : BodyManager {
     public float windSpeed = 0;
     public float humidity = 0;
     public float coreTemp = 37f;
+    float averageSkinTemp = 33.2f, headSkinTemp,neckSkinTemp, chestSkinTemp, stomachSkinTemp, pelvisSkinTemp, upperBack, lowerBackSkinTemp,
+    leftShoulderSkinTemp, rightShoulderSkinTemp, leftUpperArmSkinTemp, rightUpperArmSkinTemp, leftForearmSkinTemp, rightForearmSkinTemp,
+    leftHandSkinTemp, rightHandSkinTemp, leftThighSkinTemp, rightThighSkinTemp, leftCalfSkinTemp, rightCalfSkinTemp, leftFootSkinTemp,
+    rightFootSkinTemp;
 
     public float totalInsulation = 0;
     public float totalWaterCover = 0;
     public float totalWindCover = 0;
-    [SerializeField]
-    float lastTempCheckTime = 0;
+    
+    public float lastTempCheckTime = 28800;
 
     void UpdateCoreTemp()
     {
         ReadWeather();
-        float heatProduction = 0.005f * stats.GetStat(RPGStatType.Weight).StatValue * heartRate / (stats.GetStat(RPGStatType.RestingHeartRate).StatValue);
-        float heatLoss = ((coreTemp - localTemperature) * (.1f+humidity) + localTemperature * localTemperature * humidity) * stats.GetStat(RPGStatType.Height).StatValue / totalInsulation;
+        float avgWetness = 0;
+        foreach(RPGBodyPart bodyPart in RPGBodyPartsList)
+        {
+            avgWetness += bodyPart.wetness;
+        }
+        avgWetness /= RPGBodyPartsList.Count;
+        float heatProduction = 0.001f * stats.GetStat(RPGStatType.Weight).StatValue * Mathf.Pow(heartRate / (stats.GetStat(RPGStatType.RestingHeartRate).StatValue),1.285f); // 1w/kg (.001w/g) at rest, 
+        float heatLoss = stats.GetStat(RPGStatType.SurfaceArea).StatValue * (averageSkinTemp - localTemperature) * .000075f * (.1f + avgWetness + windSpeed/100) / totalInsulation; // coeff * area * temperature difference
+
+        //(Mathf.Pow(coreTemp / coreTempBase,3) * (coreTemp - localTemperature) * (.1f+humidity) + localTemperature * localTemperature * humidity) * stats.GetStat(RPGStatType.Height).StatValue / totalInsulation;
+        if (coreTemp > coreTempBase + .5f)
+            averageSkinTemp = coreTemp;
+        else
+            averageSkinTemp = coreTemp - 4; 
+
         //print(coreTemp + ", " + localTemperature + ", " + heartRate);
         //float coolingFactor = coreTemp * (0.000001f * (coreTemp - localTemperature + 10 - (5*heartRate/60)));
         //float heatingFactor = coreTemp * (0.000001f * (coreTemp - localTemperature + 5 - (5 * heartRate / 60)));
@@ -846,24 +1128,71 @@ public class BodyManager_Human_Player : BodyManager {
         //    coreTemp = (coreTemp - coreTempBase) + (heatingFactor * (1 + totalInsulation));
         //}
         float now = worldTime.totalGameSeconds;
-        coreTemp += (now - lastTempCheckTime) / 6 * (heatProduction - heatLoss) / stats.GetStat(RPGStatType.Weight).StatValue;
+        coreTemp += (now - lastTempCheckTime) * (heatProduction - heatLoss) / (4.184f *  stats.GetStat(RPGStatType.Weight).StatValue);
 
-        if(coreTemp > (coreTempBase+1))
-        {
-            Sweat((now - lastTempCheckTime)/6);
-        }
-        lastTempCheckTime = now;
         if (coreTemp < (coreTempBase - 1))
         {
-            shivering = true;
+            if (!shivering)
+            {
+                shivering = true;
+                StartCoroutine(teethChatter);
+            }
+            if (coreTemp < (coreTempBase - 5))
+            {
+                FrostEffect frost = camTransform.GetComponent<FrostEffect>();
+                frost.enabled = true;
+                frost.FrostAmount = 0.1f + (Mathf.Pow((coreTempBase - 5f) / coreTemp, 2) - 1);
+                if(coreTemp < (coreTempBase - 7))
+                {
+                    //die
+                }
+            }
         }
-        else shivering = false;
+        else
+        {
+            StopCoroutine(teethChatter);
+            shivering = false;
+            camTransform.GetComponent<FrostEffect>().enabled = false;
+            if (coreTemp > (coreTempBase))
+                Sweat(now - lastTempCheckTime);
+        }
     }
 
+    IEnumerator TeethChatter()
+    {
+        while (true)
+        {
+            audioSource.PlayOneShot(audioManager.teethChatter);
+            yield return new WaitForSeconds(15);
+        }
+    }
 
+    List<RPGBodyPart> RPGBodyPartsList = new List<RPGBodyPart>();
 
     void UpdateWeatherProtection()
     {
+        if(RPGBodyPartsList.Count == 0)
+        {
+            RPGBodyPartsList.Add(stats.GetStat<RPGBodyPart>(RPGStatType.Head)); 
+ 			 RPGBodyPartsList.Add( stats.GetStat<RPGBodyPart>(RPGStatType.Neck)); 
+ 			 RPGBodyPartsList.Add( stats.GetStat<RPGBodyPart>(RPGStatType.Chest)); 
+ 			 RPGBodyPartsList.Add(stats.GetStat<RPGBodyPart>(RPGStatType.Stomach)); 
+ 			 RPGBodyPartsList.Add(stats.GetStat<RPGBodyPart>(RPGStatType.Pelvis)); 
+ 			 RPGBodyPartsList.Add(stats.GetStat<RPGBodyPart>(RPGStatType.UpperBack)); 
+ 			 RPGBodyPartsList.Add(stats.GetStat<RPGBodyPart>(RPGStatType.LowerBack)); 
+ 			 RPGBodyPartsList.Add(stats.GetStat<RPGBodyPart>(RPGStatType.LeftShoulder)); 
+ 			 RPGBodyPartsList.Add(stats.GetStat<RPGBodyPart>(RPGStatType.RightShoulder)); 
+ 			 RPGBodyPartsList.Add(stats.GetStat<RPGBodyPart>(RPGStatType.LeftForearm)); 
+ 			 RPGBodyPartsList.Add(stats.GetStat<RPGBodyPart>(RPGStatType.RightForearm)); 
+ 			 RPGBodyPartsList.Add(stats.GetStat<RPGBodyPart>(RPGStatType.LeftHand)); 
+ 			 RPGBodyPartsList.Add(stats.GetStat<RPGBodyPart>(RPGStatType.RightHand)); 
+ 			 RPGBodyPartsList.Add(stats.GetStat<RPGBodyPart>(RPGStatType.LeftThigh)); 
+ 			 RPGBodyPartsList.Add(stats.GetStat<RPGBodyPart>(RPGStatType.RightThigh)); 
+ 			 RPGBodyPartsList.Add(stats.GetStat<RPGBodyPart>(RPGStatType.LeftCalf)); 
+ 			 RPGBodyPartsList.Add(stats.GetStat<RPGBodyPart>(RPGStatType.RightCalf)); 
+ 			 RPGBodyPartsList.Add(stats.GetStat<RPGBodyPart>(RPGStatType.LeftFoot)); 
+ 			 RPGBodyPartsList.Add(stats.GetStat<RPGBodyPart>(RPGStatType.RightFoot));
+        }
         totalWaterCover = (stats.GetStat<RPGBodyPart>(RPGStatType.Head).protection[4] * 5 +
                                 stats.GetStat<RPGBodyPart>(RPGStatType.Neck).protection[4] +
                                 stats.GetStat<RPGBodyPart>(RPGStatType.Chest).protection[4] * 3 +
@@ -925,6 +1254,11 @@ public class BodyManager_Human_Player : BodyManager {
                         stats.GetStat<RPGBodyPart>(RPGStatType.RightFoot).protection[5]);
         ReadWeather();
         humidity = Mathf.Clamp(humidity + precipRate / totalWaterCover, 0,1);
+
+        foreach(RPGBodyPart bodyPart in RPGBodyPartsList)
+        {
+            bodyPart.wetness = Mathf.Clamp01(bodyPart.wetness + (precipRate / totalWaterCover) + (sweating ? Mathf.Pow(Mathf.Clamp01(coreTemp - coreTempBase),2)/10 : 0));
+        }
     }
 
     int printPos = 375;
@@ -978,7 +1312,7 @@ public class BodyManager_Human_Player : BodyManager {
         calories -= calorieBurn; 
     }
 
-    public bool shivering;
+    public bool shivering,sweating;
     [SerializeField]
     float waterContent;
     public float hydration = 66f; // body water %
@@ -989,7 +1323,8 @@ public class BodyManager_Human_Player : BodyManager {
 
     void Sweat(float amount)
     {
-        hydration -= .001f * amount;
+        sweating = true;
+        hydration -=  Mathf.Pow(Mathf.Clamp01(coreTemp - coreTempBase),2)/100 * amount;
     }
 
     public float sleepDebt = 1f; // hours sleep debt
@@ -1040,12 +1375,12 @@ public class BodyManager_Human_Player : BodyManager {
     /*
      * Tasks
      */
-    private IEnumerator coroutine;
+    private IEnumerator autoTaskCoroutine;
     public float taskStartTime, taskTimeNeeded;
 
     public float treeDamage;
     public Tree targetTree;
-    public void FellTree(Tree aTree, Item_Weapon_Axe anAxe)
+    public void FellTree(Tree aTree)
     {
         targetTree = aTree;
         treeDamage = 0;
@@ -1053,25 +1388,24 @@ public class BodyManager_Human_Player : BodyManager {
         treeFelling = inTask = true;
         anim.SetBool("inTask", true);
         anim.SetBool("isFallingTree", true);
-        print("falling");
-        float chopRate = (anAxe.baseBlunt + anAxe.baseCut + anAxe.woodChopBonus) * stats.GetStat<RPGAttribute>(RPGStatType.Strength).StatValue * stats.GetStat<RPGSkill>(RPGStatType.WoodWorking).StatValue;
-        print(chopRate.ToString());
-        coroutine = FellTree(aTree, chopRate);
-        StartCoroutine(coroutine);
+        messageLog.NewMessage("Falling tree.");
+        float chopRate = primaryWeapon.TreeChopRateFactor() * stats.GetStat<RPGAttribute>(RPGStatType.Strength).StatValue * stats.GetStat<RPGSkill>(RPGStatType.WoodWorking).StatValue; ;
+        autoTaskCoroutine = FellTree(aTree, chopRate);
+        StartCoroutine(autoTaskCoroutine);
     }
     
     private IEnumerator FellTree(Tree aTree, float chopRate)
     {
-        print("Start");
         while (true)
         {
-            print("stage2");
             float workTime = worldTime.totalGameSeconds - taskStartTime;
             treeDamage = chopRate * workTime;
+            hud.UpdateTargetHealthBar((aTree.startinghealth - treeDamage), aTree.startinghealth);
             if (treeDamage >= aTree.health)
             {
                 aTree.Fall();
-                stats.GetStat<RPGSkill>(RPGStatType.WoodWorking).GainXP((int)(treeDamage));
+                int xp = (int)(treeDamage);
+                stats.GetStat<RPGSkill>(RPGStatType.WoodWorking).GainXP(xp);
                 stats.GetStat<RPGAttribute>(RPGStatType.Toughness).TrainingValue += 10;
                 stats.GetStat<RPGAttribute>(RPGStatType.Strength).TrainingValue += 10;
                 stats.GetStat<RPGAttribute>(RPGStatType.Endurance).TrainingValue += 10;
@@ -1079,8 +1413,8 @@ public class BodyManager_Human_Player : BodyManager {
                 treeFelling = inTask =  false;
                 anim.SetBool("inTask", false);
                 anim.SetBool("isFallingTree", false);
-                print("Tree felled in " + workTime / 60 + " minutes.");
-                print(treeDamage + "woodworking xp gained");
+                messageLog.NewMessage(xp + " Woodworking XP gained.");
+                messageLog.NewMessage("Tree felled in " + workTime / 60 + " minutes.");
                 yield break;
             }
             yield return new WaitForSeconds(1);
@@ -1089,16 +1423,17 @@ public class BodyManager_Human_Player : BodyManager {
 
     private IEnumerator ProcessTree(Tree aTree, float chopRate)
     {
-        print("Start chopping downed tree");
+        float startingHealth = aTree.downedHealth;
         while (true)
         {
-            print("stage2");
             float workTime = worldTime.totalGameSeconds - taskStartTime;
             treeDamage = chopRate * workTime;
+            hud.UpdateTargetHealthBar((aTree.startinghealth - treeDamage), aTree.startinghealth);
             if (treeDamage >= aTree.downedHealth)
             {
                 aTree.TurnToWoodPile();
-                stats.GetStat<RPGSkill>(RPGStatType.WoodWorking).GainXP((int)(treeDamage));
+                int xp = (int)(treeDamage);
+                stats.GetStat<RPGSkill>(RPGStatType.WoodWorking).GainXP(xp);
                 stats.GetStat<RPGAttribute>(RPGStatType.Toughness).TrainingValue += 10;
                 stats.GetStat<RPGAttribute>(RPGStatType.Strength).TrainingValue += 10;
                 stats.GetStat<RPGAttribute>(RPGStatType.Endurance).TrainingValue += 10;
@@ -1106,15 +1441,15 @@ public class BodyManager_Human_Player : BodyManager {
                 treeProcessing = inTask = false;
                 anim.SetBool("inTask", false);
                 anim.SetBool("isFallingTree", false);
-                print("Tree felled in " + workTime / 60 + " minutes.");
-                print(treeDamage + "woodworking xp gained");
+                messageLog.NewMessage(xp + " Woodworking XP gained.");
+                messageLog.NewMessage("Tree processed in " + workTime / 60 + " minutes.");
                 yield break;
             }
             yield return new WaitForSeconds(1);
         }
     }
 
-    public void ProcessDownedTree(Tree aTree, Item_Weapon_Axe anAxe)
+    public void ProcessDownedTree(Tree aTree)
     {
         if (!aTree.standing)
         {
@@ -1124,11 +1459,11 @@ public class BodyManager_Human_Player : BodyManager {
             treeProcessing = inTask = true;
             anim.SetBool("inTask", true);
             anim.SetBool("isFallingTree", true);
-            print("harvesting");
-            float chopRate = (anAxe.baseBlunt + anAxe.baseCut + anAxe.woodChopBonus) * stats.GetStat<RPGAttribute>(RPGStatType.Strength).StatValue * stats.GetStat<RPGSkill>(RPGStatType.WoodWorking).StatValue;
+            messageLog.NewMessage("Processing downed tree.");
+            float chopRate = primaryWeapon.TreeChopRateFactor() * stats.GetStat<RPGAttribute>(RPGStatType.Strength).StatValue * stats.GetStat<RPGSkill>(RPGStatType.WoodWorking).StatValue;
             print(chopRate.ToString());
-            coroutine = ProcessTree(aTree, chopRate);
-            StartCoroutine(coroutine);
+            autoTaskCoroutine = ProcessTree(aTree, chopRate);
+            StartCoroutine(autoTaskCoroutine);
         }
     }
 
@@ -1148,9 +1483,9 @@ public class BodyManager_Human_Player : BodyManager {
         anim.SetBool("isStartingFire", true);
         taskStartTime = worldTime.totalGameSeconds;
         fireStartingTime = (weatherSystem.precipRate * methodFactor + methodFactor + 1) / (stats.GetStat<RPGSkill>(RPGStatType.FireMaking).StatValue + localTemperature * .1f);
-        print(fireStartingTime);
-        coroutine = StartFire(aFire);
-        StartCoroutine(coroutine);
+        messageLog.NewMessage("Starting fire, " + fireStartingTime + " seconds expected.");
+        autoTaskCoroutine = StartFire(aFire);
+        StartCoroutine(autoTaskCoroutine);
     }
 
     // every 15 seconds try again to start fire
@@ -1161,12 +1496,15 @@ public class BodyManager_Human_Player : BodyManager {
             float workTime = worldTime.totalGameSeconds - taskStartTime;
             xpGain = workTime;
             stats.GetStat<RPGSkill>(RPGStatType.FireMaking).GainXP(10);
+            hud.UpdateTargetHealthBar(fireStartingTime - workTime, fireStartingTime);
             if (workTime > fireStartingTime)
             {
                 print("fire lit");
                 aFire.LightFire();
-                stats.GetStat<RPGSkill>(RPGStatType.FireMaking).GainXP(10 + (int)xpGain);
-                isStartingFire = false;
+                int xp = 10 + (int)xpGain;
+                stats.GetStat<RPGSkill>(RPGStatType.FireMaking).GainXP(xp);
+                messageLog.NewMessage(xp + " Firemaking XP gained.");
+                isStartingFire = inTask = false;
                 yield break;
             }
             yield return new WaitForSeconds(1);
@@ -1178,21 +1516,17 @@ public class BodyManager_Human_Player : BodyManager {
     public Perennial targetPlant;
     public void GatherPlant(Perennial plant)
     {
-        print(2);
-
         targetPlant = plant;
-        gathering = true;
+        gathering = inTask = true;
         totalGathered = 0;
         taskStartTime = worldTime.totalGameSeconds;
         float rate = plant.gatherRate * (1 + stats.GetStat<RPGSkill>(RPGStatType.Gathering).StatValue * .09f) * (stats.GetStat<RPGAttribute>(RPGStatType.Dexterity).StatValue * .005f);
         float timeNeeded = plant.numFruits / rate;
         print(rate); print(timeNeeded);
         anim.SetBool("isGathering", true);
-
-        print("Start Gather: " + totalGathered + " gathered(should be 0)");
-
-        coroutine = Gather(plant, rate);
-        StartCoroutine(coroutine);
+        messageLog.NewMessage("Gathering berries.");
+        autoTaskCoroutine = Gather(plant, rate);
+        StartCoroutine(autoTaskCoroutine);
     }
 
     // every 15 seconds try again to start fire
@@ -1203,6 +1537,7 @@ public class BodyManager_Human_Player : BodyManager {
             print(3);
             float workTime = worldTime.totalGameSeconds - taskStartTime;
             totalGathered = rate * workTime;
+            hud.UpdateTargetHealthBar((plant.numFruits) - totalGathered, plant.numFruits);
             if (totalGathered >= plant.numFruits)
             {
                 totalGathered = (int)Math.Floor(totalGathered);
@@ -1210,7 +1545,7 @@ public class BodyManager_Human_Player : BodyManager {
                 {
                     GameObject harvest = Instantiate(plant.fruitPrefab);
                     harvest.GetComponent<Item_Stack>().numItems = (int)totalGathered;
-                    baseInventory.AddItem(harvest.GetComponent<Item_Stack>());
+                    PickupItem(harvest.GetComponent<Item_Stack>());
                 }
                 else if (plant.fruitPrefab.GetComponent<Item>())
                 {
@@ -1218,11 +1553,14 @@ public class BodyManager_Human_Player : BodyManager {
                     {
                         GameObject harvest = Instantiate(plant.fruitPrefab);
                         baseInventory.AddItem(harvest.GetComponent<Item>());
+                        PickupItem(harvest.GetComponent<Item>());
                     }
                 }
-                stats.GetStat<RPGSkill>(RPGStatType.Gathering).GainXP((int)(plant.difficulty * totalGathered * 1.1));
+                int xp = (int)(plant.difficulty * totalGathered * 1.1);
+                stats.GetStat<RPGSkill>(RPGStatType.Gathering).GainXP(xp);
+                messageLog.NewMessage(xp + " Gathering XP gained.");
                 plant.SetHarvested();
-                gathering = false;
+                gathering = inTask = false;
                 print(totalGathered + " " + plant.fruit.itemName + " gathered in " + workTime / 60 + " minutes.");
                 print(plant.difficulty * totalGathered + " xp gained");
                 yield break;
@@ -1235,9 +1573,9 @@ public class BodyManager_Human_Player : BodyManager {
     public void ButcherBody(BodyManager body)
     {
         taskStartTime = worldTime.totalGameSeconds;
-        taskTimeNeeded = body.butcherTime * (1 + UnityEngine.Random.Range(0, .25f)) / (stats.GetStat(RPGStatType.Butchery).StatValue + rHandWeapon.butcheringAid);
-        coroutine = Butcher(body);
-        StartCoroutine(coroutine);
+        taskTimeNeeded = body.butcherTime * (1 + UnityEngine.Random.Range(0, .25f)) / (stats.GetStat(RPGStatType.Butchery).StatValue + primaryWeapon.butcheringAid);
+        autoTaskCoroutine = Butcher(body);
+        StartCoroutine(autoTaskCoroutine);
     }
 
     private IEnumerator Butcher(BodyManager body)
@@ -1267,6 +1605,20 @@ public class BodyManager_Human_Player : BodyManager {
             foodItem.itemUIElementScript.parentInventory.DropItem(foodItem);
         Destroy(foodItem.itemUIelement);
         Destroy(foodItem.gameObject);
+    }
+
+    public void Eat(ItemStackFood foodItem)
+    {
+        hydration += foodItem.water / stats.GetStat<RPGAttribute>(RPGStatType.Weight).StatValue;
+        calories += foodItem.calories;
+        foodItem.numItems -= 1;
+        if (foodItem.numItems == 0)
+        {
+            if (!foodItem.loose)
+                foodItem.itemUIElementScript.parentInventory.DropItem(foodItem);
+            Destroy(foodItem.itemUIelement);
+            Destroy(foodItem.gameObject);
+        }
     }
 
     public void Drink()
@@ -1303,7 +1655,7 @@ public class BodyManager_Human_Player : BodyManager {
     public void StopTasks()
     {
         anim.SetBool("inTask", false);
-        print("Stop");
+        messageLog.NewMessage("Stopping task early");
         inTask = false;
         if (gathering)
         {
@@ -1322,7 +1674,9 @@ public class BodyManager_Human_Player : BodyManager {
                     baseInventory.AddItem(harvest.GetComponent<Item>());
                 }
             }
-            stats.GetStat<RPGSkill>(RPGStatType.Gathering).GainXP((int)(targetPlant.difficulty * totalGathered));
+            int xp = (int)(targetPlant.difficulty * totalGathered);
+            stats.GetStat<RPGSkill>(RPGStatType.Gathering).GainXP(xp);
+            messageLog.NewMessage(xp + " Gathering XP gained.");
             targetPlant.numFruits -= (int)totalGathered;
             gathering = false;
             anim.SetBool("isGathering", false);
@@ -1332,24 +1686,28 @@ public class BodyManager_Human_Player : BodyManager {
         {
             targetTree.TakeDamage(treeDamage);
             treeFelling = inTask =  false;
+            int xp = (int)treeDamage;
             stats.GetStat<RPGSkill>(RPGStatType.WoodWorking).GainXP((int)(treeDamage));
             anim.SetBool("inTask", false);
             anim.SetBool("isFallingTree", false);
-            print(treeDamage + "woodworking xp gained");
+            messageLog.NewMessage(xp + " Woodworking XP gained.");
             return;
         }
         if (treeProcessing)
         {
-            targetTree.TakeDamage2(treeDamage);
+            targetTree.TakeDamage(treeDamage);
             treeProcessing = inTask = false;
             stats.GetStat<RPGSkill>(RPGStatType.WoodWorking).GainXP((int)(treeDamage));
+            int xp = (int)treeDamage;
             anim.SetBool("inTask", false);
             anim.SetBool("isFallingTree", false);
-            print(treeDamage + "woodworking xp gained");
+            messageLog.NewMessage(xp + " Woodworking XP gained.");
             return;
         }
         if (isStartingFire)
         {
+            int xp = (int)xpGain;
+            messageLog.NewMessage(xp + " Firemaking XP gained.");
             stats.GetStat<RPGSkill>(RPGStatType.FireMaking).GainXP((int)xpGain);
             isStartingFire = false;
             anim.SetBool("isStartingFire", false);
@@ -1357,6 +1715,7 @@ public class BodyManager_Human_Player : BodyManager {
         }
         if (isSleeping)
         {
+            messageLog.NewMessage("Awake.");
             isSleeping = false;
             anim.SetBool("isLayingDown", false);
             sleepLength = worldTime.totalGameSeconds - sleepStartTime;

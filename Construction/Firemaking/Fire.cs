@@ -32,6 +32,7 @@ public class Fire : MonoBehaviour {
         soundFX.enabled = true;
         isLit = true;
         gameObject.tag = "LitFire";
+        prevFuelCheckTime = worldTime.totalGameSeconds;
         InvokeRepeating("BurnFuel", 30, 30);
     }
 
@@ -41,7 +42,7 @@ public class Fire : MonoBehaviour {
         prevFuelCheckTime = worldTime.totalGameSeconds;
         if (fireContents.inventoryContents.Any())
         {
-            Item newFuel = fireContents.inventoryContents.FirstOrDefault(item => item.primaryMaterialType == ItemMaterialType.Wood);
+            Item newFuel = fireContents.inventoryContents.FirstOrDefault(item => item.primaryMaterialType == MaterialType.Wood);
             if (!(newFuel == null))
             {
                 fuel += newFuel.itemWeight * 10;

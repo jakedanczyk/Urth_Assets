@@ -12,8 +12,8 @@ public class ChunkColliderManager : MonoBehaviour
 
     int t = 0;
     int z = 0;
-    int detailLevel = 0;    // 0 = 4m blocks, 1 = 1m blocks, 2 = .25m blocks
-    // Update is called once per frame
+    int detailLevel = -1;    // -1 = 16m blocks, 0 = 4m blocks, 1 = 1m blocks, 2 = .25m blocks
+
     void Update()
     {
         if (Input.GetKey(KeyCode.N))
@@ -21,23 +21,23 @@ public class ChunkColliderManager : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Equals))
             {
                 detailLevel = Math.Min(detailLevel + 1, 2);
-                if (detailLevel == 1)
+                if (detailLevel == 0)
+                {
+                    deactivator16.SetActive(true);
+                    destroyer4.SetActive(true);
+                    messageLog.NewMessage("Terrain resolution: 4 meter");
+                }
+                else if (detailLevel == 1)
                 {
                     deactivator4.SetActive(true);
                     destroyer1.SetActive(true);
-                    messageLog.text.text = "Terrain resolution: 1 meter";
-                    messageLog.text.color = Color.green;
-                    StopAllCoroutines();
-                    StartCoroutine(ClearText());
+                    messageLog.NewMessage("Terrain resolution: 1 meter");
                 }
                 else if (detailLevel == 2)
                 {
                     deactivator1.SetActive(true);
                     destroyer.SetActive(true);
-                    messageLog.text.text = "Terrain resolution: 0.25 meter";
-                    messageLog.text.color = Color.green;
-                    StopAllCoroutines();
-                    StartCoroutine(ClearText());
+                    messageLog.NewMessage("Terrain resolution: 0.25 meter");
                 }
             }
             else if (Input.GetKeyDown(KeyCode.Minus))
@@ -46,24 +46,23 @@ public class ChunkColliderManager : MonoBehaviour
                 if (detailLevel == 1)
                 {
                     deactivator1.SetActive(false);
-                    messageLog.text.text = "Terrain resolution: 1 meter";
-                    messageLog.text.color = Color.red;
-                    StopAllCoroutines();
-                    StartCoroutine(ClearText());
+                    messageLog.NewMessage("Terrain resolution: 1 meter");
                 }
                 else if (detailLevel == 0)
                 {
                     deactivator4.SetActive(false);
-                    messageLog.text.text = "Terrain resolution: 4 meter";
-                    messageLog.text.color = Color.red;
-                    StopAllCoroutines();
-                    StartCoroutine(ClearText());
+                    messageLog.NewMessage("Terrain resolution: 4 meter");
+                }
+                else if (detailLevel == -1)
+                {
+                    deactivator16.SetActive(false);
+                    messageLog.NewMessage("Terrain resolution: 16 meter");
                 }
             }
         }
 
         t += 1;
-        if (t >= 240 && !destroyer16.activeSelf)
+        if (t >= 240)
         {
             destroyer16.SetActive(true);
             z += 1;
@@ -90,11 +89,5 @@ public class ChunkColliderManager : MonoBehaviour
                 z = 0;
             }
         }
-    }
-
-    IEnumerator ClearText()
-    {
-        yield return new WaitForSeconds(2.5f);
-        messageLog.text.text = null;
     }
 }

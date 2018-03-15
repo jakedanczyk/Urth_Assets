@@ -26,3 +26,4 @@ MonoBehaviour:
   LS_ShadowScale: 0.75
   LS_DistScale: 10
   LS_CloudColor: {x: 1, y: 0.9, z: 0.95}
+  globalFog: 0.0001

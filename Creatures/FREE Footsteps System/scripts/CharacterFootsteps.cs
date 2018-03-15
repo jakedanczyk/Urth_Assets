@@ -82,26 +82,30 @@ namespace Footsteps {
 			}
 		}
 
-		void Update() {
-			CheckGround();
+		//void Update() {
+		//	CheckGround();
 
-			if(triggeredBy == TriggeredBy.TRAVELED_DISTANCE) {
-				float speed = (characterController ? characterController.velocity : characterRigidbody.velocity).magnitude;
+		//	if(triggeredBy == TriggeredBy.TRAVELED_DISTANCE) {
+		//		float speed = (characterController ? characterController.velocity : characterRigidbody.velocity).magnitude;
 
-				if(isGrounded) {
-					// Advance the step cycle only if the character is grounded.
-					AdvanceStepCycle(speed * Time.deltaTime);
-				}
-			}
-		}
+		//		if(isGrounded) {
+		//			// Advance the step cycle only if the character is grounded.
+		//			AdvanceStepCycle(speed * Time.deltaTime);
+		//		}
+		//	}
+		//}
 
-		public void TryPlayFootstep() {
-			if(isGrounded) {
-				PlayFootstep();
-			}
-		}
+		public void TryPlayFootstep(Collider other, Vector3 point) {
+            AudioClip randomFootstep = SurfaceManager.singleton.GetFootstep(other, point);
+            float randomVolume = Random.Range(minVolume, maxVolume);
 
-		void PlayLandSound() {
+            if (randomFootstep)
+            {
+                audioSource.PlayOneShot(randomFootstep, randomVolume);
+            }
+        }
+
+        void PlayLandSound() {
 			audioSource.PlayOneShot(SurfaceManager.singleton.GetFootstep(currentGroundInfo.collider, currentGroundInfo.point));
 		}
 

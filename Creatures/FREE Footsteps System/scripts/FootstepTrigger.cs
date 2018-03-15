@@ -6,47 +6,50 @@ namespace Footsteps {
 	[RequireComponent(typeof(Collider), typeof(Rigidbody))]
 	public class FootstepTrigger : MonoBehaviour {
 
-		Collider thisCollider;
-		CharacterFootsteps footsteps;
+		public Collider thisCollider;
+		public CharacterFootsteps footsteps;
+        IEnumerator wait;
 
 
-		void Start() {
-			thisCollider = GetComponent<Collider>();
-			footsteps = GetComponentInParent<CharacterFootsteps>();
-			Rigidbody thisRigidbody = GetComponent<Rigidbody>();
-
-			if(thisCollider) {
-				thisCollider.isTrigger = true;
-				SetCollisions();
-			}
-
-			if(thisRigidbody) thisRigidbody.isKinematic = true;
-
-			string errorMessage = "";
-
-			if(!footsteps) errorMessage = "No 'CharacterFootsteps' script found as a parent, this footstep trigger will not work";
-			else if(!thisCollider) errorMessage = "Please attach a collider marked as a trigger to this gameobject, this footstep trigger will not work";
-			else if(!thisRigidbody) errorMessage = "Please attach a rigidbody to this gameobject, this footstep trigger will not work";
-
-			if(errorMessage != "") {
-				Debug.LogError(errorMessage);
-				enabled = false;
-
-				return;
-			}
+        void Start()
+        {
+            //wait = Wait();
+			SetCollisions();
 		}
 
 		void OnEnable() {
 			SetCollisions();
 		}
 
-		void OnTriggerEnter(Collider other) {
-			if(footsteps) {
-				footsteps.TryPlayFootstep();
-			}
-		}
+        //      bool isWaiting;
+        //void OnTriggerEnter(Collider other) {
+        //          if (!isWaiting && footsteps) {
+        //              isWaiting = true;
+        //              StopCoroutine(wait);
+        //              StartCoroutine(wait);
+        //		footsteps.TryPlayFootstep(other,transform.position);
+        //	}
+        //}
 
-		void SetCollisions() {
+
+        //      IEnumerator Wait()
+        //      {
+        //          yield return new WaitForSeconds(0.2f);
+        //          isWaiting = false;
+        //      }
+
+        float lastStepTime,nowTime;
+        void OnTriggerEnter(Collider other)
+        {
+            nowTime = Time.time;
+            if (nowTime - lastStepTime > 0.5f && footsteps)
+            {
+                lastStepTime = nowTime;
+                footsteps.TryPlayFootstep(other, transform.position);
+            }
+        }
+
+        void SetCollisions() {
 			if(!footsteps) return;
 
 			Collider[] allColliders = footsteps.GetComponentsInChildren<Collider>();

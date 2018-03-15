@@ -5,7 +5,6 @@ using System.Collections.Generic;
 public class World16 : MonoBehaviour {
 
     public static GameObject worldGameObject;
-    public NavMeshSourceTag navMeshSourceTag;
     public Dictionary<WorldPos, Chunk16> chunk16s = new Dictionary<WorldPos, Chunk16>();
     public GameObject chunk16Prefab;
     public GameObject treePrefab;
@@ -13,6 +12,7 @@ public class World16 : MonoBehaviour {
     public GameObject horsePrefab;
     public GameObject huckPrefab;
     public GameObject allosaurPrefab;
+    public ItemDictionary itemDictionary;
 
     public string worldName = "world16";
 
@@ -59,6 +59,9 @@ public class World16 : MonoBehaviour {
             print("boneSpawn");
             GameObject newBone = Instantiate(bonePrefab);
             newBone.transform.position = newChunk16.boneList[0];
+            int r = Random.Range(0, 9);
+            GameObject randomItem = Instantiate(itemDictionary.items[r]);
+            newBone.GetComponent<LootInventory>().AddItem(randomItem.GetComponent<Item>());
         }
         if (newChunk16.horseSpawn)
         {
@@ -95,12 +98,12 @@ public class World16 : MonoBehaviour {
         chunk16s[worldPos] = chunk;
     }
 
-    public Chunk16 GetChunk16(int x, int y, int z)
+    public Chunk16 GetChunk16(float x, float y, float z)
     {
         WorldPos pos = new WorldPos();
-        pos.x = Mathf.FloorToInt(x / 256f) * 256;
-        pos.y = Mathf.FloorToInt(y / 256f) * 256;
-        pos.z = Mathf.FloorToInt(z / 256f) * 256;
+        pos.x = Mathf.FloorToInt((x + 8) / 256f) * 256;
+        pos.y = Mathf.FloorToInt((y + 8) / 256f) * 256;
+        pos.z = Mathf.FloorToInt((z + 8) / 256f) * 256;
 
         Chunk16 containerChunk16 = null;
 
@@ -109,19 +112,24 @@ public class World16 : MonoBehaviour {
         return containerChunk16;
     }
 
-    public Block16 GetBlock16(int x, int y, int z)
+    public Block16 GetBlock16(Vector3 position)
     {
-        //x = Mathf.FloorToInt(x / 16) * 16;
-        //y = Mathf.FloorToInt(y / 16) * 16;
-        //z = Mathf.FloorToInt(z / 16) * 16;
-        Chunk16 containerChunk16 = GetChunk16(x, y, z);
+        return GetBlock16(position.x, position.y, position.z);
+    }
+
+    public Block16 GetBlock16(float xf, float yf, float zf)
+    {
+        int xi = Mathf.RoundToInt(xf / 16) * 16;
+        int yi = Mathf.RoundToInt(yf / 16) * 16;
+        int zi = Mathf.RoundToInt(zf / 16) * 16;
+        Chunk16 containerChunk16 = GetChunk16(xi, yi, zi);
 
         if (containerChunk16 != null)
         {
             Block16 block16 = containerChunk16.GetBlock16(
-                Mathf.FloorToInt((x - containerChunk16.pos.x)/16),
-                Mathf.FloorToInt((y - containerChunk16.pos.y)/16),
-                Mathf.FloorToInt((z - containerChunk16.pos.z)/16));
+                Mathf.RoundToInt((xi - containerChunk16.pos.x)/16),
+                Mathf.RoundToInt((yi - containerChunk16.pos.y)/16),
+                Mathf.RoundToInt((zi - containerChunk16.pos.z)/16));
 
             return block16;
         }
@@ -132,7 +140,12 @@ public class World16 : MonoBehaviour {
 
     }
 
-    public void SetBlock16(int x, int y, int z, Block16 block16)
+    public void SetBlock16(float x, float y, float z, Block16 block16)
+    {
+        SetBlock16(Mathf.RoundToInt(x / 16) * 16, Mathf.RoundToInt(y / 16) * 16, Mathf.RoundToInt(z / 16) * 16, block16);
+    }
+
+        public void SetBlock16(int x, int y, int z, Block16 block16)
     {
         Debug.Log("SetBlockinWorld");
 
@@ -140,17 +153,17 @@ public class World16 : MonoBehaviour {
 
         if (chunk16 != null)
         {
-            chunk16.SetBlock16(Mathf.FloorToInt((x - chunk16.pos.x) / 16),
-                                Mathf.FloorToInt((y - chunk16.pos.y) / 16),
-                                Mathf.FloorToInt((z - chunk16.pos.z) / 16),block16);
+            chunk16.SetBlock16(Mathf.RoundToInt((x - chunk16.pos.x) / 16),
+                                Mathf.RoundToInt((y - chunk16.pos.y) / 16),
+                                Mathf.RoundToInt((z - chunk16.pos.z) / 16),block16);
             chunk16.update = true;
             chunk16.UpdateChunk16();
-            UpdateIfEqual(Mathf.FloorToInt((x - chunk16.pos.x)/16)*16, 0, new WorldPos(Mathf.FloorToInt(x / 16) * 16 - 16, Mathf.FloorToInt(y / 16) * 16, Mathf.FloorToInt(z / 16) * 16));
-            UpdateIfEqual(Mathf.FloorToInt((x - chunk16.pos.x) / 16) * 16, Chunk16.chunk16Size - 1, new WorldPos(Mathf.FloorToInt(x / 16) * 16 + 16, Mathf.FloorToInt(y / 16) * 16, Mathf.FloorToInt(z / 16) * 16));
-            UpdateIfEqual(Mathf.FloorToInt((y - chunk16.pos.y) / 16) * 16, 0, new WorldPos(Mathf.FloorToInt(x / 16) * 16, Mathf.FloorToInt(y / 16) * 16 - 16, Mathf.FloorToInt(z / 16) * 16));
-            UpdateIfEqual(Mathf.FloorToInt((y - chunk16.pos.y) / 16) * 16, Chunk16.chunk16Size - 1, new WorldPos(Mathf.FloorToInt(x / 16) * 16, Mathf.FloorToInt(y / 16) * 16 + 16, Mathf.FloorToInt(z / 16) * 16));
-            UpdateIfEqual(Mathf.FloorToInt((z - chunk16.pos.z) / 16) * 16, 0, new WorldPos(Mathf.FloorToInt(x / 16) * 16, Mathf.FloorToInt(y / 16) * 16, Mathf.FloorToInt(z / 16) * 16 - 16));
-            UpdateIfEqual(Mathf.FloorToInt((z - chunk16.pos.z) / 16) * 16, Chunk16.chunk16Size - 1, new WorldPos(Mathf.FloorToInt(x / 16) * 16, Mathf.FloorToInt(y / 16) * 16, Mathf.FloorToInt(z / 16) * 16 + 16));
+            UpdateIfEqual(Mathf.RoundToInt((x - chunk16.pos.x)/16)*16, 0, new WorldPos(Mathf.RoundToInt(x / 16) * 16 - 16, Mathf.RoundToInt(y / 16) * 16, Mathf.RoundToInt(z / 16) * 16));
+            UpdateIfEqual(Mathf.RoundToInt((x - chunk16.pos.x) / 16) * 16, Chunk16.chunk16Size - 1, new WorldPos(Mathf.RoundToInt(x / 16) * 16 + 16, Mathf.RoundToInt(y / 16) * 16, Mathf.RoundToInt(z / 16) * 16));
+            UpdateIfEqual(Mathf.RoundToInt((y - chunk16.pos.y) / 16) * 16, 0, new WorldPos(Mathf.RoundToInt(x / 16) * 16, Mathf.RoundToInt(y / 16) * 16 - 16, Mathf.RoundToInt(z / 16) * 16));
+            UpdateIfEqual(Mathf.RoundToInt((y - chunk16.pos.y) / 16) * 16, Chunk16.chunk16Size - 1, new WorldPos(Mathf.RoundToInt(x / 16) * 16, Mathf.RoundToInt(y / 16) * 16 + 16, Mathf.RoundToInt(z / 16) * 16));
+            UpdateIfEqual(Mathf.RoundToInt((z - chunk16.pos.z) / 16) * 16, 0, new WorldPos(Mathf.RoundToInt(x / 16) * 16, Mathf.RoundToInt(y / 16) * 16, Mathf.RoundToInt(z / 16) * 16 - 16));
+            UpdateIfEqual(Mathf.RoundToInt((z - chunk16.pos.z) / 16) * 16, Chunk16.chunk16Size - 1, new WorldPos(Mathf.RoundToInt(x / 16) * 16, Mathf.RoundToInt(y / 16) * 16, Mathf.RoundToInt(z / 16) * 16 + 16));
         }
     }
 

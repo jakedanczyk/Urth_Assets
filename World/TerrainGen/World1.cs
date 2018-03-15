@@ -105,7 +105,12 @@ public class World1 : MonoBehaviour {
         return containerChunk1;
     }
 
-    public Block1 GetBlock(int x, int y, int z)
+    public Block1 GetBlock1(Vector3 position)
+    {
+        return GetBlock1(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y), Mathf.RoundToInt(position.z));
+    }
+
+    public Block1 GetBlock1(int x, int y, int z)
     {
         Chunk1 containerChunk1 = GetChunk1(x, y, z);
 

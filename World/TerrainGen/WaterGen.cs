@@ -43,13 +43,13 @@ public class WaterGen : MonoBehaviour {
             Chunk1 chunk = world1.GetChunk1(riverLeadList[0].x, riverLeadList[0].y + 1, riverLeadList[0].z);                
             if (chunk != null)
             {
-                Block1 block = world1.GetBlock(riverLeadList[0].x, riverLeadList[0].y + 1, riverLeadList[0].z);
+                Block1 block = world1.GetBlock1(riverLeadList[0].x, riverLeadList[0].y + 1, riverLeadList[0].z);
                 if (!(block is Block1Air))
                 {
-                    if (!(world1.GetBlock(riverLeadList[0].x - 1, riverLeadList[0].y + 1, riverLeadList[0].z) is Block1Air)
-                    && !(world1.GetBlock(riverLeadList[0].x + 1, riverLeadList[0].y + 1, riverLeadList[0].z) is Block1Air)
-                    && !(world1.GetBlock(riverLeadList[0].x, riverLeadList[0].y + 1, riverLeadList[0].z - 1) is Block1Air)
-                    && !(world1.GetBlock(riverLeadList[0].x, riverLeadList[0].y + 1, riverLeadList[0].z + 1) is Block1Air))
+                    if (!(world1.GetBlock1(riverLeadList[0].x - 1, riverLeadList[0].y + 1, riverLeadList[0].z) is Block1Air)
+                    && !(world1.GetBlock1(riverLeadList[0].x + 1, riverLeadList[0].y + 1, riverLeadList[0].z) is Block1Air)
+                    && !(world1.GetBlock1(riverLeadList[0].x, riverLeadList[0].y + 1, riverLeadList[0].z - 1) is Block1Air)
+                    && !(world1.GetBlock1(riverLeadList[0].x, riverLeadList[0].y + 1, riverLeadList[0].z + 1) is Block1Air))
                     {
                         world1.SetBlock1(riverLeadList[0].x, riverLeadList[0].y + 1, riverLeadList[0].z, new Block1Water());
                         riverLeadList[0] = new WorldPos(riverLeadList[0].x, riverLeadList[0].y + 1, riverLeadList[0].z);
