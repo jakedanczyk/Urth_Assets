@@ -5,16 +5,33 @@ using System.Linq;
 using System;
 
 public class BlockBuildingSystem : MonoBehaviour {
-    public Dictionary<BlockType, Type> blocks = new Dictionary<BlockType, Type>
+    public Dictionary<BlockType, string> blocks = new Dictionary<BlockType, string>
     {
-        { BlockType.Granite, typeof(Block) }, { BlockType.Grass, typeof(BlockGrass) } };
+        { BlockType.Granite, "Block1" },
+        { BlockType.Grass, "Block1Grass" }
+    };
+
+    public enum Mode
+    {
+        Inventory,
+        StockPile,
+    }
+
+    Mode buildMode = Mode.Inventory;
+
+    public Mode BuildMode{
+        get { return buildMode; }
+        set { buildMode = value; }
+    }
 
     public Inventory supplyInventory;
+
+    public Item_TerrainBlock buildingBlock;
 
     public buildObjects currentObject;
     private Vector3 currentPos;
     private Vector3 currentRot;
-    public Transform currentPreview;
+    public GameObject currentPreview;
     public Transform cam;
     public RaycastHit hit;
     public LayerMask layer;
@@ -24,35 +41,68 @@ public class BlockBuildingSystem : MonoBehaviour {
 
     public bool isBuilding;
 
-    void Start()
-    {
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
-    }
-
     public int i = 0;
     void Update()
     {
-        if (isBuilding)
+        if(buildingBlock != null)
         {
-            startPreview();
-            if (Input.GetButtonDown("Fire1"))
-                Build();
-        }
-
-        if (Input.GetKeyDown(KeyCode.N))
-        {
-            if (isBuilding)
+            if(currentPreview != null)
             {
-                Destroy(currentPreview.gameObject);
-                isBuilding = false;
+                if (Physics.Raycast(cam.position, cam.forward, out hit, 40, layer))
+                {
+                    Vector3 previewPos = Vector3.Lerp(cam.position, hit.point, .995f);
+                    WorldPos pos = GetBlockPos(previewPos);
+
+                    currentPreview.transform.position = new Vector3(pos.x, pos.y, pos.z);
+                    if (Input.GetButtonDown("Fire1"))
+                    {
+                        print("build");
+
+                        var nb = Activator.CreateInstance(Type.GetType(blocks[buildingBlock.blockType]));
+                        SetBlock(pos,(Block1)nb);
+                    }
+                }
+            }
+        }
+    }
+
+    public static WorldPos GetBlockPos(Vector3 pos)
+    {
+        WorldPos blockPos = new WorldPos(
+            Mathf.RoundToInt(pos.x),
+            Mathf.RoundToInt(pos.y),
+            Mathf.RoundToInt(pos.z)
+            );
+
+        return blockPos;
+    }
+
+    public static WorldPos GetBlockPos(RaycastHit hit, bool adjacent = false)
+    {
+        Vector3 pos = new Vector3(
+            MoveWithinBlock(hit.point.x, hit.normal.x, adjacent),
+            MoveWithinBlock(hit.point.y, hit.normal.y, adjacent),
+            MoveWithinBlock(hit.point.z, hit.normal.z, adjacent)
+            );
+
+        return GetBlockPos(pos);
+    }
+
+    static float MoveWithinBlock(float pos, float norm, bool adjacent = false)
+    {
+        if (pos - (int)pos == 0.5f || pos - (int)pos == -0.5f)
+        {
+            if (adjacent)
+            {
+                pos += (norm / 2);
             }
             else
             {
-                ChangeCurrentBlock();
-                isBuilding = true;
+                pos -= (norm / 2);
             }
         }
+
+        return (float)pos;
     }
 
     public void ChangeCurrentBlock()
@@ -62,7 +112,6 @@ public class BlockBuildingSystem : MonoBehaviour {
 
     public void startPreview()
     {
-        if(Physics.Raycast (cam.position, cam.forward, out hit, 40, layer))
         {
             Debug.DrawLine(cam.position, hit.point, Color.green);
             if (hit.transform != this.transform)
@@ -78,10 +127,10 @@ public class BlockBuildingSystem : MonoBehaviour {
         currentPos = new Vector3(Mathf.Round(currentPos.x), Mathf.Round(currentPos.y), Mathf.Round(currentPos.z));
         currentPos *= gridSize;
         currentPos += Vector3.one * offset;
-        currentPreview.position = currentPos;
+        currentPreview.transform.position = currentPos;
         if (Input.GetButtonDown("Fire2"))
             currentRot += new Vector3(0, 90, 0);
-        currentPreview.localEulerAngles = currentRot;
+        currentPreview.transform.localEulerAngles = currentRot;
     }
 
     public void Build()
@@ -113,5 +162,34 @@ public class BlockBuildingSystem : MonoBehaviour {
             }
             print("buildable built");
         }
+    }
+    public static bool SetBlock(RaycastHit hit, Block block, bool adjacent = false)
+    {
+        Chunk chunk = hit.collider.GetComponent<Chunk>();
+        if (chunk == null)
+            return false;
+
+        WorldPos pos = GetBlockPos(hit, adjacent);
+
+        chunk.world.SetBlock(pos.x, pos.y, pos.z, block);
+
+        return true;
+    }
+
+    public bool SetBlock(WorldPos pos, Block1 block, bool adjacent = false)
+    {
+        World1 world = World1.worldGameObject.GetComponent<World1>();
+        Chunk1 chunk = world.GetChunk1((int)pos.x, (int)pos.y, (int)pos.z);
+        if (chunk == null)
+            return false;
+
+        if(buildMode == Mode.Inventory)
+        {
+            supplyInventory.DropItem(buildingBlock);
+            Destroy(buildingBlock.gameObject);
+        }
+        world.SetBlock1(pos.x, pos.y, pos.z, block);
+
+        return true;
     }
 }

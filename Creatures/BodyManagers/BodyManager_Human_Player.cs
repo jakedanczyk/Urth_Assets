@@ -6,6 +6,7 @@ using System.Linq;
 using UnityStandardAssets.Characters.FirstPerson;
 using MORPH3D;
 using System.Threading;
+using UnityStandardAssets.Vehicles.Car;
 
 //[System.Serializable]
 public class BodyManager_Human_Player : BodyManager {
@@ -17,6 +18,7 @@ public class BodyManager_Human_Player : BodyManager {
     public PlayerControls controls;
     public WorldTime worldTime;
     StaticBuildingSystem buildingSystem;
+    public SkyControl skyControl;
     public WeatherControl weatherSystem;
     public Transform camTransform;
     public RectTransform outfittingUI;
@@ -51,6 +53,7 @@ public class BodyManager_Human_Player : BodyManager {
     public bool gathering, treeFelling, treeProcessing;
     public String chararacterName, race;
     MessageLog messageLog;
+    DataWindow data;
     IEnumerator weaponSwing,teethChatter;
     //[SerializeField]
     //public GameObject weatherFX;
@@ -71,18 +74,20 @@ public class BodyManager_Human_Player : BodyManager {
 
     void Start()
     {
-        weatherSystem = WeatherControl.manager.GetComponent<WeatherControl>();
-        speed = 1.25F + 1.25f * gait;
 
+        skyControl = SkyControl.SkyControlObject.GetComponent<SkyControl>();
+        speed = 1.25F + 1.25f * (int)currentGait;
+
+        data = DataWindow.dataWindowGameObject.GetComponent<DataWindow>();
         messageLog = MessageLog.messageLogGameObject.GetComponent<MessageLog>();
-        InvokeRepeating("UpdateHeartRate", 1f, 1f);
+        InvokeRepeating("UpdateHeartRate", 1f, .1f);
         InvokeRepeating("ReadWeather", 1.5f, 300f);
-        InvokeRepeating("UpdateCoreTemp", 1.5f, 1f);
+        InvokeRepeating("UpdateCoreTemp", 1.5f, .1f);
         InvokeRepeating("Encumbrance", 2f, 2f);
-        InvokeRepeating("CalorieBurn", 1f, 2f);
-        InvokeRepeating("Hydration", 3f, 2f);
-        InvokeRepeating("SleepDebt", 11f, 2f);
-        InvokeRepeating("StaminaUpdate", 1f, 1f);
+        InvokeRepeating("CalorieBurn", 1f, .1f);
+        InvokeRepeating("Hydration", 3f, .1f);
+        InvokeRepeating("SleepDebt", 11f, .1f);
+        InvokeRepeating("StaminaUpdate", 1f, .1f);
         sleepMod.OnValueChange += SleepOnValueChange;
         stats.GetStat<RPGAttribute>(RPGStatType.Strength).AddModifier(sleepMod);
         stats.GetStat<RPGAttribute>(RPGStatType.Agility).AddModifier(sleepMod);
@@ -93,11 +98,13 @@ public class BodyManager_Human_Player : BodyManager {
         stats.GetStat<RPGAttribute>(RPGStatType.Perception).AddModifier(sleepMod);
         stats.GetStat<RPGAttribute>(RPGStatType.Willpower).AddModifier(sleepMod);
         stats.GetStat<RPGAttribute>(RPGStatType.Stamina).AddModifier(sleepMod);
-
+        calorieTime = worldTime.totalGameSeconds;
+        hydrationTime = worldTime.totalGameSeconds;
+        sleepTime = worldTime.totalGameSeconds;
         if (LevelSerializer.IsDeserializing) return;
 
-
-        gait = 0;
+        stomachMaxVolume = Mathf.Pow((stats.GetStat(RPGStatType.Height).StatValue / 1800),2.5f) * 3500;
+        currentGait = 0;
         stamina = maxStamina = stats.GetStat(RPGStatType.Endurance).StatValue*10;
         heartRate = stats.GetStat(RPGStatType.RestingHeartRate).StatValue;
         UpdateWeatherProtection();        
@@ -119,6 +126,11 @@ public class BodyManager_Human_Player : BodyManager {
         {
             controls.enabled = false;
             if (Input.GetKeyDown(KeyCode.W)) { StopTasks(); controls.enabled = true; }
+        }
+        else 
+        {
+            if (!isSkiing)
+                controls.enabled = true;
         }
     }
 
@@ -826,6 +838,15 @@ public class BodyManager_Human_Player : BodyManager {
                 mcs.SetClothingVisibility(newWearable.modelID, true);
                 mcsUI.SetClothingVisibility(newWearable.modelID, true);
             }
+            if (newWearable is Item_Skis)
+            {
+                if (newWearable.equipped)
+                {
+                    OnSkis((Item_Skis)newWearable);
+                }
+                else
+                    OffSkis((Item_Skis)newWearable);
+            }
         }
     }
 
@@ -1025,8 +1046,7 @@ public class BodyManager_Human_Player : BodyManager {
 
     public float heartRate;
 
-    public bool moving, sprinting;
-    public int gait;
+    public bool moving, isSprinting;
     public int[] gaits = new int[] { 0, 1, 2, 3 }; //0=slow walk, 1=walk, 2=jog, 3=run
     public float speed;
 
@@ -1036,31 +1056,87 @@ public class BodyManager_Human_Player : BodyManager {
         set { sprintTime = value; }
     }
 
+    public enum Gait
+    {
+        WalkSlow,
+        Walk,
+        Jog,
+        Run,
+        Sprint,
+        Skiing
+    }
+
+    public Gait currentGait = Gait.WalkSlow;
+
     public void NextGait()
     {
-        gait++;
-        if (gait > 3)
+        currentGait++;
+        string msg = "NULL";
+        if (currentGait == Gait.Run)
         {
-            gait = 0;
-            messageLog.NewMessage("Gait: Slow Walk");
+            currentGait = 0;
+            msg = "Slow Walk";
             anim.SetBool("isRunning", false);
         }
-        else if (gait == 3)
+        else if (currentGait == Gait.WalkSlow)
         {
+            msg = "Walk";
             anim.SetBool("isRunning", true);
-            messageLog.NewMessage("Gait: Run");
         }
-        else if (gait == 2)
+        else if (currentGait == Gait.Walk)
         {
+            msg = "Jog";
             anim.SetBool("isRunning", true);
-            messageLog.NewMessage("Gait: Jog");
         }
-        else if (gait == 1)
+        else if (currentGait == Gait.Jog)
         {
+            msg = "Run";
             anim.SetBool("isRunning", false);
-            messageLog.NewMessage("Gait: Walk");
         }
-        speed = 1.25F + 1.25F * gait;
+        data.SetGaitText(msg);
+        //messageLog.NewMessage("Gait:" + msg);
+        speed = 1.25F + 1.25F * (int)currentGait;
+    }
+
+    public GameObject bodyModel;
+    bool isSkiing;
+    void OnSkis(Item_Skis skis)
+    {
+        thirdPersonCharacter.enabled = false;
+        GetComponent<CharacterController>().enabled = false;
+        GetComponent<Rigidbody>().isKinematic = false;
+        GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+        isSkiing = true;
+        GetComponent<CapsuleCollider>().enabled = false;
+        skis.gameObject.layer = 20;
+        skis.transform.position = transform.position;
+        skis.transform.rotation = transform.rotation;
+        transform.parent = skis.transform;
+        skis.transform.SetParent(null);
+        skis.gameObject.SetActive(true);
+        transform.localRotation = Quaternion.identity;
+        skis.GetComponent<CarUserControl>().enabled = true;
+        speed = 0.0f;
+        HingeJoint joint = gameObject.AddComponent<HingeJoint>();
+        joint.connectedBody = skis.gameObject.GetComponent<Rigidbody>();
+        joint.anchor = new Vector3(0, .5f, 0);
+        joint.axis = new Vector3(0, 1, 0);
+        joint.autoConfigureConnectedAnchor = false;
+    }
+    void OffSkis(Item_Skis skis)
+    {
+        thirdPersonCharacter.enabled = true;
+        GetComponent<CharacterController>().enabled = true;
+        GetComponent<Rigidbody>().isKinematic = true;
+        GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+        isSkiing = true;
+        GetComponent<CapsuleCollider>().enabled = true;
+        skis.gameObject.layer = 0;
+        transform.parent = null;
+        skis.gameObject.SetActive(false);
+        skis.GetComponent<CarUserControl>().enabled = false;
+        speed = 1.25F + 1.25F * (int)currentGait;
+        Destroy(GetComponent<HingeJoint>());
     }
 
     float lastHeartCheckTime = 0;
@@ -1068,7 +1144,7 @@ public class BodyManager_Human_Player : BodyManager {
     {
         test = stats.GetStat(RPGStatType.RestingHeartRate).StatValue;
         float target;
-        target = stats.GetStat(RPGStatType.RestingHeartRate).StatValue + (moving ? (gait * 30 * (crouching ? 1:1.5f)) : 0) + (.001f * (maxStamina - stamina)) + (shivering ? 30 : 0);
+        target = stats.GetStat(RPGStatType.RestingHeartRate).StatValue + (moving ? ((int)currentGait * 30 * (crouching ? 1:1.5f)) : 0) + (.001f * (maxStamina - stamina)) + (shivering ? 30 : 0);
         target += encumbrance * 60;
         target = Math.Min(target, 200);
         float diff = target - heartRate;
@@ -1076,8 +1152,17 @@ public class BodyManager_Human_Player : BodyManager {
         heartRate = Math.Min(heartRate + (now - lastHeartCheckTime) * ((.0005f * diff * Math.Abs(diff)) + (.01f * diff)),200);
         heartRate = Math.Max(10, heartRate);
         lastHeartCheckTime = now;
+        if (heartRate > 90)
+        {
+            if (!heartSound.isPlaying)
+                heartSound.Play();
+            heartSound.pitch = heartRate / 84;
+            heartSound.volume = (heartRate - 90) / 90;
+        }
+        else
+            heartSound.Pause();
     }
-
+    public AudioSource heartSound, chatterSound;
     float coreTempBase = 37f;
     public Thermometer thermometer;
     public ShelterCheck shelterCheck;
@@ -1129,13 +1214,12 @@ public class BodyManager_Human_Player : BodyManager {
         //}
         float now = worldTime.totalGameSeconds;
         coreTemp += (now - lastTempCheckTime) * (heatProduction - heatLoss) / (4.184f *  stats.GetStat(RPGStatType.Weight).StatValue);
-
         if (coreTemp < (coreTempBase - 1))
         {
             if (!shivering)
             {
                 shivering = true;
-                StartCoroutine(teethChatter);
+                chatterSound.Play();
             }
             if (coreTemp < (coreTempBase - 5))
             {
@@ -1150,12 +1234,13 @@ public class BodyManager_Human_Player : BodyManager {
         }
         else
         {
-            StopCoroutine(teethChatter);
+            chatterSound.Pause();
             shivering = false;
             camTransform.GetComponent<FrostEffect>().enabled = false;
             if (coreTemp > (coreTempBase))
                 Sweat(now - lastTempCheckTime);
         }
+        lastTempCheckTime = now;
     }
 
     IEnumerator TeethChatter()
@@ -1255,30 +1340,38 @@ public class BodyManager_Human_Player : BodyManager {
         ReadWeather();
         humidity = Mathf.Clamp(humidity + precipRate / totalWaterCover, 0,1);
 
-        foreach(RPGBodyPart bodyPart in RPGBodyPartsList)
+        foreach (RPGBodyPart bodyPart in RPGBodyPartsList)
         {
-            bodyPart.wetness = Mathf.Clamp01(bodyPart.wetness + (precipRate / totalWaterCover) + (sweating ? Mathf.Pow(Mathf.Clamp01(coreTemp - coreTempBase),2)/10 : 0));
+            bodyPart.wetness = Mathf.Clamp01(bodyPart.wetness + (precipRate / totalWaterCover));
         }
     }
 
     int printPos = 375;
+    bool isGUIActive = false;
+    public bool IsGUIActive
+    {
+        get { return isGUIActive; }
+        set { isGUIActive = value; }
+    }
     void OnGUI()
     {
-
-        GUI.Label(new Rect(0, 400, 500, 500), "Core Temp: " + coreTemp);
-        GUI.Label(new Rect(0, 425, 500, 500), "Local Temp: " + localTemperature);
-        GUI.Label(new Rect(0, 450, 500, 500), "Heart Rate: " + heartRate);
-        GUI.Label(new Rect(0, 475, 500, 500), "Hydration: " + hydration + "%");
-        GUI.Label(new Rect(0, 500, 500, 500), "Sleep Debt: " + sleepDebt + " hrs");
-        GUI.Label(new Rect(0, 525, 500, 500), "Calories: " + calories);
-        GUI.Label(new Rect(0, 550, 500, 500), "Encumbrance: " + encumbrance + "%");
-        GUI.Label(new Rect(0, 575, 500, 500), "Stamina Max: " + maxStamina);
-        GUI.Label(new Rect(0, 600, 500, 500), "Stamina: " + stamina);
-
-        for (int j = 0; j < outfit.Count; j++)
+        if (isGUIActive)
         {
-            GUI.Label(new Rect(1100, printPos, 500, 500), outfit[j].itemName);
-            printPos = printPos + 25;
+            GUI.Label(new Rect(0, 400, 500, 500), "Core Temp: " + coreTemp);
+            GUI.Label(new Rect(0, 425, 500, 500), "Local Temp: " + localTemperature);
+            GUI.Label(new Rect(0, 450, 500, 500), "Heart Rate: " + heartRate);
+            GUI.Label(new Rect(0, 475, 500, 500), "Hydration: " + hydration + "%");
+            GUI.Label(new Rect(0, 500, 500, 500), "Sleep Debt: " + sleepDebt + " hrs");
+            GUI.Label(new Rect(0, 525, 500, 500), "Calories: " + calories);
+            GUI.Label(new Rect(0, 550, 500, 500), "Encumbrance: " + encumbrance + "%");
+            GUI.Label(new Rect(0, 575, 500, 500), "Stamina Max: " + maxStamina);
+            GUI.Label(new Rect(0, 600, 500, 500), "Stamina: " + stamina);
+
+            for (int j = 0; j < outfit.Count; j++)
+            {
+                GUI.Label(new Rect(1100, printPos, 500, 500), outfit[j].itemName);
+                printPos = printPos + 25;
+            }
         }
     }
 
@@ -1287,9 +1380,9 @@ public class BodyManager_Human_Player : BodyManager {
         float altitude = this.transform.position.y;
         localTemperature = thermometer.temperature;
         if (shelterCheck.roof) { precipRate = 0; }
-        else { precipRate = weatherSystem.weathers[weatherSystem.schedule[0]].precipRate; }
+        else { precipRate = skyControl.weathers[skyControl.schedule[0]].precipRate; }
         if (shelterCheck.walls) { windSpeed = 0; }
-        else { windSpeed = weatherSystem.weathers[weatherSystem.schedule[0]].windSpeed; }
+        else { windSpeed = skyControl.weathers[skyControl.schedule[0]].windSpeed; }
     }
 
     //public float encumbrance = 0; //percent 
@@ -1308,23 +1401,36 @@ public class BodyManager_Human_Player : BodyManager {
     {
         float now = worldTime.totalGameSeconds;
         calorieBurn = stats.GetStat(RPGStatType.Weight).StatValue * (Math.Max(heartRate-50, 0) * .00000068481f + 0.000001175f) * (now - calorieTime)/6; // TODO
+        stomachSolidsVolume = Mathf.Max(stomachLiquidsVolume - .0000086806f * stomachMaxVolume * (now - calorieTime), 0);
+        stomachLiquidsVolume = Mathf.Max(stomachLiquidsVolume - .000086806f * stomachMaxVolume * (now - calorieTime),0);
         calorieTime = now;
-        calories -= calorieBurn; 
+        calories -= calorieBurn;
     }
 
+    float stomachMaxVolume, stomachSolidsVolume, stomachLiquidsVolume;
+
+    //
+    public float StomachFillLevel()
+    {
+        return (stomachLiquidsVolume + stomachSolidsVolume) / stomachMaxVolume;
+    }
     public bool shivering,sweating;
     [SerializeField]
     float waterContent;
-    public float hydration = 66f; // body water %
+    public float hydration = 60f; // body water %
     void Hydration()
     {
-        hydration -= calorieBurn * .000042f * Math.Max(localTemperature*.1f, 4);
+        hydration -= calorieBurn * .000042f;
     }
 
     void Sweat(float amount)
     {
         sweating = true;
-        hydration -=  Mathf.Pow(Mathf.Clamp01(coreTemp - coreTempBase),2)/100 * amount;
+        hydration -= Mathf.Clamp01(coreTemp - coreTempBase) * amount / 100;
+        foreach (RPGBodyPart bodyPart in RPGBodyPartsList)
+        {
+            bodyPart.wetness = Mathf.Clamp01(bodyPart.wetness + Mathf.Clamp01(coreTemp - coreTempBase) * amount / 100);
+        }
     }
 
     public float sleepDebt = 1f; // hours sleep debt
@@ -1358,7 +1464,7 @@ public class BodyManager_Human_Player : BodyManager {
 
     void StaminaUpdate()
     {
-        oxygenConsumptionRate = (3.5f + gait*10) * stats.GetStat(RPGStatType.Weight).StatValue * (1 + 20 * encumbrance * encumbrance);
+        oxygenConsumptionRate = (3.5f + (int)currentGait*10) * stats.GetStat(RPGStatType.Weight).StatValue * (1 + 20 * encumbrance * encumbrance);
         oxygenSupplyRate = .00003f * heartRate * stats.GetStat(RPGStatType.Endurance).StatValue * stats.GetStat(RPGStatType.Weight).StatValue * Math.Max((heartRate - stats.GetStat(RPGStatType.RestingHeartRate).StatValue),1);
         stamina = stamina + ((oxygenSupplyRate - oxygenConsumptionRate) * .0001f);
         if (stamina > maxStamina )
@@ -1545,6 +1651,7 @@ public class BodyManager_Human_Player : BodyManager {
                 {
                     GameObject harvest = Instantiate(plant.fruitPrefab);
                     harvest.GetComponent<Item_Stack>().numItems = (int)totalGathered;
+                    harvest.GetComponent<Item_Stack>().TotalProperties();
                     PickupItem(harvest.GetComponent<Item_Stack>());
                 }
                 else if (plant.fruitPrefab.GetComponent<Item>())
@@ -1599,6 +1706,7 @@ public class BodyManager_Human_Player : BodyManager {
 
     public void Eat(Item_Food foodItem)
     {
+        AddToStomach(foodItem.water, foodItem.itemWeight - foodItem.water);
         hydration += foodItem.water / stats.GetStat<RPGAttribute>(RPGStatType.Weight).StatValue;
         calories += foodItem.calories;
         if (!foodItem.loose)
@@ -1609,6 +1717,7 @@ public class BodyManager_Human_Player : BodyManager {
 
     public void Eat(ItemStackFood foodItem)
     {
+        AddToStomach(foodItem.water, foodItem.weightPerItem - foodItem.water);
         hydration += foodItem.water / stats.GetStat<RPGAttribute>(RPGStatType.Weight).StatValue;
         calories += foodItem.calories;
         foodItem.numItems -= 1;
@@ -1618,6 +1727,30 @@ public class BodyManager_Human_Player : BodyManager {
                 foodItem.itemUIElementScript.parentInventory.DropItem(foodItem);
             Destroy(foodItem.itemUIelement);
             Destroy(foodItem.gameObject);
+        }
+        else
+            foodItem.TotalProperties();
+    }
+
+    public void AddToStomach(float water, float solids)
+    {
+        stomachSolidsVolume += solids;
+        stomachLiquidsVolume += water;
+        if(stomachLiquidsVolume + stomachSolidsVolume > stomachMaxVolume)
+        {
+            Retch();
+        }
+    }
+
+    void Retch()
+    {
+        if(stomachSolidsVolume > 0)
+        {
+            calories -= stomachSolidsVolume;
+        }
+        if(stomachLiquidsVolume > 0)
+        {
+            waterContent -= stomachLiquidsVolume;
         }
     }
 

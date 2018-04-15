@@ -147,8 +147,6 @@ public class World16 : MonoBehaviour {
 
         public void SetBlock16(int x, int y, int z, Block16 block16)
     {
-        Debug.Log("SetBlockinWorld");
-
         Chunk16 chunk16 = GetChunk16(x, y, z);
 
         if (chunk16 != null)
@@ -157,7 +155,6 @@ public class World16 : MonoBehaviour {
                                 Mathf.RoundToInt((y - chunk16.pos.y) / 16),
                                 Mathf.RoundToInt((z - chunk16.pos.z) / 16),block16);
             chunk16.update = true;
-            chunk16.UpdateChunk16();
             UpdateIfEqual(Mathf.RoundToInt((x - chunk16.pos.x)/16)*16, 0, new WorldPos(Mathf.RoundToInt(x / 16) * 16 - 16, Mathf.RoundToInt(y / 16) * 16, Mathf.RoundToInt(z / 16) * 16));
             UpdateIfEqual(Mathf.RoundToInt((x - chunk16.pos.x) / 16) * 16, Chunk16.chunk16Size - 1, new WorldPos(Mathf.RoundToInt(x / 16) * 16 + 16, Mathf.RoundToInt(y / 16) * 16, Mathf.RoundToInt(z / 16) * 16));
             UpdateIfEqual(Mathf.RoundToInt((y - chunk16.pos.y) / 16) * 16, 0, new WorldPos(Mathf.RoundToInt(x / 16) * 16, Mathf.RoundToInt(y / 16) * 16 - 16, Mathf.RoundToInt(z / 16) * 16));
@@ -169,8 +166,6 @@ public class World16 : MonoBehaviour {
 
     void UpdateIfEqual(int value1, int value2, WorldPos pos)
     {
-        Debug.Log("UpdateIfEqual");
-
         if (value1 == value2)
         {
             Chunk16 chunk16 = GetChunk16(pos.x, pos.y, pos.z);

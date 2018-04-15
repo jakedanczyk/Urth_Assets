@@ -8,6 +8,7 @@ using UnityEngine.AI;
 
 public abstract class BodyManager : MonoBehaviour {
 
+    public ThirdPersonCharacter thirdPersonCharacter;
     public List<Item_Garment> outfit;
     public Inventory inventory; // all carried items
     public LootInventory lootInventory;

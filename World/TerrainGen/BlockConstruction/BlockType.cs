@@ -4,8 +4,11 @@ using UnityEngine;
 
 public enum BlockType {
     
-    Granite = 1,
-    Grass = 2,
-    
+    Granite,
+    Grass,
+    Dirt,
+    Sod,
+    QuartzGold,
+    Snow
 
 }

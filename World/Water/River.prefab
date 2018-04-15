@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 4226184825174394}
   - component: {fileID: 114979670736551782}
   - component: {fileID: 205499634688376484}
+  - component: {fileID: 114963892197299704}
   m_Layer: 4
   m_Name: River
   m_TagString: Water
@@ -123,6 +124,22 @@ MonoBehaviour:
   isTouchingLake: 0
   touchedRiver: {fileID: 0}
   touchedLake: {fileID: 0}
+--- !u!114 &114963892197299704
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1651699150877306}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5ac6d84dca7648fab1a3a905dbc55b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  IsDeserializing: 0
+  _id: 000aefa8-71e6-4446-9480-d01572efbf70
+  classId: 87818701-876c-495a-850a-702cdf6b5a9a
+  StoreAllComponents: 1
+  Components: []
 --- !u!114 &114979670736551782
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -147,6 +164,7 @@ MonoBehaviour:
   tributaries: []
   parentStem: {fileID: 0}
   endLake: {fileID: 0}
+  sourceLake: {fileID: 0}
   nodes: []
   nodePrefab: {fileID: 1011207659083066, guid: f45a405e285dcb74c88a2725c0f25a3d, type: 2}
 --- !u!205 &205499634688376484

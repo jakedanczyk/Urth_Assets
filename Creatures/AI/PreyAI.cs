@@ -56,7 +56,8 @@ public class PreyAI : MonoBehaviour {
                             if (NavMesh.SamplePosition(transform.position - direction.normalized * 100f, out navMeshHit, 100f, NavMesh.AllAreas))
                             {
                                 isFleeing = true;
-                                aiCharControl.target = target = navMeshHit.position;
+                                aiCharControl.target = aiCharControl.leader.transform;
+                                aiCharControl.leader.transform.position = target = navMeshHit.position;
                                 approachingTarget = false;
                             }
                         }
@@ -86,7 +87,8 @@ public class PreyAI : MonoBehaviour {
                 NavMeshHit navMeshHit;
                 if (NavMesh.SamplePosition(transform.position + new Vector3(Random.Range(-10, 10), Random.Range(-10, 10), Random.Range(-10, 10)), out navMeshHit, 20f, NavMesh.AllAreas))
                 {
-                    aiCharControl.target = target = navMeshHit.position;
+                    aiCharControl.target = aiCharControl.leader.transform;
+                    aiCharControl.leader.transform.position = target = navMeshHit.position;
                     approachingTarget = false;
                     bodyManager.Walk();
                 }

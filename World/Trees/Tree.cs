@@ -5,6 +5,7 @@ using System;
 
 public class Tree : MonoBehaviour {
 
+    public string treeName;
     public float health,startinghealth;
     public float size; 
     public bool standing;

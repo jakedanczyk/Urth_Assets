@@ -16,10 +16,14 @@ public class Block64Snow : Block64
     (Chunk64 chunk64, int x, int y, int z, MeshData meshData)
     {
         var terrainGen = new TerrainGen();
-        float nw = terrainGen.SnowHeight(64 * x - 32f + chunk64.pos.x, 64 * y + chunk64.pos.y, 64 * z + 32f + chunk64.pos.z) - chunk64.pos.y;
-        float ne = terrainGen.SnowHeight(64 * x + 32f + chunk64.pos.x, 64 * y + chunk64.pos.y, 64 * z + 32f + chunk64.pos.z) - chunk64.pos.y;
-        float se = terrainGen.SnowHeight(64 * x + 32f + chunk64.pos.x, 64 * y + chunk64.pos.y, 64 * z - 32f + chunk64.pos.z) - chunk64.pos.y;
-        float sw = terrainGen.SnowHeight(64 * x - 32f + chunk64.pos.x, 64 * y + chunk64.pos.y, 64 * z - 32f + chunk64.pos.z) - chunk64.pos.y;
+        terrainGen.NoiseGen(64 * x - 32f + chunk64.pos.x, 64 * y + chunk64.pos.y, 64 * z + 32f + chunk64.pos.z, 64);
+        float nw = terrainGen.SnowHeight - chunk64.pos.y;
+        terrainGen.NoiseGen(64 * x + 32f + chunk64.pos.x, 64 * y + chunk64.pos.y, 64 * z + 32f + chunk64.pos.z, 64);
+        float ne = terrainGen.SnowHeight - chunk64.pos.y;
+        terrainGen.NoiseGen(64 * x + 32f + chunk64.pos.x, 64 * y + chunk64.pos.y, 64 * z - 32f + chunk64.pos.z, 64);
+        float se = terrainGen.SnowHeight - chunk64.pos.y;
+        terrainGen.NoiseGen(64 * x - 32f + chunk64.pos.x, 64 * y + chunk64.pos.y, 64 * z - 32f + chunk64.pos.z, 64);
+        float sw = terrainGen.SnowHeight - chunk64.pos.y;
 
         meshData.AddVertex(new Vector3(64f * x - 32f, nw, 64 * z + 32f));
         meshData.AddVertex(new Vector3(64f * x + 32f, ne, 64 * z + 32f));

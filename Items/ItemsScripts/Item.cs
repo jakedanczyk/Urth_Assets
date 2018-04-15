@@ -9,6 +9,9 @@ public class Item : MonoBehaviour {
     public int itemID;
     public string itemName;
     public string itemDesc;
+    /// <summary>
+    /// weight in grams
+    /// </summary>
     public int itemWeight; //g
     public int itemVolume; //mL
     public int baseQuality;

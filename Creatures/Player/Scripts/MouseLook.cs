@@ -28,7 +28,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         }
 
 
-        public void LookRotation(Transform character, Transform camera)
+        public float LookRotation(Transform character, Transform camera)
         {
             float yRot = CrossPlatformInputManager.GetAxis("Mouse X") * XSensitivity;
             float xRot = CrossPlatformInputManager.GetAxis("Mouse Y") * YSensitivity;
@@ -53,6 +53,36 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
 
             UpdateCursorLock();
+            return yRot;
+        }
+
+        public void FreeCamRotation(Transform character, Transform camera)
+        {
+            float yRot = CrossPlatformInputManager.GetAxis("Mouse X") * XSensitivity;
+            float xRot = CrossPlatformInputManager.GetAxis("Mouse Y") * YSensitivity;
+
+            m_CameraTargetRot *= Quaternion.Euler(-xRot, yRot, 0f);
+
+            if (clampVerticalRotation)
+                m_CameraTargetRot = ClampRotationAroundXAxis(m_CameraTargetRot);
+
+            if (smooth)
+            {
+                camera.localRotation = Quaternion.Slerp(camera.localRotation, m_CameraTargetRot,
+                    smoothTime * Time.deltaTime);
+            }
+            else
+            {
+                camera.localRotation = m_CameraTargetRot;
+            }
+
+            UpdateCursorLock();
+        }
+
+        public void Recenter(Transform character, Transform camera)
+        {
+            m_CameraTargetRot = character.rotation;
+            camera.localRotation = Quaternion.identity;
         }
 
         public void SetCursorLock(bool value)
@@ -111,5 +141,15 @@ namespace UnityStandardAssets.Characters.FirstPerson
             return q;
         }
 
+
+        void OnDeserialized()
+        {
+            if (float.IsNaN(m_CameraTargetRot.x))
+                m_CameraTargetRot = Quaternion.identity;
+            if (m_CameraTargetRot.w == 0)
+                m_CameraTargetRot.w = 1;
+            if (m_CharacterTargetRot.w == 0)
+                m_CharacterTargetRot.w = 1;
+        }
     }
 }

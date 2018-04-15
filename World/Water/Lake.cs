@@ -21,6 +21,9 @@ public class Lake : MonoBehaviour
     IEnumerator volumeFill,finalFill;
     GameObject waterManagerObject;
     WaterManager waterManager;
+    public GameObject lod0, lod1;
+    Transform playerTransform;
+
 
     int attempts = 0;
 
@@ -35,7 +38,35 @@ public class Lake : MonoBehaviour
 
     private void Start()
     {
+        playerTransform = BodyManager_Human_Player.playerObject.transform;
+        StartCoroutine(CheckPlayerDistance());
+    }
 
+
+    IEnumerator CheckPlayerDistance()
+    {
+        while (true)
+        {
+            float dist = Vector3.Distance(playerTransform.position, transform.position);
+
+            if (dist > 600)
+            {
+                if (lod0.activeSelf)
+                {
+                    lod0.SetActive(false);
+                    lod1.SetActive(true);
+                }
+            }
+            else if (dist < 500)
+            {
+                if (!lod0.activeSelf)
+                {
+                    lod0.SetActive(true);
+                    lod1.SetActive(false);
+                }
+            }
+            yield return new WaitForSeconds(15);
+        }
     }
 
     public void Generate()
@@ -632,7 +663,7 @@ public class Lake : MonoBehaviour
                         depth = (depth + lastDepth) / 2f;
                         lastDepth = temp;
                     }
-                    else if (depth < lastDepth)
+                    else if (depth <= lastDepth)
                     {
                         float temp = depth;
                         depth = (highDepth + depth) / 2f;

@@ -108,7 +108,7 @@ Transform:
   m_GameObject: {fileID: 1390003119266272}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -20, y: 2020, z: -4.6978683}
-  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 224861428095828050}
   - {fileID: 4958280620520804}
@@ -137,6 +137,7 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -152,6 +153,7 @@ MeshRenderer:
   m_PreserveUVs: 1
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
   m_SelectedEditorRenderState: 3
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
@@ -236,6 +238,7 @@ MonoBehaviour:
     changed: 1
     con: 0
     durability: 1000
+  blockType: 0
 --- !u!114 &114123991284756280
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -388,6 +391,7 @@ MonoBehaviour:
   m_PreferredHeight: 30
   m_FlexibleWidth: 1
   m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!114 &114634221458009058
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -402,6 +406,12 @@ MonoBehaviour:
   parentItem: {fileID: 114091102569494540}
   parentInventory: {fileID: 0}
   thisButton: {fileID: 114123991284756280}
+  panel: {fileID: 0}
+  playerControls: {fileID: 0}
+  nameText: {fileID: 0}
+  weightText: {fileID: 0}
+  volumeText: {fileID: 0}
+  infoText: {fileID: 0}
 --- !u!222 &222001254261991100
 CanvasRenderer:
   m_ObjectHideFlags: 1

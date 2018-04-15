@@ -7,8 +7,8 @@ public class Fire : MonoBehaviour {
 
     public Inventory fireContents;
     public LootInventory fireLoot;
-    public float fuelRate = 22f;
-    public float fuel = 20000f;
+    public float fuelRate = 1.26f;
+    public float fuel = 3402f;
     public bool isLit;
 
     float maxTemp = 500f;
@@ -31,29 +31,32 @@ public class Fire : MonoBehaviour {
         heat.SetActive(true);
         soundFX.enabled = true;
         isLit = true;
-        gameObject.tag = "LitFire";
         prevFuelCheckTime = worldTime.totalGameSeconds;
         InvokeRepeating("BurnFuel", 30, 30);
+    }
+    
+    public void AddFuel(Item newFuel)
+    {
+        fuel += newFuel.itemWeight;
+        Destroy(newFuel.gameObject);
     }
 
     void BurnFuel()
     {
         fuel -= fuelRate * (worldTime.totalGameSeconds - prevFuelCheckTime);
         prevFuelCheckTime = worldTime.totalGameSeconds;
-        if (fireContents.inventoryContents.Any())
-        {
-            Item newFuel = fireContents.inventoryContents.FirstOrDefault(item => item.primaryMaterialType == MaterialType.Wood);
-            if (!(newFuel == null))
-            {
-                fuel += newFuel.itemWeight * 10;
-                Destroy(newFuel.gameObject);
-            }
-        }
         if(fuel < 0)
         {
-            heat.gameObject.SetActive(false);
-            flameFX.SetActive(false);
-            isLit = false;
+            Extinguish();
         }
+    }
+
+    public void Extinguish()
+    {
+        flameFX.SetActive(false);
+        heat.SetActive(false);
+        soundFX.enabled = false;
+        isLit = false;
+        StopAllCoroutines();
     }
 }

@@ -139,6 +139,7 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -154,6 +155,7 @@ MeshRenderer:
   m_PreserveUVs: 1
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
   m_SelectedEditorRenderState: 3
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
@@ -265,6 +267,7 @@ MonoBehaviour:
     changed: 1
     con: 0
     durability: 1000
+  blockType: 0
 --- !u!114 &114380983031749214
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -301,6 +304,12 @@ MonoBehaviour:
   parentItem: {fileID: 114260170832066788}
   parentInventory: {fileID: 0}
   thisButton: {fileID: 114631265703414206}
+  panel: {fileID: 0}
+  playerControls: {fileID: 0}
+  nameText: {fileID: 0}
+  weightText: {fileID: 0}
+  volumeText: {fileID: 0}
+  infoText: {fileID: 0}
 --- !u!114 &114571955829935560
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -319,6 +328,7 @@ MonoBehaviour:
   m_PreferredHeight: 30
   m_FlexibleWidth: 1
   m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!114 &114582976696870326
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -331,7 +341,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsDeserializing: 0
-  _id: 5fe7503b-87e2-41f4-bb7f-374d2c576c04
+  _id: c0f7e188-f0a4-4e32-a6cc-74be230238da
   classId: a8639f83-2996-47dc-a2a7-b52fe6ee8474
   StoreAllComponents: 1
   Components: []
@@ -432,7 +442,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsDeserializing: 0
-  _id: 244824f0-c116-4de7-ae4a-46b66bb7d53c
+  _id: c2422938-0762-4781-a17a-2d4d59d11b85
   classId: 8bd645c5-c0ab-4a35-a38c-56daa010f2c0
   StoreAllComponents: 1
   Components: []

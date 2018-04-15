@@ -68,7 +68,7 @@ public class LevelLoader : MonoBehaviour {
         if (!showGUI) {
             return;
         }
-        if (!_loading && Event.current.type == EventType.repaint) {
+        if (!_loading && Event.current.type == EventType.Repaint) {
             _alpha = Mathf.Clamp01(_alpha - 0.02f);
         }
         else if (Math.Abs(_alpha - 0) < float.Epsilon) {

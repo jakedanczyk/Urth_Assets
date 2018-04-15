@@ -5,11 +5,12 @@ using System;
 
 public class Item_TerrainBlock : Item {
 
-    public Block block;
+    public Block1 block;
+
+    public BlockType blockType;
 
     void Start()
     {
-        matDict = FindObjectOfType<ItemMaterialsDictionary>();
         MassCalc();
     }
 }

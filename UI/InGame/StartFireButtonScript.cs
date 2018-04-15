@@ -7,7 +7,8 @@ using System;
 
 public class StartFireButtonScript : MonoBehaviour, ISelectHandler // required interface when using the OnSelect method. 
 {
-
+    [SerializeField]
+    UIManager UI { get; set; }
     public Fire currentFire;
     public Inventory currentFireInventory;
     public Button thisButton;
@@ -15,7 +16,10 @@ public class StartFireButtonScript : MonoBehaviour, ISelectHandler // required i
 
     void Awake()
     {
-        thisButton = GetComponentInParent<Button>();
+        if (UI == null)
+            UI = GetComponentInParent<UIManager>();
+        if(thisButton == null)
+            thisButton = GetComponent<Button>();
     }
 
     public void OnSelect(BaseEventData eventData)

@@ -6,7 +6,7 @@ AvatarMask:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: Right Arm
-  m_Mask: 00000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000
+  m_Mask: 00000000010000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000
   m_Elements:
   - m_Path: 
     m_Weight: 1
@@ -245,7 +245,7 @@ AvatarMask:
   - m_Path: M3DMale/hip/abdomenLower/abdomenUpper/chestLower/chestUpper/rCollar/rShldrBend/rShldrTwist/rForearmBend/rForearmTwist
     m_Weight: 1
   - m_Path: M3DMale/hip/abdomenLower/abdomenUpper/chestLower/chestUpper/rCollar/rShldrBend/rShldrTwist/rForearmBend/rForearmTwist/rHand
-    m_Weight: 1
+    m_Weight: 0
   - m_Path: M3DMale/hip/abdomenLower/abdomenUpper/chestLower/chestUpper/rCollar/rShldrBend/rShldrTwist/rForearmBend/rForearmTwist/rHand/rCarpal1
     m_Weight: 0
   - m_Path: M3DMale/hip/abdomenLower/abdomenUpper/chestLower/chestUpper/rCollar/rShldrBend/rShldrTwist/rForearmBend/rForearmTwist/rHand/rCarpal1/rIndex1
@@ -289,9 +289,9 @@ AvatarMask:
   - m_Path: M3DMale/hip/abdomenLower/abdomenUpper/chestLower/lPectoral
     m_Weight: 0
   - m_Path: M3DMale/hip/abdomenLower/abdomenUpper/chestLower/rPectoral
-    m_Weight: 0
+    m_Weight: 1
   - m_Path: M3DMale/hip/pelvis
-    m_Weight: 0
+    m_Weight: 1
   - m_Path: M3DMale/hip/pelvis/lThighBend
     m_Weight: 0
   - m_Path: M3DMale/hip/pelvis/lThighBend/lThighTwist
@@ -361,10 +361,10 @@ AvatarMask:
   - m_Path: M3DMale/hip/pelvis/rThighBend/rThighTwist/rShin/rFoot/rMetatarsals/rToe
     m_Weight: 0
   - m_Path: M3DMale/M3DMale_LOD0
-    m_Weight: 1
+    m_Weight: 0
   - m_Path: M3DMale/M3DMale_LOD1
-    m_Weight: 1
+    m_Weight: 0
   - m_Path: M3DMale/M3DMale_LOD2
-    m_Weight: 1
+    m_Weight: 0
   - m_Path: M3DMale/M3DMale_LOD3
-    m_Weight: 1
+    m_Weight: 0

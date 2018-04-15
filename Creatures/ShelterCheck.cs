@@ -24,7 +24,7 @@ public class ShelterCheck : MonoBehaviour
     void RoofCheck()
     {
         RaycastHit hit;
-        if (!(Physics.Raycast(this.gameObject.transform.position, Vector3.up, out hit, 44f, mask)))
+        if (!(Physics.Raycast(this.gameObject.transform.position, Vector3.up, out hit, 500, mask)))
         {
             roof = false;
         }
@@ -34,25 +34,25 @@ public class ShelterCheck : MonoBehaviour
     void WallsCheck()
     {
         RaycastHit hit1, hit2, hit3, hit4;
-        if (!(Physics.Raycast(this.gameObject.transform.position, Vector3.forward, out hit1, 44f, mask)))
+        if (!(Physics.Raycast(this.gameObject.transform.position, Vector3.forward, out hit1, 500, mask)))
         {
             wall1 = false;
         }
         else wall1 = true;
 
-        if (!(Physics.Raycast(this.gameObject.transform.position, Vector3.back, out hit2, 44f, mask)))
+        if (!(Physics.Raycast(this.gameObject.transform.position, Vector3.back, out hit2, 500, mask)))
         {
             wall2 = false;
         }
         else wall2 = true;
 
-        if (!(Physics.Raycast(this.gameObject.transform.position, Vector3.left, out hit3, 44f, mask)))
+        if (!(Physics.Raycast(this.gameObject.transform.position, Vector3.left, out hit3, 500, mask)))
         {
             wall3 = false;
         }
         else wall3 = true;
 
-        if (!(Physics.Raycast(this.gameObject.transform.position, Vector3.right, out hit4, 44f, mask)))
+        if (!(Physics.Raycast(this.gameObject.transform.position, Vector3.right, out hit4, 500, mask)))
         {
             wall4 = false;
         }

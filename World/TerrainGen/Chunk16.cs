@@ -22,6 +22,7 @@ public class Chunk16 : MonoBehaviour
     public bool rendered;
     public bool isSubChunked = false, isWalkable = false;
     public List<Chunk4> subChunkList = new List<Chunk4>();
+    public List<Chunk1> subChunk1List = new List<Chunk1>();
 
     public MeshFilter filter;
     public MeshCollider coll;
@@ -140,5 +141,84 @@ public class Chunk16 : MonoBehaviour
         }
         else
             LoadChunk4s.terrainLoadManager.GetComponent<LoadChunk4s>().ReplaceChunk16(this, pos);
+    }
+
+    public void SkinConvert()
+    {
+        if (!isSubChunked)
+        {
+            LoadChunk1s loader = LoadChunk1s.terrainLoadManager.GetComponent<LoadChunk1s>();
+            int endi = 0, endj = 0, endk = 0;
+            for (int i = 0; i < 16; i++)
+            {
+                for (int j = 0; j < 16; j++)
+                {
+                    for (int k = 0; k < 16; k++)
+                    {
+                        if (block16s[i, j, k].exposed)
+                        {
+                            endi = i; endj = j; endk = k;
+                            WorldPos newPos = new WorldPos(pos.x + i * 16, pos.y + j * 16, pos.z + k * 16);
+                            loader.AddToBuildList(newPos);
+                            loader.parentList16[newPos] = this;
+                            newPos = new WorldPos(pos.x + (i - 1) * 16, pos.y + j * 16, pos.z + k * 16);
+                            loader.AddToBuildList(newPos);
+                            loader.parentList16[newPos] = this;
+                            newPos = new WorldPos(pos.x + (i - 1) * 16, pos.y + j * 16, pos.z + (k - 1) * 16);
+                            loader.AddToBuildList(newPos);
+                            loader.parentList16[newPos] = this;
+                            newPos = new WorldPos(pos.x + i * 16, pos.y + j * 16, pos.z + (k - 1) * 16);
+                            loader.AddToBuildList(newPos);
+                            loader.parentList16[newPos] = this;
+                            newPos = new WorldPos(pos.x + i * 16, pos.y + (j - 1) * 16, pos.z + k * 16);
+                            loader.AddToBuildList(newPos);
+                            loader.parentList16[newPos] = this;
+                            newPos = new WorldPos(pos.x + (i - 1) * 16, pos.y + (j - 1) * 16, pos.z + k * 16);
+                            loader.AddToBuildList(newPos);
+                            loader.parentList16[newPos] = this;
+                            newPos = new WorldPos(pos.x + (i - 1) * 16, pos.y + (j - 1) * 16, pos.z + (k - 1) * 16);
+                            loader.AddToBuildList(newPos);
+                            loader.parentList16[newPos] = this;
+                            newPos = new WorldPos(pos.x + i * 16, pos.y + (j - 1) * 16, pos.z + (k - 1) * 16);
+                            loader.AddToBuildList(newPos);
+                            loader.parentList16[newPos] = this;
+                            //if (block16s[i, j, k].u)
+                            //{
+                            //    loader.AddToBuildList(new WorldPos(pos.x + i * 16, pos.y + (j + 1) * 16, pos.z + k * 16));
+                            //}
+                            //if (block16s[i, j, k].d)
+                            //{
+                            //    loader.AddToBuildList(new WorldPos(pos.x + i * 16, pos.y + (j - 1) * 16, pos.z + k * 16));
+                            //}
+                            //if (block16s[i, j, k].n)
+                            //{
+                            //    loader.AddToBuildList(new WorldPos(pos.x + i * 16, pos.y + j * 16, pos.z + (k + 1) * 16));
+                            //}
+                            //if (block16s[i, j, k].s)
+                            //{
+                            //    loader.AddToBuildList(new WorldPos(pos.x + i * 16, pos.y + j * 16, pos.z + (k - 1) * 16));
+                            //}
+                            //if (block16s[i, j, k].e)
+                            //{
+                            //    loader.AddToBuildList(new WorldPos(pos.x + (i + 1) * 16, pos.y + j * 16, pos.z + k * 16));
+                            //}
+                            //if (block16s[i, j, k].w)
+                            //{
+                            //    loader.AddToBuildList(new WorldPos(pos.x + (i - 1) * 16, pos.y + j * 16, pos.z + k * 16));
+                            //}
+                        }
+                    }
+                }
+            }
+            loader.replaceList16[new WorldPos(pos.x + endi * 16, pos.y + endj * 16, pos.z + endk * 16)] = this;
+        }
+        else
+        {
+            foreach(Chunk1 chunk1 in subChunk1List)
+            {
+                chunk1.gameObject.SetActive(true);
+            }
+            gameObject.SetActive(false);
+        }
     }
 }

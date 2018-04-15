@@ -72,9 +72,14 @@ public class LoadChunk1s : MonoBehaviour
 
     List<WorldPos> updateList = new List<WorldPos>();
     List<WorldPos> buildList = new List<WorldPos>();
+    HashSet<WorldPos> buildHash = new HashSet<WorldPos>();
 
     Dictionary<WorldPos, Chunk4> parentList = new Dictionary<WorldPos, Chunk4>();
     Dictionary<WorldPos, Chunk4> replaceList = new Dictionary<WorldPos, Chunk4>();
+
+
+    public Dictionary<WorldPos, Chunk16> parentList16 = new Dictionary<WorldPos, Chunk16>();
+    public Dictionary<WorldPos, Chunk16> replaceList16 = new Dictionary<WorldPos, Chunk16>();
 
     int timer = 0;
 
@@ -156,7 +161,7 @@ public class LoadChunk1s : MonoBehaviour
     {
         if (buildList.Count != 0)
         {
-            for (int i = 0; i < buildList.Count && i < 4; i++)
+            for (int i = 0; i < buildList.Count && i < 16; i++)
             {
                 BuildChunk1(buildList[0]);
                 buildList.RemoveAt(0);
@@ -168,29 +173,41 @@ public class LoadChunk1s : MonoBehaviour
 
         if (updateList.Count != 0)
         {
-            for (int i = 0; i < updateList.Count && i < 4; i++)
+            for (int i = 0; i < updateList.Count && i < 16; i++)
             {
                 Chunk1 chunk1 = world1.GetChunk1(updateList[0].x, updateList[0].y, updateList[0].z);
                 if (chunk1 != null)
                 {
                     chunk1.update = true;
                     chunk1.UpdateChunk1();
-                    if (parentList.ContainsKey(updateList[0]))
+                    if (parentList16.ContainsKey(updateList[0]))
                     {
-                        parentList[updateList[0]].subChunkList.Add(chunk1);
-                        parentList.Remove(updateList[0]);
+                        parentList16[updateList[0]].subChunk1List.Add(chunk1);
+                        parentList16.Remove(updateList[0]);
                     }
                 }
-                if (replaceList.ContainsKey(updateList[0]))
+                if (replaceList16.ContainsKey(updateList[0]))
                 {
-                    replaceList[updateList[0]].gameObject.GetComponent<MeshRenderer>().enabled = false;
-                    replaceList[updateList[0]].gameObject.layer = 14;
-                    replaceList[updateList[0]].isSubChunked = true;
-                    replaceList.Remove(updateList[0]);
+                    replaceList16[updateList[0]].isSubChunked = true;
+                    replaceList16[updateList[0]].gameObject.SetActive(false);
+                    replaceList16.Remove(updateList[0]);
                 }
+                //if (replaceList.ContainsKey(updateList[0]))
+                //{
+                //    replaceList[updateList[0]].gameObject.GetComponent<MeshRenderer>().enabled = false;
+                //    replaceList[updateList[0]].gameObject.layer = 14;
+                //    replaceList[updateList[0]].isSubChunked = true;
+                //    replaceList.Remove(updateList[0]);
+                //}
                 updateList.RemoveAt(0);
             }
         }
+    }
+
+    public void AddToBuildList(WorldPos pos)
+    {
+        if(buildHash.Add(pos))
+            buildList.Add(pos);
     }
 
     void BuildChunk1(WorldPos pos)
@@ -200,6 +217,7 @@ public class LoadChunk1s : MonoBehaviour
             world1.CreateChunk1(pos.x, pos.y, pos.z);
         }
         Chunk1 chunk1 = world1.GetChunk1(pos.x, pos.y, pos.z);
+        updateList.Add(pos);
         //if (chunk1.hasWater)
         //{
         //    for (int y = 15; y >= 0; y--)
@@ -228,7 +246,6 @@ public class LoadChunk1s : MonoBehaviour
     public int dist;
     bool DeleteChunk1s()
     {
-
         if (timer == 10)
         {
             float v = playerRigidBody.velocity.magnitude;

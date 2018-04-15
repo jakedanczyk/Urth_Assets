@@ -88,7 +88,7 @@ Shader "LemonSpawn/LazyClouds" {
                  float4 uv : TEXCOORD2;
                  float3 worldPosition: TEXCOORD3;
  
-                 LIGHTING_COORDS(3,4)
+                 //LIGHTING_COORDS(3,4)
              };
               
              v2f vert (appdata_base v)
@@ -100,7 +100,7 @@ Shader "LemonSpawn/LazyClouds" {
                  o.texcoord = v.texcoord;
  				 o.worldPosition = mul (unity_ObjectToWorld, v.vertex).xyz;
 
-                 TRANSFER_VERTEX_TO_FRAGMENT(o);
+                 //TRANSFER_VERTEX_TO_FRAGMENT(o);
                  
                  return o;
              }

@@ -25,7 +25,7 @@ public class Thermometer : MonoBehaviour {
         float altitude = this.transform.position.y;
         print("thermo " + temperature);
         temperature += weatherSystem.weathers[weatherSystem.currentWeatherIndex].globalTemperature - (.0064f * (altitude - 2000)) + heatZones.Sum(temp => temp.temperatureDifference);
-        InvokeRepeating("ReadTemp", 6, 6);
+        InvokeRepeating("ReadTemp", 3, 3);
 	}
 
     public float ReadTemp()

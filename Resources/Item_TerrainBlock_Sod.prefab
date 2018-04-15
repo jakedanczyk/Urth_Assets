@@ -110,7 +110,7 @@ Transform:
   m_GameObject: {fileID: 1424625207978392}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -20, y: 2020, z: -4.6978683}
-  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 224721113273107910}
   - {fileID: 4883276625500874}
@@ -139,6 +139,7 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -154,6 +155,7 @@ MeshRenderer:
   m_PreserveUVs: 1
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
   m_SelectedEditorRenderState: 3
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
@@ -220,7 +222,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsDeserializing: 0
-  _id: 3a0dc37f-0091-43dc-859c-f2212f8d5be3
+  _id: 4225573e-8d00-41a9-a077-561e151ec45d
   classId: df392a2a-97b0-498e-ab0f-d48486be7fcf
   StoreAllComponents: 1
   Components: []
@@ -296,7 +298,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsDeserializing: 0
-  _id: 850f9b75-767a-4b4a-8cd7-c4472849a8ad
+  _id: 7162de1e-3a74-41e3-8391-3b372dd19269
   classId: c9131b12-a28f-4882-a7c6-14cda345c566
   StoreAllComponents: 1
   Components: []
@@ -318,6 +320,7 @@ MonoBehaviour:
   m_PreferredHeight: 30
   m_FlexibleWidth: 1
   m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!114 &114287659921858912
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -332,6 +335,12 @@ MonoBehaviour:
   parentItem: {fileID: 114836901499916324}
   parentInventory: {fileID: 0}
   thisButton: {fileID: 114772818808557306}
+  panel: {fileID: 0}
+  playerControls: {fileID: 0}
+  nameText: {fileID: 0}
+  weightText: {fileID: 0}
+  volumeText: {fileID: 0}
+  infoText: {fileID: 0}
 --- !u!114 &114772818808557306
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -436,6 +445,7 @@ MonoBehaviour:
     changed: 1
     con: 0
     durability: 1000
+  blockType: 3
 --- !u!222 &222466442629934192
 CanvasRenderer:
   m_ObjectHideFlags: 1

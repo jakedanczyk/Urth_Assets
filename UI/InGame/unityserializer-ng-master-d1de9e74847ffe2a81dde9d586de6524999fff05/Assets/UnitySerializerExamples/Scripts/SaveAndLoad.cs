@@ -20,7 +20,7 @@ public class SaveAndLoad : MonoBehaviour {
     {
         if (Input.GetKeyDown(KeyCode.F5))
         {
-            LevelSerializer.SaveGame("main");
+            LevelSerializer.SaveGame("quicksave");
             //data = LevelSerializer.SerializeLevel(false, theObject.GetComponent<UniqueIdentifier>().Id);
         }
         if (Input.GetKeyDown(KeyCode.F6))

@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0967a60719fa2a14289e2bf8cfdff37b, type: 3}
+  m_Name: Blizzard
+  m_EditorClassIdentifier: 
+  weatherID: 2
+  weatherName: Blizzard
+  globalTemperature: -5
+  windSpeed: 35
+  precipRate: 10
+  weatherFX: {fileID: 1272952391633778, guid: 8c3d68b3290eed94284d96bb56cc4570, type: 2}
+  LS_CloudTimeScale: 2
+  LS_CloudScale: 4
+  LS_CloudScattering: 0.69
+  LS_CloudIntensity: 4
+  LS_CloudSharpness: 0.75
+  LS_CloudThickness: 1
+  LS_ShadowScale: 0.75
+  LS_DistScale: 10
+  LS_CloudColor: {x: 1, y: 0.9, z: 0.95}
+  globalFog: 0.003
+  fogStart: -10
+  fogEnd: 1000
+  areLowClouds: 1
+  areHighClouds: 1
+  areCirrusClouds: 0
+  areCloseClouds: 1
+  lowCloudDensity: 0.701
+  highCloudDensity: 0.6
+  lowCloudColor: {r: 0.5441177, g: 0.5441177, b: 0.5441177, a: 0.428}
+  highCloudColor: {r: 0.6985294, g: 0.6985294, b: 0.6985294, a: 0.8627451}
+  fogColor: {r: 0, g: 0, b: 0, a: 0}

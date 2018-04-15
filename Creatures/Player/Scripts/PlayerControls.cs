@@ -14,6 +14,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
     {
         public static GameObject playerControlsGameObject;
         public HUDManager hud;
+        public UIManager ui;
         public World thisWorld;
         public BodyManager_Human_Player playerBodyManager;
         //public RPGCreature player;
@@ -77,6 +78,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
         [SerializeField]
         public MouseLook m_MouseLook;
         [SerializeField]
+        public MouseLook t_MouseLook;
+        [SerializeField]
         private bool m_UseFovKick;
         [SerializeField]
         private FOVKick m_FovKick = new FOVKick();
@@ -95,7 +98,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         [SerializeField]
         private AudioClip m_LandSound;           // the sound played when character touches back on ground.
 
-
+        private float turn;
         private bool m_Jump;
         private float m_YRotation;
         private Vector2 m_Input;
@@ -111,10 +114,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         public PlayerAudio_Manager playerAudioManager;
 
-        public bool e_down;
-        public Camera cam;
+        public bool e_down,camIsFree;
+        public Camera firstCam, thirdCam;
         Camera m_Camera;
         public Collider cameraBubble;
+        public GameObject firstPersonCamRig, thirdPersonCamRig;
 
         CharacterController characterController;
         public StaticBuildingSystem buildingSystem;
@@ -125,7 +129,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             crouching = false;
             lastPosition = this.transform.position;
             playerControlsGameObject = this.gameObject;
-            m_Camera = cam;
+            m_Camera = firstCam;
         }
 
         // Use this for initialization
@@ -147,6 +151,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_NextStep = m_StepCycle / 2f;
             m_Jumping = false;
             m_MouseLook.Init(transform, m_Camera.transform);
+            t_MouseLook.Init(transform, thirdCam.transform);
             m_CharacterControllerHeight = m_CharacterController.height;
             m_CharacterControllerCenter = m_CharacterController.center;
             inventory = playerBodyManager.baseInventory;
@@ -165,6 +170,16 @@ namespace UnityStandardAssets.Characters.FirstPerson
         // Update is called once per frame
         private void Update()
         {
+            fallingCount = (m_CharacterController.isGrounded) ? 0 : fallingCount + 1;
+            if (fallingCount > 0)
+            {
+                fallSpeed = m_MoveDir.y;
+            }
+            else if (fallSpeed < -10f && fallingCount == 0)
+            {
+                playerStats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue += (int)((fallSpeed + 10f) * 10);
+                fallSpeed = 0;
+            }
             //RaycastHit ground;
             //if (Physics.Raycast(this.transform.position + Vector3.up, Vector3.down, out ground, 512f, mask1))
             //{
@@ -184,309 +199,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 m_Jump = CrossPlatformInputManager.GetButtonDown("Jump");
             }
 
-            fallingCount = (m_CharacterController.isGrounded) ? 0 : fallingCount + 1;
-            if(fallingCount > 0)
-            {
-                fallSpeed = m_MoveDir.y;
-            }
-            else if(fallSpeed < -10f && fallingCount == 0)
-            {
-                playerStats.GetStat<RPGVital>(RPGStatType.Health).StatCurrentValue += (int)((fallSpeed + 10f) * 10);
-                fallSpeed = 0;
-            }
-
-            if (menusOpen)
-            {
-                Cursor.lockState = CursorLockMode.None;
-                m_MouseLook.lockCursor = false;
-            }
-            //if (!showInventory)
-            else
-            {
-                Cursor.lockState = CursorLockMode.Locked;
-
-                RotateView();
-
-                if (Input.GetKeyDown(KeyCode.Mouse0)) //
-                {
-                    if (playerBodyManager.weaponsReadied && !playerBodyManager.isAttackingPrimary)
-                    {
-                        playerBodyManager.PrimaryAttack();
-                    }
-
-                    else if (playerBodyManager.drawingBow)
-                    {
-                        playerBodyManager.FireBow();
-                    }
-
-                    else if (playerBodyManager.rangedWeaponDrawn)
-                    { // TODO change to generic draw action
-                        playerBodyManager.KnockArrow();
-                    }
-
-                    if (terrainMode)
-                    {
-                        RaycastHit hit;
-                        if (Physics.Raycast(playerBodyManager.aimPoint.position, playerBodyManager.aimPoint.forward, out hit, 12f))
-                        {
-                            WorldPosFloat pos1 = EditTerrain.GetBlockPos(hit);
-                            Vector3 direction = playerBodyManager.aimPoint.position - hit.point;
-                            direction = direction.normalized;
-                            WorldPos pos2 = new WorldPos((int)(pos1.x + (2 * direction.x)), (int)(pos1.y + (2 * direction.y)), (int)(pos1.z + (2 * direction.z)));
-                            Chunk chunk = thisWorld.GetChunk(pos2.x, pos2.y, pos2.z);
-                            if (!(chunk == null))
-                            {
-                                if (chunk.world.GetBlock(pos2.x, pos2.y, pos2.z) is BlockAir) { chunk.airCount--; } //decrement aircount if existing block is air
-                                chunk.world.SetBlock(pos2.x, pos2.y, pos2.z, setBlock);
-                                if (!chunk.gameObject.activeSelf)
-                                {
-                                    chunk.gameObject.SetActive(true);
-                                }
-                                Destroy(buildingBlock.gameObject);
-                            }
-                        }
-                    }
-                }
-
-                if (Input.GetKeyDown(KeyCode.Mouse1))
-                {
-                    if (playerBodyManager.wieldingBow && playerBodyManager.arrowKnocked && !playerBodyManager.bowDrawn)
-                    {
-                        playerBodyManager.DrawBow();
-                    }
-                    else if (playerBodyManager.weaponsReadied && !playerBodyManager.isAttackingSecondary && (playerBodyManager.offHandWeapon != null || (!playerBodyManager.isAttackingPrimary)))
-                    { //if wielding melee and not already swinging offhand or two-handed primary
-                        playerBodyManager.OffHandAttack();
-                    }
-                }
-                else if (Input.GetKeyUp(KeyCode.Mouse1))
-                {
-                    if (playerBodyManager.wieldingBow && playerBodyManager.drawingBow)
-                    {
-                        playerBodyManager.ReleaseBow(); //release tension on bow
-                    }
-                }
-
-                if (Input.GetKeyDown(KeyCode.E)) //pickup, interact
-                {
-                    e_down = true;
-                    RaycastHit hit;
-                    if (Physics.Raycast(m_Camera.transform.position, m_Camera.transform.forward, out hit, 20f, eLayerMask))
-                    {
-                        if (hit.collider.gameObject.tag == "Item")
-                        {
-                            Item hitItem = hit.collider.gameObject.GetComponentInParent<Item>();
-                            if (hitItem is Item_Weapon)
-                            {
-                                Item_Weapon hitWeapon = (Item_Weapon)hitItem;
-                                if (hitWeapon.isWielded)
-                                { }
-                                else
-                                    playerBodyManager.PickupItem(hitItem);
-                            }
-                            else
-                                playerBodyManager.PickupItem(hitItem);
-                            //Destroy(hit.collider.gameObject);
-                        }
-                        else if (hit.collider.gameObject.tag == "Tree")
-                        {
-                            Tree hitTree = hit.collider.gameObject.GetComponentInParent<Tree>();
-                            if (hitTree.standing)
-                                playerBodyManager.FellTree(hitTree);
-                            else
-                                playerBodyManager.ProcessDownedTree(hitTree);
-                        }
-                        else if (hit.collider.gameObject.tag == "Perennial")// && playerBodyManager.rHandWeapon.gameObject == null)
-                        {
-                            Perennial hitPerennial = hit.collider.gameObject.GetComponent<Perennial>();
-                            playerBodyManager.GatherPlant(hitPerennial);
-                        }
-                        else if (hit.collider.gameObject.tag == "StackContainer")
-                        {
-                            StackContainer hitStack = hit.collider.gameObject.GetComponentInParent<StackContainer>();
-                            print(hitStack.name);
-                            hitStack.PullItem(inventory);
-                        }
-                        //else if (hit.collider.gameObject.tag == "UnlitFire")
-                        //{
-                        //  Fire hitFire = hit.collider.gameObject.GetComponentInParent<Fire>();
-                        //  playerBodyManager.StartFire(hitFire, 1);
-                        //}
-                        else if (hit.collider.gameObject.tag == "BodyPart")
-                        {
-                            BodyManager parentBody = hit.collider.gameObject.GetComponentInParent<BodyManager>();
-                            print(parentBody.name);
-                            print(parentBody.tag);
-                            if (parentBody.gameObject.tag == "DeadCreature")
-                            {
-                                inventoryUIPanel.gameObject.SetActive(true);
-                                lootingUI.gameObject.SetActive(true);
-                                //butcheringUI.gameObject.SetActive(true);
-                                BodyManager hitBody = hit.collider.gameObject.GetComponentInParent<BodyManager>();
-                                print(hitBody.name);
-                                lootInventory = hitBody.lootInventory;
-                                hitBody.lootInventory.playerControls = this;
-                                hitBody.lootInventory.itemsPanel = lootPanel;
-                                hitBody.lootInventory.inventoryUIPanel = lootingUI;
-                                hitBody.lootInventory.RebuildUIPanel(this);
-                                showInventory = true;
-                                print(hitBody.lootInventory.name);
-                                lootPanelScript.attachedInventory = hitBody.lootInventory;
-                            }
-                        }
-                        else if (hit.collider.gameObject.tag == "Water")
-                        {
-                            if (inventory.waterVesselItems.Count > 0)
-                            {
-                                for (int i = 0; i < inventory.waterVesselItems.Count; i++)
-                                {
-                                    Item_WaterVessel vessel = (Item_WaterVessel)inventory.waterVesselItems[i];
-                                    vessel.Fill(10000);
-                                    vessel.full = true;
-                                }
-                            }
-                            else
-                                playerBodyManager.hydration += (100 * 500 / playerStats.GetStat<RPGAttribute>(RPGStatType.Weight).StatValue);
-                        }
-                        else if (hit.collider.gameObject.tag == "LitFire" || hit.collider.gameObject.tag == "UnlitFire")
-                        {
-                            //  playerBodyManager.StartFire(hitFire, 1);
-                            Fire fire = hit.collider.gameObject.GetComponentInParent<Fire>();
-                            fireUIPanel.SetActive(true);
-                            fireButton.currentFire = fire;
-                            fireButton.currentFireInventory = fire.fireLoot;
-                            playerCrafting.isCrafting = true;
-                            //butcheringUI.gameObject.SetActive(true);
-                            lootInventory = fire.fireLoot;
-                            lootInventory.inventoryUIPanel = firePanel;
-                            lootInventory.RebuildUIPanel(this);
-                            showInventory = true;
-                            lootPanelScript.attachedInventory = fire.fireLoot;
-                        }
-                        //else if(hit.collider.gameObject.tag == "Terrain")
-                        //{
-                        //    print("terrain");
-                        //    Chunk16 chunk16 = hit.collider.gameObject.GetComponent<Chunk16>();
-                        //    if (chunk16 && chunk16.navMesh == null)
-                        //    {
-                        //        chunk16.navMesh = chunk16.gameObject.AddComponent<NavMeshSurface>();
-                        //        chunk16.navMesh.collectObjects = CollectObjects.Children;
-                        //        chunk16.navMesh.layerMask = 13;
-                        //    }
-                        //    if (chunk16 && chunk16.navMesh != null)
-                        //    {
-                        //        chunk16.navMesh.BuildNavMesh();
-                        //    }
-                        //}
-                    }
-                }
-
-                if (Input.GetKeyDown(KeyCode.R))
-                {
-                    playerBodyManager.DrawWeapons();
-                }
-            }//--^^--inventory UI closed--^^--
-
-            if (Input.GetKeyDown(KeyCode.Q))
-            {
-                autoMove = !autoMove;
-                if (autoMove)
-                {
-                    playerBodyManager.moving = true;
-                    if (playerBodyManager.gait <= 1)
-                    {
-                        anim.SetBool("isWalking", true);
-                        anim.SetBool("isRunning", false);
-                    }
-                    else
-                    {
-                        anim.SetBool("isWalking", true);
-                        anim.SetBool("isRunning", true);
-                    }
-                }
-
-            }
-            if (Input.GetKey(KeyCode.W))
-            {
-                if (playerBodyManager.gait <= 1)
-                {
-                    anim.SetBool("isWalking", true);
-                    anim.SetBool("isRunning", false);
-                }
-                else
-                {
-                    anim.SetBool("isWalking", true);
-                    anim.SetBool("isRunning", true);
-                }
-                playerBodyManager.moving = true;
-                autoMove = false;
-            }
-            if (Input.GetKeyUp(KeyCode.W))
-            {
-                anim.SetBool("isWalking", false);
-                anim.SetBool("isRunning", false);
-                playerBodyManager.moving = false;
-                autoMove = false;
-            }
-            if (Input.GetKey(KeyCode.LeftShift))
-            {
-                anim.SetBool("isRunning", true);
-                anim.SetBool("isSprinting", true);
-                playerBodyManager.sprinting = true;
-                playerBodyManager.SprintTime = Time.time;
-            }
-            if (Input.GetKeyUp(KeyCode.LeftShift))
-            {
-                anim.SetBool("isRunning", false);
-                anim.SetBool("isSprinting", false);
-                playerBodyManager.sprinting = false;
-                float sprintTime = Time.time - playerBodyManager.SprintTime;
-                playerStats.GetStat<RPGAttribute>(RPGStatType.Strength).TrainingValue += (int)(sprintTime / 3f);
-                playerStats.GetStat<RPGAttribute>(RPGStatType.Speed).TrainingValue += (int)(sprintTime);
-            }
-
-            if (Input.GetKeyDown(KeyCode.C))
-            {
-                print("crouch");
-                crouching = !crouching;
-                playerBodyManager.crouching = crouching;
-                anim.SetBool("isCrouching", crouching);
-                //ScaleCapsuleForCrouching(crouching);
-                //if (!crouching)
-                //{
-                //    print("crouch");
-                //    crouching = true;
-                //    anim.SetBool("isCrouching", true);
-                //}
-                //else
-                //{
-                //    print("uncrouch");
-                //    crouching = false;
-                //    anim.SetBool("isCrouching", false);
-                //}
-            }
-
-            if (Input.GetKeyDown(KeyCode.CapsLock))
-            {
-                playerBodyManager.NextGait();
-            }
-            if (Input.GetKeyDown(KeyCode.Tab))
-            {
-                menusOpen = !menusOpen;
-                inventoryActive = menusOpen;
-                inventoryUIPanel.gameObject.SetActive(menusOpen);
-                lootPanel.gameObject.SetActive(menusOpen);
-                characterUI.SetActive(menusOpen);
-                playerCrafting.isCrafting = menusOpen;
-                if (fireUIPanel.activeSelf)
-                    fireUIPanel.SetActive(false);
-
-                if (menusOpen) { }
-                else
-                {
-                }
-            }
-
             if (!m_PreviouslyGrounded && m_CharacterController.isGrounded)
             {
                 StartCoroutine(m_JumpBob.DoBobCycle());
@@ -502,353 +214,693 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_PreviouslyGrounded = m_CharacterController.isGrounded;
 
 
-            if (showInventory)
+            if (menusOpen)
             {
-                if (inventoryActive)
+                //Cursor.lockState = CursorLockMode.None;
+                //m_MouseLook.lockCursor = false;
+            }
+            //if (!showInventory)
+            else
+            {
+                //Cursor.lockState = CursorLockMode.Locked;
+
+                turn = RotateView();
+
+                if (Input.anyKey)
                 {
-                    if (Input.GetKey(KeyCode.E) && Input.GetKeyDown(KeyCode.Mouse0))
+                    if (Input.GetKeyDown(KeyCode.Mouse0)) //
                     {
-                        if (inventory.selectedItem is Item_Weapon)
+                        if (playerBodyManager.weaponsReadied && !playerBodyManager.isAttackingPrimary)
                         {
-                            Item_Weapon selectedItem = (Item_Weapon)inventory.selectedItem;
+                            playerBodyManager.PrimaryAttack();
+                        }
 
-                            if (!selectedItem.isWielded)
+                        else if (playerBodyManager.drawingBow)
+                        {
+                            playerBodyManager.FireBow();
+                        }
+
+                        else if (playerBodyManager.rangedWeaponDrawn)
+                        { // TODO change to generic draw action
+                            playerBodyManager.KnockArrow();
+                        }
+
+                        if (terrainMode)
+                        {
+                            RaycastHit hit;
+                            if (Physics.Raycast(playerBodyManager.aimPoint.position, playerBodyManager.aimPoint.forward, out hit, 12f))
                             {
-                                playerBodyManager.DrawWeapon(selectedItem);
-                            }
-                            else if (selectedItem.isWielded)
-                            {
-                                playerBodyManager.SheatheWeapon(selectedItem);
+                                WorldPosFloat pos1 = EditTerrain.GetBlockPos(hit);
+                                Vector3 direction = playerBodyManager.aimPoint.position - hit.point;
+                                direction = direction.normalized;
+                                WorldPos pos2 = new WorldPos((int)(pos1.x + (2 * direction.x)), (int)(pos1.y + (2 * direction.y)), (int)(pos1.z + (2 * direction.z)));
+                                Chunk chunk = thisWorld.GetChunk(pos2.x, pos2.y, pos2.z);
+                                if (!(chunk == null))
+                                {
+                                    if (chunk.world.GetBlock(pos2.x, pos2.y, pos2.z) is BlockAir) { chunk.airCount--; } //decrement aircount if existing block is air
+                                    chunk.world.SetBlock(pos2.x, pos2.y, pos2.z, setBlock);
+                                    if (!chunk.gameObject.activeSelf)
+                                    {
+                                        chunk.gameObject.SetActive(true);
+                                    }
+                                    Destroy(buildingBlock.gameObject);
+                                }
                             }
                         }
                     }
-                    if (Input.GetKey(KeyCode.E) && Input.GetKeyDown(KeyCode.Mouse1))
-                    {
-                        if (inventory.selectedItem is Item_Weapon)
-                        {
-                            Item_Weapon selectedItem = (Item_Weapon)inventory.selectedItem;
 
-                            if (!selectedItem.isWielded)
-                            {
-                                playerBodyManager.OffHandDrawWeapon(selectedItem);
-                            }
-                            else if (selectedItem.isWielded)
-                            {
-                                playerBodyManager.SheatheWeapon(selectedItem);
-                            }
+                    if (Input.GetKeyDown(KeyCode.Mouse1))
+                    {
+                        if (playerBodyManager.wieldingBow && playerBodyManager.arrowKnocked && !playerBodyManager.bowDrawn)
+                        {
+                            playerBodyManager.DrawBow();
+                        }
+                        else if (playerBodyManager.weaponsReadied && !playerBodyManager.isAttackingSecondary && (playerBodyManager.offHandWeapon != null || (!playerBodyManager.isAttackingPrimary)))
+                        { //if wielding melee and not already swinging offhand or two-handed primary
+                            playerBodyManager.OffHandAttack();
                         }
                     }
-                    if (Input.GetKeyUp(KeyCode.E))
+                    else if (Input.GetKeyUp(KeyCode.Mouse1))
                     {
-                        terrainMode = false;
-                        //if (inventory.selectedItem != null)
-                        //{ }
-                        if (inventory.selectedItem is Item_Garment)
+                        if (playerBodyManager.wieldingBow && playerBodyManager.drawingBow)
                         {
-                            Item_Garment selectedItem = (Item_Garment)inventory.selectedItem;
-                            if (!selectedItem.equipped)
-                            {
-                                m_AudioSource.PlayOneShot(playerAudioManager.equip);
-                                playerBodyManager.EquipWearable(selectedItem);
-                            }
-                            else if (selectedItem.equipped)
-                            {
-                                m_AudioSource.PlayOneShot(playerAudioManager.equip);
-                                playerBodyManager.RemoveGarment(selectedItem);
-                            }
-                        }
-                        else if (inventory.selectedItem is Item_Weapon)
-                        { //TODO on ui: equip/unequip
-                            Item_Weapon selectedItem = (Item_Weapon)inventory.selectedItem;
-
-                            if (selectedItem.isWielded)
-                            {
-                                playerBodyManager.SheatheWeapon(selectedItem);
-                            }
-                            else
-                            {
-                                playerBodyManager.DrawWeapon(selectedItem);
-                            }
-                        }
-                        else if (inventory.selectedItem is Item_Food)
-                        {
-                            Item_Food selectedFood = (Item_Food)inventory.selectedItem;
-                            playerBodyManager.Eat(selectedFood);
-                        }
-                        else if(inventory.selectedItem is ItemStackFood)
-                        {
-                            ItemStackFood selectedFood = (ItemStackFood)inventory.selectedItem;
-                            playerBodyManager.Eat(selectedFood);
-                        }
-                        else if(inventory.selectedItem is Item_Ammo)
-                        {
-                            Item_Ammo selectedAmmo = inventory.selectedItem.GetComponent<Item_Ammo>();
-                            playerBodyManager.currentAmmo = selectedAmmo;
-                            playerBodyManager.currentAmmoPrefab = selectedAmmo.itemPrefab;
-                        }
-                        //if (inventory.selectedItem.GetType().IsAssignableFrom(typeof(Item_WaterVessel)))
-                        else if (inventory.selectedItem is Item_WaterVessel)
-                        {
-                            Item_WaterVessel vessel = (Item_WaterVessel)inventory.selectedItem;
-                            float x = vessel.content;
-                            vessel.Fill(-500);
-                            x = x - vessel.content;
-                            playerBodyManager.hydration += (100 * x / playerStats.GetStat<RPGAttribute>(RPGStatType.Weight).StatValue);
-                            m_AudioSource.PlayOneShot(playerAudioManager.drink);
-                        }
-                        else if (inventory.selectedItem is Item_TerrainBlock)
-                        {
-                            terrainMode = true;
-                            Item_TerrainBlock setItem = (Item_TerrainBlock)inventory.selectedItem;
-                            setBlock = setItem.block;
-                            buildingBlock = setItem;
+                            playerBodyManager.ReleaseBow(); //release tension on bow
                         }
                     }
+
+                    if (Input.GetKeyDown(KeyCode.E)) //pickup, interact
+                    {
+                        e_down = true;
+                        RaycastHit hit;
+                        if (Physics.Raycast(m_Camera.transform.position, m_Camera.transform.forward, out hit, 20f, eLayerMask))
+                        {
+                            if (hit.collider.gameObject.tag == "Item")
+                            {
+                                Item hitItem = hit.collider.gameObject.GetComponentInParent<Item>();
+                                if (hitItem is Item_Weapon)
+                                {
+                                    Item_Weapon hitWeapon = (Item_Weapon)hitItem;
+                                    if (hitWeapon.isWielded)
+                                    { }
+                                    else
+                                        playerBodyManager.PickupItem(hitItem);
+                                }
+                                else
+                                    playerBodyManager.PickupItem(hitItem);
+                                //Destroy(hit.collider.gameObject);
+                            }
+                            else if (hit.collider.gameObject.tag == "Tree")
+                            {
+                                Tree hitTree = hit.collider.gameObject.GetComponentInParent<Tree>();
+                                if (hitTree.standing)
+                                    playerBodyManager.FellTree(hitTree);
+                                else
+                                    playerBodyManager.ProcessDownedTree(hitTree);
+                            }
+                            else if (hit.collider.gameObject.tag == "Perennial")// && playerBodyManager.rHandWeapon.gameObject == null)
+                            {
+                                Perennial hitPerennial = hit.collider.gameObject.GetComponent<Perennial>();
+                                playerBodyManager.GatherPlant(hitPerennial);
+                            }
+                            else if (hit.collider.gameObject.tag == "StackContainer")
+                            {
+                                StackContainer hitStack = hit.collider.gameObject.GetComponentInParent<StackContainer>();
+                                print(hitStack.name);
+                                hitStack.PullItem(inventory);
+                            }
+                            //else if (hit.collider.gameObject.tag == "UnlitFire")
+                            //{
+                            //  Fire hitFire = hit.collider.gameObject.GetComponentInParent<Fire>();
+                            //  playerBodyManager.StartFire(hitFire, 1);
+                            //}
+                            else if (hit.collider.gameObject.tag == "BodyPart")
+                            {
+                                BodyManager parentBody = hit.collider.gameObject.GetComponentInParent<BodyManager>();
+                                print(parentBody.name);
+                                print(parentBody.tag);
+                                if (parentBody.gameObject.tag == "DeadCreature")
+                                {
+                                    inventoryUIPanel.gameObject.SetActive(true);
+                                    lootingUI.gameObject.SetActive(true);
+                                    //butcheringUI.gameObject.SetActive(true);
+                                    BodyManager hitBody = hit.collider.gameObject.GetComponentInParent<BodyManager>();
+                                    print(hitBody.name);
+                                    lootInventory = hitBody.lootInventory;
+                                    hitBody.lootInventory.playerControls = this;
+                                    hitBody.lootInventory.itemsPanel = lootPanel;
+                                    hitBody.lootInventory.inventoryUIPanel = lootingUI;
+                                    hitBody.lootInventory.RebuildUIPanel(this);
+                                    showInventory = true;
+                                    print(hitBody.lootInventory.name);
+                                    lootPanelScript.attachedInventory = hitBody.lootInventory;
+                                }
+                            }
+                            else if (hit.collider.gameObject.tag == "Water")
+                            {
+                                if (inventory.waterVesselItems.Count > 0)
+                                {
+                                    for (int i = 0; i < inventory.waterVesselItems.Count; i++)
+                                    {
+                                        Item_WaterVessel vessel = (Item_WaterVessel)inventory.waterVesselItems[i];
+                                        vessel.Fill(10000);
+                                        vessel.full = true;
+                                    }
+                                }
+                                else
+                                    playerBodyManager.hydration += (100 * 500 / playerStats.GetStat<RPGAttribute>(RPGStatType.Weight).StatValue);
+                            }
+                            else if (hit.collider.gameObject.tag == "LitFire" || hit.collider.gameObject.tag == "UnlitFire")
+                            {
+                                //  playerBodyManager.StartFire(hitFire, 1);
+                                Fire fire = hit.collider.gameObject.GetComponentInParent<Fire>();
+                                if (fire != null)
+                                    ui.OpenFireMenu(fire);
+                            }
+                            //else if(hit.collider.gameObject.tag == "Terrain")
+                            //{
+                            //    print("terrain");
+                            //    Chunk16 chunk16 = hit.collider.gameObject.GetComponent<Chunk16>();
+                            //    if (chunk16 && chunk16.navMesh == null)
+                            //    {
+                            //        chunk16.navMesh = chunk16.gameObject.AddComponent<NavMeshSurface>();
+                            //        chunk16.navMesh.collectObjects = CollectObjects.Children;
+                            //        chunk16.navMesh.layerMask = 13;
+                            //    }
+                            //    if (chunk16 && chunk16.navMesh != null)
+                            //    {
+                            //        chunk16.navMesh.BuildNavMesh();
+                            //    }
+                            //}
+                        }
+                    }
+
                     if (Input.GetKeyDown(KeyCode.R))
                     {
-                        playerBodyManager.DropItem(inventory.selectedItem);
-                    }
-                    if (Input.GetKeyDown(KeyCode.T))
-                    {
-                        if (inventory.selectedItem == null || !lootingUI.gameObject.activeSelf)
-                            return;
-                        Item anItem = inventory.selectedItem;
-                        playerBodyManager.DropItem(inventory.selectedItem);
-                        lootInventory.AddItem(anItem);
-                        anItem.itemUIElementScript.panel = (RectTransform)lootInventory.inventoryUIPanel;
-                        anItem.itemUIElementScript.playerControls = this;
-                        Destroy(anItem.itemUIelement.GetComponent<InventoryFocusPanel>());
-
-                        //LootInventoryFocusPanel lifp = anItem.itemUIelement.AddComponent<LootInventoryFocusPanel>();
-                        //lifp.attachedInventory = lootInventory;
-                        //lifp.panel = (RectTransform)lootInventory.inventoryUIPanel;
-                        //lifp.playerControls = this;
-                        lootInventory.selectedItem = null;
-                        inventory.selectedItem = null;
+                        playerBodyManager.DrawWeapons();
                     }
                 }
-                else if (lootActive)
+
+            }//--^^--inventory UI closed--^^--
+            if (Input.GetKey(KeyCode.W))
+            {
+                if ((int)playerBodyManager.currentGait <= 1)
                 {
-                    if (Input.GetKey(KeyCode.E) && Input.GetMouseButtonDown(0))
+                    anim.SetBool("isWalking", true);
+                    anim.SetBool("isRunning", false);
+                }
+                else
+                {
+                    anim.SetBool("isWalking", true);
+                    anim.SetBool("isRunning", true);
+                }
+                playerBodyManager.moving = true;
+                autoMove = false;
+            }
+            else if (playerBodyManager.moving == true)
+            {
+                anim.SetBool("isWalking", false);
+                anim.SetBool("isRunning", false);
+                playerBodyManager.moving = false;
+                autoMove = false;
+            }
+            if (Input.GetKey(KeyCode.LeftShift))
+            {
+                anim.SetBool("isSprinting", true);
+                playerBodyManager.isSprinting = true;
+                playerBodyManager.SprintTime = Time.time;
+            }
+            else if (playerBodyManager.isSprinting)
+            {
+                anim.SetBool("isSprinting", false);
+                playerBodyManager.isSprinting = false;
+                float sprintTime = Time.time - playerBodyManager.SprintTime;
+                playerStats.GetStat<RPGAttribute>(RPGStatType.Strength).TrainingValue += (int)(sprintTime / 3f);
+                playerStats.GetStat<RPGAttribute>(RPGStatType.Speed).TrainingValue += (int)(sprintTime);
+            }
+            if (Input.anyKey)
+            {
+                if (Input.GetKeyDown(KeyCode.Q))
+                {
+                    autoMove = !autoMove;
+                    if (autoMove)
                     {
-                        if (lootInventory.selectedItem is Item_Weapon)
+                        playerBodyManager.moving = true;
+                        if ((int)playerBodyManager.currentGait <= 1)
                         {
-                            Item_Weapon selectedItem = (Item_Weapon)lootInventory.selectedItem;
-                            lootInventory.selectedItem = null;
-
-                            if (!selectedItem.isWielded)
-                            {
-                                playerBodyManager.DrawWeapon(selectedItem);
-                            }
-                            else if (selectedItem.isWielded)
-                            {
-                                playerBodyManager.SheatheWeapon(selectedItem);
-                            }
-
+                            anim.SetBool("isWalking", true);
+                            anim.SetBool("isRunning", false);
+                        }
+                        else
+                        {
+                            anim.SetBool("isWalking", true);
+                            anim.SetBool("isRunning", true);
                         }
                     }
-                    if (Input.GetKey(KeyCode.E) && Input.GetMouseButtonDown(1))
+                    else
                     {
-                        if (lootInventory.selectedItem is Item_Weapon)
-                        {
-                            Item_Weapon selectedItem = (Item_Weapon)lootInventory.selectedItem;
-
-                            if (!selectedItem.isWielded)
-                            {
-                                playerBodyManager.OffHandDrawWeapon(selectedItem);
-                            }
-                            else if (selectedItem.isWielded)
-                            {
-                                playerBodyManager.SheatheWeapon(selectedItem);
-                            }
-                        }
+                        playerBodyManager.moving = false;
+                        anim.SetBool("isWalking", false);
+                        anim.SetBool("isRunning", false);
                     }
 
-                    if (Input.GetKeyUp(KeyCode.E))
+                }
+               
+
+                if (Input.GetKeyDown(KeyCode.C))
+                {
+                    print("crouch");
+                    crouching = !crouching;
+                    playerBodyManager.crouching = crouching;
+                    anim.SetBool("isCrouching", crouching);
+                    //ScaleCapsuleForCrouching(crouching);
+                    //if (!crouching)
+                    //{
+                    //    print("crouch");
+                    //    crouching = true;
+                    //    anim.SetBool("isCrouching", true);
+                    //}
+                    //else
+                    //{
+                    //    print("uncrouch");
+                    //    crouching = false;
+                    //    anim.SetBool("isCrouching", false);
+                    //}
+                }
+
+                if (Input.GetKeyDown(KeyCode.CapsLock))
+                {
+                    playerBodyManager.NextGait();
+                }
+                if (Input.GetKeyDown(KeyCode.Tab))
+                {
+                    if (menusOpen)
                     {
-                        if (lootInventory.selectedItem == null)
-                            return;
+                        craftingUI.SetActive(false);
+                        playerCrafting.isCrafting = false;
+                        playerCrafting.selectedRecipe = null;
+                        Cursor.lockState = CursorLockMode.Locked;
+                        menusOpen = false;
+                        inventoryActive = false;
+                        inventoryUIPanel.gameObject.SetActive(false);
+                        lootPanel.gameObject.SetActive(false);
+                        characterUI.SetActive(menusOpen);
+                        playerCrafting.isCrafting = menusOpen;
+                        fireUIPanel.SetActive(false);
+                        actionUI.SetActive(false);
+                    }
+                    else
+                    {
+                        craftingUI.SetActive(true);
+                        playerCrafting.isCrafting = true;
+                        Cursor.lockState = CursorLockMode.None;
+                        menusOpen = true;
+                        inventoryActive = true;
+                        inventoryUIPanel.gameObject.SetActive(true);
+                        lootPanel.gameObject.SetActive(true);
+                        characterUI.SetActive(menusOpen);
+                        playerCrafting.isCrafting = menusOpen;
+                        fireUIPanel.SetActive(true);
+                        actionUI.SetActive(true);
+                    }
+                }
 
-                        //if (lootInventory.selectedItem != null)
-                        //{ }
-                        if (lootInventory.selectedItem is Item_Garment)
+
+
+                if (showInventory)
+                {
+                    if (inventoryActive)
+                    {
+                        if (Input.GetKey(KeyCode.E) && Input.GetKeyDown(KeyCode.Mouse0))
                         {
-                            Item_Garment selectedItem = (Item_Garment)lootInventory.selectedItem;
-                            if (!selectedItem.equipped)
+                            if (inventory.selectedItem is Item_Weapon)
                             {
-                                playerBodyManager.EquipWearable(selectedItem);
-                                m_AudioSource.PlayOneShot(playerAudioManager.equip);
-                            }
-                            else if (selectedItem.equipped)
-                            {
-                                playerBodyManager.RemoveGarment(selectedItem);
-                                m_AudioSource.PlayOneShot(playerAudioManager.equip);
-                            }
-                        }
+                                Item_Weapon selectedItem = (Item_Weapon)inventory.selectedItem;
 
-                        if (lootInventory.selectedItem is Item_Weapon)
-                        {
-                            Item_Weapon selectedItem = (Item_Weapon)lootInventory.selectedItem;
-
-                            if (selectedItem.isWielded)
-                            {
-                                playerBodyManager.SheatheWeapon(selectedItem);
-                                m_AudioSource.PlayOneShot(playerAudioManager.sheathe);
-                            }
-
-                            else if (playerBodyManager.primaryWeapon == null)
-                            {
                                 if (!selectedItem.isWielded)
                                 {
                                     playerBodyManager.DrawWeapon(selectedItem);
-                                    m_AudioSource.PlayOneShot(playerAudioManager.draw);
                                 }
                                 else if (selectedItem.isWielded)
                                 {
                                     playerBodyManager.SheatheWeapon(selectedItem);
-                                    m_AudioSource.PlayOneShot(playerAudioManager.sheathe);
                                 }
                             }
-                            else if (playerBodyManager.offHandWeapon == null)
+                        }
+                        if (Input.GetKey(KeyCode.E) && Input.GetKeyDown(KeyCode.Mouse1))
+                        {
+                            if (inventory.selectedItem is Item_Weapon)
                             {
+                                Item_Weapon selectedItem = (Item_Weapon)inventory.selectedItem;
+
                                 if (!selectedItem.isWielded)
                                 {
                                     playerBodyManager.OffHandDrawWeapon(selectedItem);
-                                    m_AudioSource.PlayOneShot(playerAudioManager.draw);
                                 }
                                 else if (selectedItem.isWielded)
                                 {
                                     playerBodyManager.SheatheWeapon(selectedItem);
-                                    m_AudioSource.PlayOneShot(playerAudioManager.sheathe);
+                                }
+                            }
+                        }
+                        if (Input.GetKeyDown(KeyCode.E))
+                        {
+                            terrainMode = false;
+                            //if (inventory.selectedItem != null)
+                            //{ }
+                            if (inventory.selectedItem is Item_Garment)
+                            {
+                                Item_Garment selectedItem = (Item_Garment)inventory.selectedItem;
+                                if (!selectedItem.equipped)
+                                {
+                                    m_AudioSource.PlayOneShot(playerAudioManager.equip);
+                                    playerBodyManager.EquipWearable(selectedItem);
+                                }
+                                else if (selectedItem.equipped)
+                                {
+                                    m_AudioSource.PlayOneShot(playerAudioManager.equip);
+                                    playerBodyManager.RemoveGarment(selectedItem);
+                                }
+                            }
+                            else if (inventory.selectedItem is Item_Weapon)
+                            { //TODO on ui: equip/unequip
+                                Item_Weapon selectedItem = (Item_Weapon)inventory.selectedItem;
+
+                                if (selectedItem.isWielded)
+                                {
+                                    playerBodyManager.SheatheWeapon(selectedItem);
+                                }
+                                else
+                                {
+                                    playerBodyManager.DrawWeapon(selectedItem);
+                                }
+                            }
+                            else if (inventory.selectedItem is Item_Food)
+                            {
+                                Item_Food selectedFood = (Item_Food)inventory.selectedItem;
+                                playerBodyManager.Eat(selectedFood);
+                            }
+                            else if (inventory.selectedItem is ItemStackFood)
+                            {
+                                ItemStackFood selectedFood = (ItemStackFood)inventory.selectedItem;
+                                playerBodyManager.Eat(selectedFood);
+                            }
+                            else if (inventory.selectedItem is Item_Ammo)
+                            {
+                                Item_Ammo selectedAmmo = inventory.selectedItem.GetComponent<Item_Ammo>();
+                                playerBodyManager.currentAmmo = selectedAmmo;
+                                playerBodyManager.currentAmmoPrefab = selectedAmmo.itemPrefab;
+                            }
+                            //if (inventory.selectedItem.GetType().IsAssignableFrom(typeof(Item_WaterVessel)))
+                            else if (inventory.selectedItem is Item_WaterVessel)
+                            {
+                                Item_WaterVessel vessel = (Item_WaterVessel)inventory.selectedItem;
+                                float x = vessel.content;
+                                vessel.Fill(-500);
+                                x = x - vessel.content;
+                                playerBodyManager.hydration += (100 * x / playerStats.GetStat<RPGAttribute>(RPGStatType.Weight).StatValue);
+                                playerBodyManager.AddToStomach(100, 0);
+                                m_AudioSource.PlayOneShot(playerAudioManager.drink);
+                            }
+                            else if (inventory.selectedItem is Item_TerrainBlock)
+                            {
+                                terrainMode = true;
+                                blockBuildingSystem.enabled = true;
+                                blockBuildingSystem.BuildMode = BlockBuildingSystem.Mode.Inventory;
+                                Item_TerrainBlock setItem = (Item_TerrainBlock)inventory.selectedItem;
+                                blockBuildingSystem.currentPreview = Instantiate(setItem.itemModel);
+                                blockBuildingSystem.buildingBlock = setItem;
+                            }
+                        }
+                        if (Input.GetKeyDown(KeyCode.R))
+                        {
+                            playerBodyManager.DropItem(inventory.selectedItem);
+                        }
+                        if (Input.GetKeyDown(KeyCode.T))
+                        {
+                            if (inventory.selectedItem == null || !lootingUI.gameObject.activeSelf)
+                                return;
+                            Item anItem = inventory.selectedItem;
+                            playerBodyManager.DropItem(inventory.selectedItem);
+                            lootInventory.AddItem(anItem);
+                            anItem.itemUIElementScript.panel = (RectTransform)lootInventory.inventoryUIPanel;
+                            anItem.itemUIElementScript.playerControls = this;
+                            Destroy(anItem.itemUIelement.GetComponent<InventoryFocusPanel>());
+
+                            //LootInventoryFocusPanel lifp = anItem.itemUIelement.AddComponent<LootInventoryFocusPanel>();
+                            //lifp.attachedInventory = lootInventory;
+                            //lifp.panel = (RectTransform)lootInventory.inventoryUIPanel;
+                            //lifp.playerControls = this;
+                            lootInventory.selectedItem = null;
+                            inventory.selectedItem = null;
+                        }
+                    }
+                    else if (lootActive)
+                    {
+                        if (Input.GetKey(KeyCode.E) && Input.GetMouseButtonDown(0))
+                        {
+                            if (lootInventory.selectedItem is Item_Weapon)
+                            {
+                                Item_Weapon selectedItem = (Item_Weapon)lootInventory.selectedItem;
+                                lootInventory.selectedItem = null;
+
+                                if (!selectedItem.isWielded)
+                                {
+                                    playerBodyManager.DrawWeapon(selectedItem);
+                                }
+                                else if (selectedItem.isWielded)
+                                {
+                                    playerBodyManager.SheatheWeapon(selectedItem);
+                                }
+
+                            }
+                        }
+                        if (Input.GetKey(KeyCode.E) && Input.GetMouseButtonDown(1))
+                        {
+                            if (lootInventory.selectedItem is Item_Weapon)
+                            {
+                                Item_Weapon selectedItem = (Item_Weapon)lootInventory.selectedItem;
+
+                                if (!selectedItem.isWielded)
+                                {
+                                    playerBodyManager.OffHandDrawWeapon(selectedItem);
+                                }
+                                else if (selectedItem.isWielded)
+                                {
+                                    playerBodyManager.SheatheWeapon(selectedItem);
                                 }
                             }
                         }
 
-                        if (lootInventory.selectedItem is Item_Ammo)
+                        if (Input.GetKeyUp(KeyCode.E))
                         {
-                            Item_Ammo selectedAmmo = lootInventory.selectedItem.GetComponent<Item_Ammo>();
-                            playerBodyManager.currentAmmo = selectedAmmo;
-                            playerBodyManager.currentAmmoPrefab = selectedAmmo.itemPrefab;
-                        }
+                            if (lootInventory.selectedItem == null)
+                                return;
 
-                        if (lootInventory.selectedItem is Item_TerrainBlock)
+                            //if (lootInventory.selectedItem != null)
+                            //{ }
+                            if (lootInventory.selectedItem is Item_Garment)
+                            {
+                                Item_Garment selectedItem = (Item_Garment)lootInventory.selectedItem;
+                                if (!selectedItem.equipped)
+                                {
+                                    playerBodyManager.EquipWearable(selectedItem);
+                                    m_AudioSource.PlayOneShot(playerAudioManager.equip);
+                                }
+                                else if (selectedItem.equipped)
+                                {
+                                    playerBodyManager.RemoveGarment(selectedItem);
+                                    m_AudioSource.PlayOneShot(playerAudioManager.equip);
+                                }
+                            }
+
+                            if (lootInventory.selectedItem is Item_Weapon)
+                            {
+                                Item_Weapon selectedItem = (Item_Weapon)lootInventory.selectedItem;
+
+                                if (selectedItem.isWielded)
+                                {
+                                    playerBodyManager.SheatheWeapon(selectedItem);
+                                    m_AudioSource.PlayOneShot(playerAudioManager.sheathe);
+                                }
+
+                                else if (playerBodyManager.primaryWeapon == null)
+                                {
+                                    if (!selectedItem.isWielded)
+                                    {
+                                        playerBodyManager.DrawWeapon(selectedItem);
+                                        m_AudioSource.PlayOneShot(playerAudioManager.draw);
+                                    }
+                                    else if (selectedItem.isWielded)
+                                    {
+                                        playerBodyManager.SheatheWeapon(selectedItem);
+                                        m_AudioSource.PlayOneShot(playerAudioManager.sheathe);
+                                    }
+                                }
+                                else if (playerBodyManager.offHandWeapon == null)
+                                {
+                                    if (!selectedItem.isWielded)
+                                    {
+                                        playerBodyManager.OffHandDrawWeapon(selectedItem);
+                                        m_AudioSource.PlayOneShot(playerAudioManager.draw);
+                                    }
+                                    else if (selectedItem.isWielded)
+                                    {
+                                        playerBodyManager.SheatheWeapon(selectedItem);
+                                        m_AudioSource.PlayOneShot(playerAudioManager.sheathe);
+                                    }
+                                }
+                            }
+
+                            if (lootInventory.selectedItem is Item_Ammo)
+                            {
+                                Item_Ammo selectedAmmo = lootInventory.selectedItem.GetComponent<Item_Ammo>();
+                                playerBodyManager.currentAmmo = selectedAmmo;
+                                playerBodyManager.currentAmmoPrefab = selectedAmmo.itemPrefab;
+                            }
+
+                            if (lootInventory.selectedItem is Item_TerrainBlock)
+                            {
+                                terrainMode = true;
+                                blockBuildingSystem.enabled = true;
+                                blockBuildingSystem.BuildMode = BlockBuildingSystem.Mode.Inventory;
+                                Item_TerrainBlock setItem = (Item_TerrainBlock)inventory.selectedItem;
+                                blockBuildingSystem.currentPreview = Instantiate(setItem.itemModel);
+                            }
+                            Destroy(lootInventory.selectedItem.itemUIelement.GetComponent<LootInventoryFocusPanel>());
+                            lootInventory.RemoveItem(lootInventory.selectedItem);
+                            playerBodyManager.PickupItem(lootInventory.selectedItem);
+                            terrainMode = false;
+                        }
+                        if (Input.GetKeyDown(KeyCode.R))
                         {
-                            terrainMode = true;
-                            Item_TerrainBlock setItem = (Item_TerrainBlock)lootInventory.selectedItem;
-                            setBlock = setItem.block;
-                            buildingBlock = setItem;
+                            if (lootInventory.selectedItem == null)
+                                return;
+                            lootInventory.selectedItem.loose = true;
+                            lootInventory.selectedItem.gameObject.SetActive(true);
+                            lootInventory.selectedItem.transform.position = this.transform.position;
+                            lootInventory.selectedItem.transform.parent = null;
+                            Destroy(lootInventory.selectedItem.itemUIelement.GetComponent<LootInventoryFocusPanel>());
+                            lootInventory.RemoveItem(lootInventory.selectedItem);
+                            lootInventory.selectedItem = null;
+
                         }
-                        Destroy(lootInventory.selectedItem.itemUIelement.GetComponent<LootInventoryFocusPanel>());
-                        lootInventory.RemoveItem(lootInventory.selectedItem);
-                        playerBodyManager.PickupItem(lootInventory.selectedItem);
-                        terrainMode = false;
+                        if (Input.GetKeyDown(KeyCode.T))
+                        {
+                            if (lootInventory.selectedItem == null)
+                                return;
+                            Item anItem = lootInventory.selectedItem;
+                            Destroy(anItem.itemUIelement.GetComponent<LootInventoryFocusPanel>());
+                            lootInventory.RemoveItem(lootInventory.selectedItem);
+                            playerBodyManager.PickupItem(lootInventory.selectedItem);
+                            InventoryFocusPanel ifp = anItem.itemUIelement.AddComponent<InventoryFocusPanel>();
+                            ifp.attachedInventory = inventory;
+                            ifp.panel = (RectTransform)inventory.inventoryUIPanel;
+                            ifp.playerControls = this;
+                            lootInventory.selectedItem = null;
+                        }
                     }
-                    if (Input.GetKeyDown(KeyCode.R))
+                }
+
+                if (Input.GetKeyDown(KeyCode.I))
+                {
+                    if (showInventory)
                     {
-                        if (lootInventory.selectedItem == null)
-                            return;
-                        lootInventory.selectedItem.loose = true;
-                        lootInventory.selectedItem.gameObject.SetActive(true);
-                        lootInventory.selectedItem.transform.position = this.transform.position;
-                        lootInventory.selectedItem.transform.parent = null;
-                        Destroy(lootInventory.selectedItem.itemUIelement.GetComponent<LootInventoryFocusPanel>());
-                        lootInventory.RemoveItem(lootInventory.selectedItem);
-                        lootInventory.selectedItem = null;
+                        modelViewObject.SetActive(false);
+                        modelViewUI.gameObject.SetActive(false);
+                        playerBodyManager.baseInventory.selectedItem = null;
+                        inventoryUIPanel.gameObject.SetActive(false);
+                        lootInventory = null;
+                        lootingUI.gameObject.SetActive(false);
+                        fireUIPanel.SetActive(false);
+                        showInventory = false;
+                        playerCrafting.isCrafting = false;
+                        m_AudioSource.PlayOneShot(playerAudioManager.openInventory);
+                        Cursor.lockState = CursorLockMode.Locked;
 
                     }
-                    if (Input.GetKeyDown(KeyCode.T))
+                    else
                     {
-                        if (lootInventory.selectedItem == null)
-                            return;
-                        Item anItem = lootInventory.selectedItem;
-                        Destroy(anItem.itemUIelement.GetComponent<LootInventoryFocusPanel>());
-                        lootInventory.RemoveItem(lootInventory.selectedItem);
-                        playerBodyManager.PickupItem(lootInventory.selectedItem);
-                        InventoryFocusPanel ifp = anItem.itemUIelement.AddComponent<InventoryFocusPanel>();
-                        ifp.attachedInventory = inventory;
-                        ifp.panel = (RectTransform)inventory.inventoryUIPanel;
-                        ifp.playerControls = this;
-                        lootInventory.selectedItem = null;
+                        modelViewObject.SetActive(true);
+                        modelViewUI.gameObject.SetActive(true);
+                        inventoryUIPanel.gameObject.SetActive(true);
+                        showInventory = true;
+                        m_AudioSource.PlayOneShot(playerAudioManager.openInventory);
+                        Cursor.lockState = CursorLockMode.None;
+                        Cursor.visible = true;
+                        m_MouseLook.lockCursor = false;
                     }
                 }
-            }
 
-            if (Input.GetKeyDown(KeyCode.I))
-            {
-                if (showInventory)
+                if (Input.GetKeyDown(KeyCode.L))
                 {
-                    modelViewObject.SetActive(false);
-                    modelViewUI.gameObject.SetActive(false);
-                    playerBodyManager.baseInventory.selectedItem = null;
-                    inventoryUIPanel.gameObject.SetActive(false);
-                    lootInventory = null;
-                    lootingUI.gameObject.SetActive(false);
-                    fireUIPanel.SetActive(false);
-                    showInventory = false;
-                    playerCrafting.isCrafting = false;
-                    m_AudioSource.PlayOneShot(playerAudioManager.openInventory);
-                    Cursor.lockState = CursorLockMode.Locked;
+                    if (actionUI.activeSelf)
+                    {
+                        //actionUI.GetComponent<ActionUIScript>().panelActive = false;
+                        actionUI.SetActive(false);
+                        //Destroy(outfittingUI.GetComponent<OutfitUIScript>());
+                        return;
+                    }
+                    if (!actionUI.activeSelf)
+                    {
+                        //actionUI.GetComponent<ActionUIScript>().panelActive = true;
+                        actionUI.SetActive(true);
+                        //outfittingUI.AddComponent<OutfitUIScript>();
+                        return;
+                    }
+                }
 
-                }
-                else
+                if (Input.GetKeyDown(KeyCode.O))
                 {
-                    modelViewObject.SetActive(true);
-                    modelViewUI.gameObject.SetActive(true);
-                    inventoryUIPanel.gameObject.SetActive(true);
-                    showInventory = true;
-                    m_AudioSource.PlayOneShot(playerAudioManager.openInventory);
-                    Cursor.lockState = CursorLockMode.None;
-                    Cursor.visible = true;
-                    m_MouseLook.lockCursor = false;
+                    if (characterUI.activeSelf)
+                    {
+                        characterUI.SetActive(false);
+                        return;
+                    }
+                    if (!characterUI.activeSelf)
+                    {
+                        characterUI.SetActive(true);
+                        return;
+                    }
                 }
-            }
 
-            if(Input.GetKeyDown(KeyCode.L))
-            {
-                if (actionUI.activeSelf)
+                if (Input.GetKeyDown(KeyCode.K))
                 {
-                    //actionUI.GetComponent<ActionUIScript>().panelActive = false;
-                    actionUI.SetActive(false);
-                    //Destroy(outfittingUI.GetComponent<OutfitUIScript>());
-                    return;
+                    if (craftingUI.activeSelf)
+                    {
+                        craftingUI.SetActive(false);
+                        playerCrafting.isCrafting = false;
+                        playerCrafting.selectedRecipe = null;
+                        Cursor.lockState = CursorLockMode.Locked;
+                    }
+                    else
+                    {
+                        craftingUI.SetActive(true);
+                        playerCrafting.isCrafting = true;
+                        Cursor.lockState = CursorLockMode.None;
+                    }
                 }
-                if (!actionUI.activeSelf)
+                if (Input.GetKey(KeyCode.F3))
                 {
-                    //actionUI.GetComponent<ActionUIScript>().panelActive = true;
-                    actionUI.SetActive(true);
-                    //outfittingUI.AddComponent<OutfitUIScript>();
-                    return;
-                }
-            }
-
-            if (Input.GetKeyDown(KeyCode.O))
-            {
-                if (characterUI.activeSelf)
-                {
-                    characterUI.SetActive(false);
-                    return;
-                }
-                if (!characterUI.activeSelf)
-                {
-                    characterUI.SetActive(true);
-                    return;
-                }
-            }
-
-            if (Input.GetKeyDown(KeyCode.K))
-            {
-                if (craftingUI.activeSelf)
-                {
-                    craftingUI.SetActive(false);
-                    playerCrafting.isCrafting = false;
-                    playerCrafting.selectedRecipe = null;
-                    Cursor.lockState = CursorLockMode.Locked;
-                }
-                else
-                {
-                    craftingUI.SetActive(true);
-                    playerCrafting.isCrafting = true;
-                    Cursor.lockState = CursorLockMode.None;
+                    if (Input.GetKeyDown(KeyCode.F3))
+                    {
+                        //toggle between first and third person
+                        if (firstCam.enabled)
+                        {
+                            firstCam.enabled = false;
+                            thirdCam.enabled = true;
+                            thirdPersonCamRig.transform.ActivateChildren();
+                        }
+                        else
+                        {
+                            firstCam.enabled = true;
+                            thirdCam.enabled = false;
+                            thirdPersonCamRig.transform.DeactivateChildren();
+                        }
+                    }
+                    else if (thirdCam.enabled)
+                    {
+                        camIsFree = true;
+                    }
                 }
             }
         } //end of Update
@@ -861,6 +913,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_NextStep = m_StepCycle + .5f;
         }
 
+        private Vector3 m_CamForward;             // The current forward direction of the camera
+        private Vector3 m_Move;
+        public ThirdPerson.ThirdPersonCharacter m_Character; // A reference to the ThirdPersonCharacter on the object
 
         private void FixedUpdate()
         {
@@ -901,22 +956,49 @@ namespace UnityStandardAssets.Characters.FirstPerson
             {
                 m_MoveDir += Physics.gravity * m_GravityMultiplier * Time.fixedDeltaTime;
             }
-        m_CollisionFlags = m_CharacterController.Move(m_MoveDir * Time.fixedDeltaTime);
+            m_CollisionFlags = m_CharacterController.Move(m_MoveDir * Time.fixedDeltaTime);
 
-        ProgressStepCycle(speed);
-        UpdateCameraPosition(speed);
+            ProgressStepCycle(speed);
+            UpdateCameraPosition(speed);
 
-        m_MouseLook.UpdateCursorLock();
+            m_MouseLook.UpdateCursorLock();
+
+            // read inputs
+            //float h = CrossPlatformInputManager.GetAxis("Horizontal");
+            //float v = CrossPlatformInputManager.GetAxis("Vertical");
+
+            //// calculate move direction to pass to character
+            //if (m_Camera != null)
+            //{
+            //    // calculate camera relative direction to move:
+            //    m_CamForward = Vector3.Scale(m_Camera.transform.forward, new Vector3(1, 0, 1)).normalized;
+            //    m_Move = v * transform.forward + h * transform.right;
+            //}
+            //else
+            //{
+            //    // we use world-relative directions in the case of no main camera
+            //    m_Move = v * Vector3.forward + h * Vector3.right;
+            //}
+//#if !MOBILE_INPUT
+//            // walk speed multiplier
+//            if (Input.GetKey(KeyCode.LeftShift)) m_Move *= 0.5f;
+//#endif
+
+            // pass all parameters to the character control script
+            m_Character.Move(new Vector3(m_MoveDir.x,0,m_MoveDir.z), turn, crouching, m_Jump);
+            m_Jump = false;
         }
 
         public LayerMask mask1, mask2;
         public bool falling = false;
-
+        public Transform skyCam;
         private void LateUpdate()
         {
             m_Camera = Camera.main.GetComponent<Camera>();
+            skyCam.localRotation = m_Camera.transform.rotation;
+            //skyCam.Rotate(m_Camera.transform.rotation.eulerAngles.x, m_Camera.transform.rotation.eulerAngles.y, m_Camera.transform.rotation.eulerAngles.z);
 
-            if(playerBodyManager.isAttackingPrimary || playerBodyManager.isAttackingSecondary)
+            if (playerBodyManager.isAttackingPrimary || playerBodyManager.isAttackingSecondary)
             {
                 rightShoulderTransform.transform.Rotate(m_Camera.transform.rotation.eulerAngles.x, 0, 0);
                 leftShoulderTransform.transform.Rotate(m_Camera.transform.rotation.eulerAngles.x, 0, 0);
@@ -1119,9 +1201,21 @@ namespace UnityStandardAssets.Characters.FirstPerson
         }
 
 
-        private void RotateView()
+        private float RotateView()
         {
-            m_MouseLook.LookRotation(transform, m_Camera.transform);
+            float turn = 0;
+            if (!camIsFree)
+            {
+                turn = m_MouseLook.LookRotation(transform, m_Camera.transform);
+                t_MouseLook.LookRotation(transform, thirdCam.transform);
+            }
+            else
+            {
+                //m_MouseLook.FreeCamRotation(transform, m_Camera.transform);
+                t_MouseLook.FreeCamRotation(transform, thirdCam.transform);
+                camIsFree = false;
+            }
+            return turn;
         }
 
 
@@ -1189,6 +1283,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             m_FovKick.Setup(m_Camera);
             m_MouseLook.Init(transform, m_Camera.transform);
+            t_MouseLook.Init(transform, thirdCam.transform);
         }
     }
 }

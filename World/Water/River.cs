@@ -102,7 +102,7 @@ public class River : MonoBehaviour
                 turns.Add(turn);
                 waypoints.Add(new Vector3(waypoints[waypoints.Count - 1].x + moveX, drop, waypoints[waypoints.Count - 1].z + moveZ));
                 speeds.Add(10 * (waypoints[waypoints.Count - 2].y - drop) / 16);
-                widths.Add(Mathf.Min(0.5f * sourceFlow / speeds[speeds.Count - 1], 10 * Mathf.Sqrt(sourceFlow)));
+                widths.Add(Mathf.Min(0.5f * sourceFlow / speeds[speeds.Count - 1], 15.5f));
                 left.Add(new Vector3(waypoints[waypoints.Count - 1].x - (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z + (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
                 right.Add(new Vector3(waypoints[waypoints.Count - 1].x + (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z - (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
                 if (terrainGen.CaveCheck(source.x + waypoints[waypoints.Count - 1].x + moveX, source.y + drop, source.z + waypoints[waypoints.Count - 1].z + moveZ))
@@ -114,19 +114,19 @@ public class River : MonoBehaviour
                             turns.Add(turn);
                             waypoints.Add(new Vector3(waypoints[waypoints.Count - 1].x, drop-d, waypoints[waypoints.Count - 1].z));
                             speeds.Add(10 * (waypoints[waypoints.Count - 2].y - drop) / 16);
-                            widths.Add(Mathf.Min(0.5f * sourceFlow / speeds[speeds.Count - 1], 10 * Mathf.Sqrt(sourceFlow)));
+                            widths.Add(Mathf.Min(0.5f * sourceFlow / speeds[speeds.Count - 1], 15.5f));
                             left.Add(new Vector3(waypoints[waypoints.Count - 1].x - (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop - d, waypoints[waypoints.Count - 1].z + (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
                             right.Add(new Vector3(waypoints[waypoints.Count - 1].x + (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop - d, waypoints[waypoints.Count - 1].z - (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
                             turns.Add(turn);
                             waypoints.Add(new Vector3(waypoints[waypoints.Count - 1].x, drop, waypoints[waypoints.Count - 1].z));
                             speeds.Add(10 * (waypoints[waypoints.Count - 2].y - drop) / 16);
-                            widths.Add(Mathf.Min(0.5f * sourceFlow / speeds[speeds.Count - 1], 10 * Mathf.Sqrt(sourceFlow)));
+                            widths.Add(Mathf.Min(0.5f * sourceFlow / speeds[speeds.Count - 1], 15.5f));
                             left.Add(new Vector3(waypoints[waypoints.Count - 1].x - (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z + (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
                             right.Add(new Vector3(waypoints[waypoints.Count - 1].x + (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z - (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
                             turns.Add(turn);
                             waypoints.Add(new Vector3(waypoints[waypoints.Count - 1].x, drop - d, waypoints[waypoints.Count - 1].z));
                             speeds.Add(10 * (waypoints[waypoints.Count - 2].y - drop) / 16);
-                            widths.Add(Mathf.Min(0.5f * sourceFlow / speeds[speeds.Count - 1], 10 * Mathf.Sqrt(sourceFlow)));
+                            widths.Add(Mathf.Min(0.5f * sourceFlow / speeds[speeds.Count - 1], 15.5f));
                             left.Add(new Vector3(waypoints[waypoints.Count - 1].x - (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop - d, waypoints[waypoints.Count - 1].z + (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
                             right.Add(new Vector3(waypoints[waypoints.Count - 1].x + (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop - d, waypoints[waypoints.Count - 1].z - (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
                             StopCoroutine(initialGenerate);
@@ -230,7 +230,7 @@ public class River : MonoBehaviour
 
                 waypoints.Add(new Vector3(waypoints[waypoints.Count - 1].x + moveX, drop, waypoints[waypoints.Count - 1].z + moveZ));
                 speeds.Add(10 * (waypoints[waypoints.Count - 2].y - drop) / 16);
-                widths.Add(Mathf.Min(0.5f * sourceFlow / speeds[speeds.Count - 1], 10 * Mathf.Sqrt(sourceFlow)));
+                widths.Add(Mathf.Min(0.5f * sourceFlow / speeds[speeds.Count - 1], 15.5f));
                 left.Add(new Vector3(waypoints[waypoints.Count - 1].x + (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z + (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
                 right.Add(new Vector3(waypoints[waypoints.Count - 1].x - (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z - (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
             }
@@ -304,7 +304,7 @@ public class River : MonoBehaviour
 
                 waypoints.Add(new Vector3(waypoints[waypoints.Count - 1].x + moveX, drop, waypoints[waypoints.Count - 1].z + moveZ));
                 speeds.Add(10 * (waypoints[waypoints.Count - 2].y - drop) / 16);
-                widths.Add(Mathf.Min(0.5f * sourceFlow / speeds[speeds.Count - 1], 10 * Mathf.Sqrt(sourceFlow)));
+                widths.Add(Mathf.Min(0.5f * sourceFlow / speeds[speeds.Count - 1], 15.5f));
                 left.Add(new Vector3(waypoints[waypoints.Count - 1].x + (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z + (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
                 right.Add(new Vector3(waypoints[waypoints.Count - 1].x - (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z - (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
             }
@@ -362,7 +362,7 @@ public class River : MonoBehaviour
                 turns.Add(turn);
                 waypoints.Add(new Vector3(waypoints[waypoints.Count - 1].x + moveX, drop, waypoints[waypoints.Count - 1].z + moveZ));
                 speeds.Add(10 * (waypoints[waypoints.Count - 2].y - drop) / extend);
-                widths.Add(Mathf.Min(0.5f * sourceFlow / speeds[speeds.Count - 1], 10 * Mathf.Sqrt(sourceFlow)));
+                widths.Add(Mathf.Min(0.5f * sourceFlow / speeds[speeds.Count - 1], 15.5f));
                 left.Add(new Vector3(waypoints[waypoints.Count - 1].x + (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z + (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
                 right.Add(new Vector3(waypoints[waypoints.Count - 1].x - (widths[widths.Count - 1] / 2) * Mathf.Sin(turn), drop, waypoints[waypoints.Count - 1].z - (widths[widths.Count - 1] / 2) * Mathf.Cos(turn)));
                 StartCoroutine(generate);

@@ -16,10 +16,14 @@ public class Block256Snow : Block256
         (Chunk256 chunk256, int x, int y, int z, MeshData meshData)
     {
         var terrainGen = new TerrainGen();
-        float nw = terrainGen.SnowHeight256(256 * x - 128f + chunk256.pos.x, 256 * y + chunk256.pos.y, 256 * z + 128f + chunk256.pos.z) - chunk256.pos.y;
-        float ne = terrainGen.SnowHeight256(256 * x + 128f + chunk256.pos.x, 256 * y + chunk256.pos.y, 256 * z + 128f + chunk256.pos.z) - chunk256.pos.y;
-        float se = terrainGen.SnowHeight256(256 * x + 128f + chunk256.pos.x, 256 * y + chunk256.pos.y, 256 * z - 128f + chunk256.pos.z) - chunk256.pos.y;
-        float sw = terrainGen.SnowHeight256(256 * x - 128f + chunk256.pos.x, 256 * y + chunk256.pos.y, 256 * z - 128f + chunk256.pos.z) - chunk256.pos.y;
+        terrainGen.NoiseGen(256 * x - 128f + chunk256.pos.x, 256 * y + chunk256.pos.y, 256 * z + 128f + chunk256.pos.z, 256);
+        float nw = terrainGen.SnowHeight - chunk256.pos.y;
+        terrainGen.NoiseGen(256 * x + 128f + chunk256.pos.x, 256 * y + chunk256.pos.y, 256 * z + 128f + chunk256.pos.z, 256);
+        float ne = terrainGen.SnowHeight - chunk256.pos.y;
+        terrainGen.NoiseGen(256 * x + 128f + chunk256.pos.x, 256 * y + chunk256.pos.y, 256 * z - 128f + chunk256.pos.z, 256);
+        float se = terrainGen.SnowHeight - chunk256.pos.y;
+        terrainGen.NoiseGen(256 * x - 128f + chunk256.pos.x, 256 * y + chunk256.pos.y, 256 * z - 128f + chunk256.pos.z, 256);
+        float sw = terrainGen.SnowHeight - chunk256.pos.y;
 
         meshData.AddVertex(new Vector3(256f * x - 128f, nw, 256 * z + 128f));
         meshData.AddVertex(new Vector3(256f * x + 128f, ne, 256 * z + 128f));

@@ -39,7 +39,7 @@ public class Chase : MonoBehaviour {
                 {
                     if (hit.transform.gameObject.layer == 20 && playerBody.alive)
                     {
-                        aiCharControl.target = player.position;
+                        aiCharControl.target = player;
                         //this.transform.rotation = Quaternion.Slerp(this.transform.rotation,
                         //Quaternion.LookRotation(direction), 0.2f);
                         anim.SetBool("isIdle", false);

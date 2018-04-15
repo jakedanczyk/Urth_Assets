@@ -1,13 +1,13 @@
 Help
 
 Controls
+
+E - Interact.
+R - Draw/sheathe weapons.
+
 Caps Lock - cycle gait: slow walk, walk, jog, run
 Shift - hold down to sprint
 Ctrl - toggle crouch
-
-E - Interact. Equip/Unequip if inventory or loot panel is open and item is selected.
-R - Raise/lower weapon. Drop selected item if inventory or loot panel is open and item is selected.
-T - Transfer selected item to/from loot container.
 
 Tab - Open/close all menus
 I - Inventory
@@ -15,19 +15,26 @@ O - Chacter overview
 K - Crafting
 L - Actions
 
-B - Activate building mode
-Left click -  Build when preview is green
-Right click - Rotate 90 degrees
-0 - Cycle through buildings
-
-P - Pause
+Inventory
+E - Equip/Unequip selected item.
+R - Drop selected item.
+T - Transfer selected item to/from current external container.
 
 1/2/3 - World time of day, bodily needs, and tasks progress at...
 1 - 1 second per second
 2 - 1 minute per second
 3 - 1 hour per second
+P - Pause
 
-[] (Left/Right Bracket) - Halve/Double game speed between 1x and 64x. Useful for fast travel.
+[] (Left/Right Bracket) - Halve/Double game speed between 1x and 64x. Primarily intended for traveling for long periods.
 
-= while holding N - increase terrain resolution.
-- while holding N - decrease terrain resolution.
+Terrain block size adjustment
+Block size must be 1m or below to mine terrain and to explore caves without taking fall damage
+= while holding N - decrease block size one step
+- while holding N - increase block size one step
+
+Building Mode
+B - Activate building mode
+Left click -  Build when preview is green
+Right click - Rotate 90 degrees
+0 - Cycle through buildings

@@ -41,7 +41,7 @@ public class UndeadAI : MonoBehaviour
                     if (hit.transform.gameObject.layer == 20 && playerBody.alive)
                     {
                         seesPlayer = true;
-                        aiCharControl.target = player.position;
+                        aiCharControl.target = player;
                         //this.transform.rotation = Quaternion.Slerp(this.transform.rotation,
                         //Quaternion.LookRotation(direction), 0.2f
                         if (direction.magnitude > aiCharControl.agent.stoppingDistance)

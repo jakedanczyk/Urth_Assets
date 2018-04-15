@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Perennial : MonoBehaviour {
 
+    public string plantName;
     public int numFruits;
     public int difficulty; //gather xp per item
     public int gatherRate;

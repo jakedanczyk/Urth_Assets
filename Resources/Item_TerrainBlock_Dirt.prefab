@@ -110,7 +110,7 @@ Transform:
   m_GameObject: {fileID: 1860230177730408}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -20, y: 2020.03, z: -4.6978683}
-  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 224968581404836626}
   - {fileID: 4660829378690344}
@@ -139,6 +139,7 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -154,6 +155,7 @@ MeshRenderer:
   m_PreserveUVs: 1
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
   m_SelectedEditorRenderState: 3
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
@@ -220,7 +222,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsDeserializing: 0
-  _id: 2c488fe0-f990-4c86-aa8a-aa574d41bf3b
+  _id: 469ad7ca-dacc-4a77-8368-e66df0709ebc
   classId: 214cc165-dfb2-430c-8709-3dcda9260233
   StoreAllComponents: 1
   Components: []
@@ -238,6 +240,12 @@ MonoBehaviour:
   parentItem: {fileID: 114719702566592290}
   parentInventory: {fileID: 0}
   thisButton: {fileID: 114630831248605396}
+  panel: {fileID: 0}
+  playerControls: {fileID: 0}
+  nameText: {fileID: 0}
+  weightText: {fileID: 0}
+  volumeText: {fileID: 0}
+  infoText: {fileID: 0}
 --- !u!114 &114265125194939120
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -278,6 +286,7 @@ MonoBehaviour:
   m_PreferredHeight: 30
   m_FlexibleWidth: 1
   m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!114 &114518704276246416
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -410,7 +419,7 @@ MonoBehaviour:
   currQuality: 1
   loose: 0
   primaryMaterialType: 107
-  itemModel: {fileID: 0}
+  itemModel: {fileID: 1143356388592932}
   itemAttributes: []
   componentItems: []
   itemUIelement: {fileID: 1742177666004602}
@@ -420,6 +429,7 @@ MonoBehaviour:
     changed: 1
     con: 0
     durability: 1000
+  blockType: 2
 --- !u!114 &114838739062255764
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -432,7 +442,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsDeserializing: 0
-  _id: 9487b4ca-b5a1-471b-8bbe-566ea930e87f
+  _id: 60c5bd43-08bd-4db9-a883-22276c095f3f
   classId: 6b469e3e-8c93-4741-9b3f-6b6ed2be48dc
   StoreAllComponents: 1
   Components: []

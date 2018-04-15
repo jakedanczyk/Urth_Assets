@@ -32,6 +32,10 @@ public class StartupScript : MonoBehaviour
         mask = 174592;
         playerControl.gameObject.transform.position = new Vector3(this.transform.position.x, this.transform.position.y + heightsDict[mask.value], this.transform.position.z);
         playerControl.lastPosition = playerControl.transform.position;
+    }
+
+    private void Start()
+    {
         messageLog.NewMessage("Initial terrain generation in progress");
     }
 
@@ -199,7 +203,7 @@ public class StartupScript : MonoBehaviour
             }
             if (ground.collider.GetComponent<Chunk16>() != null)
             {
-                messageLog.text.text = "Initial terrain generation completed";
+                messageLog.NewMessage("Initial terrain generation completed");
                 this.enabled = false;
             }
 

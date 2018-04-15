@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class WaterManager : MonoBehaviour {
 
+    public MessageLog messageLog;
+
     public static GameObject waterManagerObject;
     public GameObject riverPrefab,lakePrefab,caveRiverPrefab;
     Vector3 playerPos;
@@ -22,10 +24,13 @@ public class WaterManager : MonoBehaviour {
 
     void Start()
     {
+        messageLog = MessageLog.messageLogGameObject.GetComponent<MessageLog>();
         playerPos = BodyManager_Human_Player.playerObject.transform.position;
         generate = Generate();
         StartCoroutine(generate);
         erode256 = ErodeChunk256();
+        messageLog.NewMessage("River and lake generation in progress");
+
     }
 
     IEnumerator Generate()
@@ -51,6 +56,8 @@ public class WaterManager : MonoBehaviour {
             if(!newRiver.DoneForNow) { yield return null; continue; }
             yield return null;
         }
+        messageLog.NewMessage("River generation complete");
+
         bool lakesSettled = false;
         while (!lakesSettled)
         {
@@ -62,6 +69,7 @@ public class WaterManager : MonoBehaviour {
             }
             yield return null;
         }
+        messageLog.NewMessage("Lake generation complete");
         //StartCoroutine(ErodeChunk256());
         StopCoroutine(generate);
         yield return null;

@@ -44,7 +44,7 @@ public class PredatorAI : MonoBehaviour {
                             seesPlayer = true;
                             bodyManager.AggressiveBellow();
                         }
-                        aiCharControl.target = player.position;
+                        aiCharControl.target = player;
                         //this.transform.rotation = Quaternion.Slerp(this.transform.rotation,
                         //Quaternion.LookRotation(direction), 0.2f
                         if (direction.magnitude > aiCharControl.agent.stoppingDistance)
